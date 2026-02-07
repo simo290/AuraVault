@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuraLegacy - Rare Antique Books</title>
+    <title>AuraLegacy - Global Book Market</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -27,26 +27,22 @@
             color: var(--text-color);
             margin: 0;
             transition: 0.3s;
+            line-height: 1.6;
         }
-
-        h1, h2, h3 { color: var(--gold); text-align: center; }
-
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
 
         header {
             background-color: var(--card-bg);
-            padding: 20px;
-            box-shadow: 0 4px 8px var(--shadow);
+            padding: 30px 20px;
+            box-shadow: 0 4px 10px var(--shadow);
+            text-align: center;
             position: relative;
         }
 
-        /* Toggle Button */
         .theme-toggle {
             position: absolute;
             top: 20px;
             right: 20px;
             background: var(--gold);
-            color: #000;
             border: none;
             padding: 8px 15px;
             border-radius: 20px;
@@ -54,311 +50,188 @@
             font-weight: bold;
         }
 
-        .book-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
-            margin-top: 40px;
-        }
-
-        .book-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--gold);
-            border-radius: 10px;
-            padding: 20px;
+        .filters {
             display: flex;
-            flex-direction: column;
-            box-shadow: 0 4px 8px var(--shadow);
-            transition: 0.3s;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
         }
 
-        .book-image { width: 100%; height: 250px; object-fit: cover; border-radius: 5px; }
-
-        .book-description {
-            font-size: 0.9em;
-            margin: 15px 0;
-            border-top: 1px solid var(--gold);
-            padding-top: 10px;
-        }
-
-        /* Share Button Style */
-        .share-btn {
-            background: transparent;
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            margin-top: 10px;
-            padding: 5px;
-            font-size: 0.8em;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-
-        .share-btn:hover { background: var(--gold); color: #000; }
-
-        /* Admin & UI */
-        .admin-panel { display: none; background: var(--card-bg); padding: 20px; border-radius: 10px; margin-top: 20px; border: 1px dashed var(--gold); }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #333; color: #fff; border: 1px solid var(--gold); box-sizing: border-box;}
-        
-        .buy-button { background: var(--gold); color: #000; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: auto;}
-    </style>
-</head>
-<body>
-
-    <header>
-        <button class="theme-toggle" onclick="toggleTheme()">🌓 Mode</button>
-        <h1>AuraLegacy</h1>
-        <p style="text-align:center;">Handpicked Rare Books & Collectibles</p>
-    </header>
-
-    <main class="container">
-        <div class="book-grid" id="book-grid"></div>
-
-        <div class="admin-toggle" style="text-align: center; margin-top: 30px;">
-            <button onclick="document.getElementById('admin-panel').style.display='block'">Admin Access</button>
-        </div>
-
-        <div class="admin-panel" id="admin-panel">
-            <h2>Add New Masterpiece</h2>
-            <form id="admin-form">
-                <input type="password" id="admin-password" placeholder="Password" required>
-                <input type="text" id="book-title" placeholder="Title" required>
-                <input type="text" id="book-author" placeholder="Author" required>
-                <input type="number" id="book-year" placeholder="Year" required>
-                <input type="number" id="book-price" placeholder="Price" step="0.01" required>
-                <input type="url" id="book-image" placeholder="Image URL" required>
-                <input type="url" id="book-link" placeholder="Affiliate Link" required>
-                <textarea id="book-desc" placeholder="Historical description..."></textarea>
-                <button type="submit" style="width:100%; margin-top:10px;">Generate JSON</button>
-            </form>
-            <textarea id="json-output" readonly style="height: 100px; margin-top:10px;"></textarea>
-        </div>
-    </main>
-
-    <script>
-        let booksData = [];
-
-        // 1. Toggle Theme Function
-        function toggleTheme() {
-            document.body.classList.toggle('light-mode');
-        }
-
-        // 2. Share Function
-        function shareBook(title) {
-            const url = window.location.href;
-            if (navigator.share) {
-                navigator.share({ title: title, url: url });
-            } else {
-                navigator.clipboard.writeText(url);
-                alert("Link copied! Share it with book lovers.");
-            }
-        }
-
-        async function loadBooks() {
-            try {
-                const response = await fetch('books.json');
-                booksData = await response.json();
-                renderBooks(booksData);
-            } catch (e) { console.log("Add books.json to see results"); }
-        }
-
-        function renderBooks(books) {
-            const grid = document.getElementById('book-grid');
-            grid.innerHTML = '';
-            books.forEach(book => {
-                grid.innerHTML += `
-                    <div class="book-card">
-                        <img src="${book.imageUrl}" class="book-image">
-                        <h3>${book.title}</h3>
-                        <p><strong>${book.author} (${book.year})</strong></p>
-                        <p class="book-description">${book.description || ''}</p>
-                        <p style="color:var(--gold); font-weight:bold;">$${book.price}</p>
-                        <button class="buy-button" onclick="window.open('${book.affiliateLink}')">Check Availability</button>
-                        <button class="share-btn" onclick="shareBook('${book.title}')">🔗 Share Link</button>
-                    </div>
-                `;
-            });
-        }
-
-        document.getElementById('admin-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            if(document.getElementById('admin-password').value !== 'canon_-!LB2107') return alert('Wrong!');
-            
-            const newBook = {
-                title: document.getElementById('book-title').value,
-                author: document.getElementById('book-author').value,
-                year: parseInt(document.getElementById('book-year').value),
-                price: parseFloat(document.getElementById('book-price').value),
-                imageUrl: document.getElementById('book-image').value,
-                affiliateLink: document.getElementById('book-link').value,
-                description: document.getElementById('book-desc').value
-            };
-            document.getElementById('json-output').value = JSON.stringify(newBook, null, 2) + ",";
-        });
-
-        loadBooks();
-    </script>
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuraLegacy - Rare Antique Books</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-color: #1a1a1a;
-            --card-bg: #2a2a2a;
-            --text-color: #f5f5f5;
-            --gold: #d4af37;
-            --shadow: rgba(0,0,0,0.5);
-        }
-
-        .light-mode {
-            --bg-color: #f5f5f5;
-            --card-bg: #ffffff;
-            --text-color: #1a1a1a;
-            --shadow: rgba(0,0,0,0.1);
-        }
-
-        body {
-            font-family: 'Playfair Display', serif;
-            background-color: var(--bg-color);
+        select, input {
+            padding: 10px;
+            background: var(--card-bg);
             color: var(--text-color);
-            margin: 0;
-            transition: 0.3s;
-        }
-
-        h1, h2, h3 { color: var(--gold); text-align: center; }
-
-        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-
-        header {
-            background-color: var(--card-bg);
-            padding: 20px;
-            box-shadow: 0 4px 8px var(--shadow);
-            position: relative;
-        }
-
-        /* Toggle Button */
-        .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: var(--gold);
-            color: #000;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-weight: bold;
+            border: 1px solid var(--gold);
+            border-radius: 5px;
         }
 
         .book-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 25px;
-            margin-top: 40px;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .book-card {
-            background-color: var(--card-bg);
+            background: var(--card-bg);
             border: 1px solid var(--gold);
-            border-radius: 10px;
+            border-radius: 12px;
             padding: 20px;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 8px var(--shadow);
             transition: 0.3s;
+            position: relative;
         }
 
-        .book-image { width: 100%; height: 250px; object-fit: cover; border-radius: 5px; }
+        .book-card:hover { transform: translateY(-10px); }
+
+        .tag-container {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .badge {
+            font-size: 0.7em;
+            padding: 3px 8px;
+            border-radius: 10px;
+            background: var(--gold);
+            color: #000;
+            font-weight: bold;
+        }
+
+        .book-image { width: 100%; height: 250px; object-fit: cover; border-radius: 8px; }
 
         .book-description {
-            font-size: 0.9em;
+            font-size: 0.85em;
             margin: 15px 0;
-            border-top: 1px solid var(--gold);
+            height: 60px;
+            overflow: hidden;
+            border-top: 1px solid #444;
             padding-top: 10px;
         }
 
-        /* Share Button Style */
-        .share-btn {
-            background: transparent;
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            margin-top: 10px;
-            padding: 5px;
-            font-size: 0.8em;
-            cursor: pointer;
+        .buy-button {
+            background: var(--gold);
+            color: #000;
+            padding: 12px;
+            border: none;
             border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: auto;
         }
 
-        .share-btn:hover { background: var(--gold); color: #000; }
+        /* Admin Page Style */
+        .admin-panel {
+            display: none;
+            max-width: 600px;
+            margin: 40px auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid var(--gold);
+        }
 
-        /* Admin & UI */
-        .admin-panel { display: none; background: var(--card-bg); padding: 20px; border-radius: 10px; margin-top: 20px; border: 1px dashed var(--gold); }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; background: #333; color: #fff; border: 1px solid var(--gold); box-sizing: border-box;}
-        
-        .buy-button { background: var(--gold); color: #000; padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: auto;}
+        .admin-form input, .admin-form select, .admin-form textarea {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        #json-output {
+            width: 100%;
+            height: 120px;
+            background: #111;
+            color: #0f0;
+            font-family: monospace;
+            padding: 10px;
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <button class="theme-toggle" onclick="toggleTheme()">🌓 Mode</button>
+        <button class="theme-toggle" onclick="toggleTheme()">🌓 Light/Dark</button>
         <h1>AuraLegacy</h1>
-        <p style="text-align:center;">Handpicked Rare Books & Collectibles</p>
+        <p>Your Global Gate to Rare, Modern & Educational Books</p>
+        
+        <div class="filters">
+            <input type="text" id="search" placeholder="Search title/author...">
+            <select id="lang-filter">
+                <option value="">All Languages</option>
+                <option value="ar">العربية</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+            </select>
+            <select id="cat-filter">
+                <option value="">All Categories</option>
+                <option value="Rare">Rare & Antique</option>
+                <option value="Riwayat">Riwayat (Novels)</option>
+                <option value="Kids">Qisas Atfal</option>
+                <option value="Finance">Management & Money</option>
+                <option value="Education">Educational</option>
+            </select>
+        </div>
     </header>
 
-    <main class="container">
-        <div class="book-grid" id="book-grid"></div>
+    <main id="book-grid" class="book-grid"></main>
 
-        <div class="admin-toggle" style="text-align: center; margin-top: 30px;">
-            <button onclick="document.getElementById('admin-panel').style.display='block'">Admin Access</button>
-        </div>
+    <div style="text-align: center; margin: 40px;">
+        <button onclick="toggleAdmin()" style="padding: 10px 30px;">Admin Page</button>
+    </div>
 
-        <div class="admin-panel" id="admin-panel">
-            <h2>Add New Masterpiece</h2>
-            <form id="admin-form">
-                <input type="password" id="admin-password" placeholder="Password" required>
-                <input type="text" id="book-title" placeholder="Title" required>
-                <input type="text" id="book-author" placeholder="Author" required>
+    <div id="admin-panel" class="admin-panel">
+        <h2 style="color:var(--gold);">Admin: Add New Book</h2>
+        <form id="admin-form" class="admin-form">
+            <input type="password" id="admin-password" placeholder="Admin Password" required>
+            <input type="text" id="book-title" placeholder="Book Title" required>
+            <input type="text" id="book-author" placeholder="Author Name" required>
+            
+            <div style="display:flex; gap:10px;">
+                <select id="book-lang" required>
+                    <option value="ar">Arabic</option>
+                    <option value="en">English</option>
+                    <option value="fr">French</option>
+                </select>
+                <select id="book-cat" required>
+                    <option value="Rare">Rare & Antique</option>
+                    <option value="Riwayat">Riwayat (Novels)</option>
+                    <option value="Kids">Qisas Atfal</option>
+                    <option value="Finance">Finance/Management</option>
+                    <option value="Education">Education</option>
+                </select>
+            </div>
+
+            <div style="display:flex; gap:10px;">
                 <input type="number" id="book-year" placeholder="Year" required>
-                <input type="number" id="book-price" placeholder="Price" step="0.01" required>
-                <input type="url" id="book-image" placeholder="Image URL" required>
-                <input type="url" id="book-link" placeholder="Affiliate Link" required>
-                <textarea id="book-desc" placeholder="Historical description..."></textarea>
-                <button type="submit" style="width:100%; margin-top:10px;">Generate JSON</button>
-            </form>
-            <textarea id="json-output" readonly style="height: 100px; margin-top:10px;"></textarea>
-        </div>
-    </main>
+                <input type="number" id="book-price" placeholder="Price ($)" step="0.01" required>
+            </div>
+
+            <input type="url" id="book-image" placeholder="Image URL (Link)" required>
+            <input type="url" id="book-link" placeholder="Affiliate Link" required>
+            <textarea id="book-desc" placeholder="Write book description..."></textarea>
+            
+            <button type="submit" style="width: 100%; background: var(--gold); color: #000; padding: 15px; border: none; cursor: pointer; font-weight: bold;">Generate Code for JSON</button>
+        </form>
+        <p style="font-size: 0.8em; margin-top: 10px;">Copy this code to your books.json file:</p>
+        <textarea id="json-output" readonly></textarea>
+    </div>
 
     <script>
         let booksData = [];
 
-        // 1. Toggle Theme Function
-        function toggleTheme() {
-            document.body.classList.toggle('light-mode');
-        }
-
-        // 2. Share Function
-        function shareBook(title) {
-            const url = window.location.href;
-            if (navigator.share) {
-                navigator.share({ title: title, url: url });
-            } else {
-                navigator.clipboard.writeText(url);
-                alert("Link copied! Share it with book lovers.");
-            }
-        }
+        function toggleTheme() { document.body.classList.toggle('light-mode'); }
+        function toggleAdmin() { const p = document.getElementById('admin-panel'); p.style.display = p.style.display === 'block' ? 'none' : 'block'; }
 
         async function loadBooks() {
             try {
                 const response = await fetch('books.json');
                 booksData = await response.json();
                 renderBooks(booksData);
-            } catch (e) { console.log("Add books.json to see results"); }
+            } catch (e) { console.log("Waiting for books.json..."); }
         }
 
         function renderBooks(books) {
@@ -367,32 +240,59 @@
             books.forEach(book => {
                 grid.innerHTML += `
                     <div class="book-card">
+                        <div class="tag-container">
+                            <span class="badge">${book.language.toUpperCase()}</span>
+                            <span class="badge" style="background:#555; color:#fff;">${book.category}</span>
+                        </div>
                         <img src="${book.imageUrl}" class="book-image">
                         <h3>${book.title}</h3>
-                        <p><strong>${book.author} (${book.year})</strong></p>
-                        <p class="book-description">${book.description || ''}</p>
-                        <p style="color:var(--gold); font-weight:bold;">$${book.price}</p>
-                        <button class="buy-button" onclick="window.open('${book.affiliateLink}')">Check Availability</button>
-                        <button class="share-btn" onclick="shareBook('${book.title}')">🔗 Share Link</button>
+                        <p style="font-size:0.9em; margin:0;">By: ${book.author} (${book.year})</p>
+                        <div class="book-description">${book.description || 'No description provided.'}</div>
+                        <p style="color:var(--gold); font-weight:bold; font-size:1.2em;">$${book.price}</p>
+                        <button class="buy-button" onclick="window.open('${book.affiliateLink}')">Check Offer</button>
                     </div>
                 `;
             });
         }
 
+        // Filtering Logic
+        function applyFilters() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const lang = document.getElementById('lang-filter').value;
+            const cat = document.getElementById('cat-filter').value;
+
+            const filtered = booksData.filter(b => {
+                const matchSearch = b.title.toLowerCase().includes(search) || b.author.toLowerCase().includes(search);
+                const matchLang = lang === "" || b.language === lang;
+                const matchCat = cat === "" || b.category === cat;
+                return matchSearch && matchLang && matchCat;
+            });
+            renderBooks(filtered);
+        }
+
+        document.getElementById('search').addEventListener('input', applyFilters);
+        document.getElementById('lang-filter').addEventListener('change', applyFilters);
+        document.getElementById('cat-filter').addEventListener('change', applyFilters);
+
+        // Admin Form Handling
         document.getElementById('admin-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            if(document.getElementById('admin-password').value !== 'canon_-!LB2107') return alert('Wrong!');
+            if(document.getElementById('admin-password').value !== 'canon_-!LB2107') return alert('Incorrect Password');
             
             const newBook = {
                 title: document.getElementById('book-title').value,
                 author: document.getElementById('book-author').value,
+                language: document.getElementById('book-lang').value,
+                category: document.getElementById('book-cat').value,
                 year: parseInt(document.getElementById('book-year').value),
                 price: parseFloat(document.getElementById('book-price').value),
                 imageUrl: document.getElementById('book-image').value,
                 affiliateLink: document.getElementById('book-link').value,
                 description: document.getElementById('book-desc').value
             };
+            
             document.getElementById('json-output').value = JSON.stringify(newBook, null, 2) + ",";
+            alert("Code Generated! Scroll down to copy it.");
         });
 
         loadBooks();
