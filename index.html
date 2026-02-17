@@ -65,4 +65,132 @@
             <div class="tab-logic">
                 <button id="btn-book" onclick="setAdminMode('book')">books.json</button>
                 <button id="btn-summary" onclick="setAdminMode('summary')">summaries.json</button>
-                <button
+                <button id="btn-hoodie" onclick="setAdminMode('hoodie')">hoody.json</button>
+            </div>
+        </div>
+
+        <div id="admin-content">
+            <form id="admin-form" class="admin-form">
+                <input type="text" id="p-title" placeholder="Title (e.g. Rich Dad Poor Dad)" required>
+                <div id="book-only-fields">
+                    <input type="text" id="p-author" placeholder="Author Name">
+                    <input type="number" id="p-year" placeholder="Year">
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <select id="p-lang">
+                        <option value="en">English</option>
+                        <option value="ar">Arabic</option>
+                        <option value="fr">French</option>
+                    </select>
+                    <input type="text" id="p-cat" placeholder="Category (e.g. Finance)">
+                </div>
+                <input type="number" id="p-price" placeholder="Price ($)" step="0.01" required>
+                <input type="url" id="p-image" placeholder="Image URL (Direct link)" required>
+                <input type="url" id="p-link" placeholder="Affiliate/Redbubble/Gumroad Link" required>
+                <textarea id="p-desc" placeholder="Product Description..."></textarea>
+                <button type="submit" style="width:100%; background:var(--gold); color:#000; padding:15px; border:none; cursor:pointer; font-weight:bold; border-radius: 5px;">Generate JSON Code</button>
+            </form>
+            <p style="font-size:0.8em; color:var(--gold); margin-top: 20px;">Copy the code below and paste it into your JSON file:</p>
+            <textarea id="json-output" readonly></textarea>
+        </div>
+    </div>
+
+    <script>
+        const PASS = 'canon_-!LB2107';
+        let adminTarget = 'book';
+
+        // 1. Dynamic Loading
+        async function loadDisplay(source, btn) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const grid = document.getElementById('book-grid');
+            grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">Loading AuraVault Collection...</p>';
+
+            try {
+                const response = await fetch(source);
+                if (!response.ok) throw new Error('File not found');
+                const data = await response.json();
+                renderItems(data);
+            } catch (e) {
+                grid.innerHTML = `<p style="text-align:center; grid-column: 1/-1;">No data found in ${source}. Use Admin Panel to generate content!</p>`;
+            }
+        }
+
+        function renderItems(items) {
+            const grid = document.getElementById('book-grid');
+            grid.innerHTML = '';
+            items.forEach(item => {
+                grid.innerHTML += `
+                    <div class="book-card">
+                        <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/280x350?text=AuraVault'">
+                        <h3>${item.title}</h3>
+                        ${item.author ? `<p style="font-size:0.9em; margin:0; color:#bbb;">By: ${item.author}</p>` : ''}
+                        <p style="color:var(--gold); font-weight:bold; font-size:1.3em; margin:10px 0;">$${item.price}</p>
+                        <button class="buy-button" onclick="window.open('${item.link}')">View Details</button>
+                    </div>
+                `;
+            });
+        }
+
+        // 2. Admin Logic
+        function toggleAdmin() {
+            const p = document.getElementById('admin-panel');
+            p.style.display = p.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function checkPass() {
+            if(document.getElementById('admin-password').value === PASS) {
+                document.getElementById('auth-section').style.display = 'none';
+                document.getElementById('admin-options').style.display = 'block';
+                document.getElementById('admin-title').innerText = "Admin Access Granted";
+            } else { alert("Wrong Password"); }
+        }
+
+        function setAdminMode(type) {
+            adminTarget = type;
+            document.getElementById('admin-content').style.display = 'block';
+            
+            const titles = { 'book': 'books.json', 'summary': 'summaries.json', 'hoodie': 'hoody.json' };
+            document.getElementById('admin-title').innerText = "Target: " + titles[type];
+            
+            // Show author/year fields for books and summaries only
+            document.getElementById('book-only-fields').style.display = (type === 'book' || type === 'summary') ? 'block' : 'none';
+            
+            document.getElementById('btn-book').classList.toggle('active', type === 'book');
+            document.getElementById('btn-summary').classList.toggle('active', type === 'summary');
+            document.getElementById('btn-hoodie').classList.toggle('active', type === 'hoodie');
+        }
+
+        // 3. Form Submission
+        document.getElementById('admin-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const item = {
+                title: document.getElementById('p-title').value,
+                price: document.getElementById('p-price').value,
+                imageUrl: document.getElementById('p-image').value,
+                link: document.getElementById('p-link').value,
+                desc: document.getElementById('p-desc').value,
+                lang: document.getElementById('p-lang').value,
+                cat: document.getElementById('p-cat').value
+            };
+
+            if(adminTarget === 'book' || adminTarget === 'summary') {
+                item.author = document.getElementById('p-author').value;
+                item.year = document.getElementById('p-year').value;
+            }
+
+            // Generate JSON and add comma for easy list building
+            const jsonResult = JSON.stringify(item, null, 2);
+            document.getElementById('json-output').value = jsonResult + ",";
+            
+            alert("Success! Copy the code from the green box.");
+        });
+
+        function toggleTheme() { document.body.classList.toggle('light-mode'); }
+
+        // Initial Load
+        window.onload = () => loadDisplay('books.json', document.getElementById('nav-books'));
+    </script>
+</body>
+</html>
