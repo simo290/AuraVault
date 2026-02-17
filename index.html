@@ -103,26 +103,30 @@
             }
         }
 
-        function renderItems(items, isPack) {
+       function renderItems(items, isPack) {
             const grid = document.getElementById('book-grid');
             grid.innerHTML = '';
+            
             items.forEach(item => {
+                // هاد السطر هو اللي كيصلح مشكل 404: كيأكد أن الرابط غيتحل كـ موقع خارجي
+                const finalLink = item.link.startsWith('http') ? item.link : 'https://' + item.link;
+
                 grid.innerHTML += `
                     <div class="book-card">
                         ${isPack ? '<span class="pack-badge">PREMIUM PACK</span>' : ''}
-                        <img src="${item.imageUrl}" class="book-image">
+                        <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/280x350?text=AuraVault'">
                         <h3>${item.title}</h3>
                         <p style="font-size:0.9em; color:#bbb;">${item.author || ''}</p>
                         
                         ${isPack ? `
-                            <div style="background:#111; padding:10px; border-radius:5px; margin:10px 0; font-size:0.85em;">
+                            <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:5px; margin:10px 0; font-size:0.85em;">
                                 <strong>Summary:</strong> ${item.summary}
                             </div>
-                            <button class="buy-button" style="background:white;" onclick="window.open('${item.hoodieLink}')">👕 Get the Hoodie</button>
-                            <button class="buy-button" onclick="window.open('${item.link}')">📖 Buy the Book</button>
+                            <button class="buy-button" style="background:white; color:#000;" onclick="window.open('${item.hoodieLink}', '_blank')">👕 Get the Hoodie</button>
+                            <button class="buy-button" onclick="window.open('${finalLink}', '_blank')">📖 Buy the Book</button>
                         ` : `
-                            <p style="color:var(--gold); font-weight:bold; font-size:1.2em;">$${item.price}</p>
-                            <button class="buy-button" onclick="window.open('${item.link}')">View Product</button>
+                            <p style="color:var(--gold); font-weight:bold; font-size:1.2em; margin:10px 0;">$${item.price}</p>
+                            <button class="buy-button" onclick="window.open('${finalLink}', '_blank')">View Product</button>
                         `}
                     </div>
                 `;
