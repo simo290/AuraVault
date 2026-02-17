@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuraVault - The Pack Experience</title>
+    <title>AuraVault - Global Market</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --bg-color: #1a1a1a; --card-bg: #2a2a2a; --text-color: #f5f5f5; --gold: #d4af37; --shadow: rgba(0,0,0,0.5); }
@@ -11,22 +11,25 @@
         body { font-family: 'Playfair Display', serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; transition: 0.3s; line-height: 1.6; }
         header { background-color: var(--card-bg); padding: 30px 20px; box-shadow: 0 4px 10px var(--shadow); text-align: center; position: relative; }
         
+        /* Navigation Style */
         .main-nav { display: flex; justify-content: center; background: var(--gold); padding: 12px; gap: 15px; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
         .nav-btn { background: none; border: none; font-weight: bold; cursor: pointer; font-size: 1em; color: #000; transition: 0.2s; padding: 5px 10px; }
         .nav-btn.active { border-bottom: 3px solid #000; transform: scale(1.05); }
 
         .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--gold); border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; }
-        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
         .book-card { background: var(--card-bg); border: 1px solid var(--gold); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; transition: 0.3s; }
         .book-image { width: 100%; height: 280px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; }
-        .buy-button { background: var(--gold); color: #000; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; width: 100%; }
-        .pack-badge { background: #000; color: var(--gold); font-size: 0.7em; padding: 2px 8px; border-radius: 10px; margin-bottom: 5px; display: inline-block; width: fit-content; }
+        .buy-button { background: var(--gold); color: #000; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: auto; }
 
         /* Admin Section */
         .admin-panel { display: none; max-width: 600px; margin: 40px auto; background: var(--card-bg); padding: 30px; border-radius: 15px; border: 2px solid var(--gold); }
         #admin-content, #admin-options { display: none; }
         .admin-form input, .admin-form select, .admin-form textarea { width: 100%; margin-bottom: 15px; padding: 10px; background: #111; color: #fff; border: 1px solid var(--gold); box-sizing: border-box; border-radius: 5px; }
         #json-output { width: 100%; height: 120px; background: #111; color: #0f0; font-family: monospace; padding: 10px; margin-top: 10px; border: 1px dashed var(--gold); }
+        .tab-logic { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-logic button { flex: 1; padding: 10px; cursor: pointer; background: #444; color: #fff; border: none; font-weight: bold; border-radius: 5px; }
+        .tab-logic button.active { background: var(--gold); color: #000; }
     </style>
 </head>
 <body>
@@ -34,137 +37,32 @@
     <header>
         <button class="theme-toggle" onclick="toggleTheme()">🌓 Light/Dark</button>
         <h1>AuraVault</h1>
-        <p>Read the Mind, Wear the Vibe</p>
+        <p>The Bridge Between Knowledge & Style</p>
     </header>
 
     <nav class="main-nav">
-        <button id="nav-books" class="nav-btn active" onclick="loadDisplay('books.json', this)">📚 All Products</button>
-        <button id="nav-summaries" class="nav-btn" onclick="loadDisplay('summaries.json', this)">📝 Book Packs (Summary + Hoodie)</button>
+        <button id="nav-books" class="nav-btn active" onclick="loadDisplay('books.json', this)">📚 Books</button>
+        <button id="nav-summaries" class="nav-btn" onclick="loadDisplay('summaries.json', this)">📝 Summaries</button>
+        <button id="nav-hoodies" class="nav-btn" onclick="loadDisplay('hoody.json', this)">👕 Hoodies</button>
     </nav>
 
-    <main id="book-grid" class="book-grid"></main>
+    <main id="book-grid" class="book-grid">
+        </main>
 
     <div style="text-align: center; margin: 40px;">
-        <button onclick="toggleAdmin()" style="padding: 10px 30px; cursor:pointer; background:none; color:var(--gold); border:1px solid var(--gold); border-radius: 5px;">🛠 Master Admin Panel</button>
+        <button onclick="toggleAdmin()" style="padding: 10px 30px; cursor:pointer; background:none; color:var(--gold); border:1px solid var(--gold); border-radius: 5px;">🛠 Admin Panel</button>
     </div>
 
     <div id="admin-panel" class="admin-panel">
-        <h2 id="admin-title" style="color:var(--gold);">Admin Auth</h2>
+        <h2 id="admin-title" style="color:var(--gold);">Authentication</h2>
         <div id="auth-section">
-            <input type="password" id="admin-password" placeholder="Admin Password">
-            <button onclick="checkPass()" class="buy-button">Login</button>
+            <input type="password" id="admin-password" placeholder="Admin Password" style="width: 100%; padding: 10px; margin-bottom: 10px; background: #111; color: #fff; border: 1px solid var(--gold);">
+            <button onclick="checkPass()" style="width:100%; padding:10px; background:var(--gold); border:none; cursor:pointer; font-weight:bold; border-radius: 5px;">Login</button>
         </div>
 
         <div id="admin-options">
-            <p style="color: var(--gold);">What are you adding today?</p>
-            <div style="display:flex; gap:10px; margin-bottom:20px;">
-                <button onclick="setAdminMode('book')" class="buy-button" style="margin:0">Simple Book/Hoodie</button>
-                <button onclick="setAdminMode('summary')" class="buy-button" style="margin:0; background:white;">Full Book Pack</button>
-            </div>
-        </div>
-
-        <div id="admin-content">
-            <form id="admin-form" class="admin-form">
-                <input type="text" id="p-title" placeholder="Book Title" required>
-                <input type="text" id="p-author" placeholder="Author">
-                
-                <div id="pack-fields" style="display:none; border: 1px solid #444; padding: 10px; margin-bottom: 10px;">
-                    <p style="color:var(--gold); margin-top:0;">Pack Exclusive Details:</p>
-                    <textarea id="p-summary" placeholder="Write the Book Summary here..."></textarea>
-                    <input type="url" id="p-hoodie-link" placeholder="Link to Teepublic Hoodie">
-                </div>
-
-                <input type="url" id="p-image" placeholder="Main Image URL (Book Cover)" required>
-                <input type="url" id="p-link" placeholder="Main Purchase Link (Amazon/Affiliate)" required>
-                <input type="number" id="p-price" placeholder="Price ($)" step="0.01">
-                
-                <button type="submit" class="buy-button">Generate Code</button>
-            </form>
-            <textarea id="json-output" readonly></textarea>
-        </div>
-    </div>
-
-    <script>
-        const PASS = 'canon_-!LB2107';
-        let adminTarget = 'book';
-
-        async function loadDisplay(source, btn) {
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const grid = document.getElementById('book-grid');
-            grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">Loading...</p>';
-
-            try {
-                const response = await fetch(source);
-                const data = await response.json();
-                renderItems(data, source.includes('summaries'));
-            } catch (e) {
-                grid.innerHTML = `<p style="text-align:center; grid-column: 1/-1;">No data found. Add some in Admin!</p>`;
-            }
-        }
-
-       function renderItems(items, isPack) {
-            const grid = document.getElementById('book-grid');
-            grid.innerHTML = '';
-            
-            items.forEach(item => {
-                // هاد السطر هو اللي كيصلح مشكل 404: كيأكد أن الرابط غيتحل كـ موقع خارجي
-                const finalLink = item.link.startsWith('http') ? item.link : 'https://' + item.link;
-
-                grid.innerHTML += `
-                    <div class="book-card">
-                        ${isPack ? '<span class="pack-badge">PREMIUM PACK</span>' : ''}
-                        <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/280x350?text=AuraVault'">
-                        <h3>${item.title}</h3>
-                        <p style="font-size:0.9em; color:#bbb;">${item.author || ''}</p>
-                        
-                        ${isPack ? `
-                            <div style="background:rgba(0,0,0,0.2); padding:10px; border-radius:5px; margin:10px 0; font-size:0.85em;">
-                                <strong>Summary:</strong> ${item.summary}
-                            </div>
-                            <button class="buy-button" style="background:white; color:#000;" onclick="window.open('${item.hoodieLink}', '_blank')">👕 Get the Hoodie</button>
-                            <button class="buy-button" onclick="window.open('${finalLink}', '_blank')">📖 Buy the Book</button>
-                        ` : `
-                            <p style="color:var(--gold); font-weight:bold; font-size:1.2em; margin:10px 0;">$${item.price}</p>
-                            <button class="buy-button" onclick="window.open('${finalLink}', '_blank')">View Product</button>
-                        `}
-                    </div>
-                `;
-            });
-        }
-
-        function toggleAdmin() { document.getElementById('admin-panel').style.display = 'block'; }
-        function checkPass() {
-            if(document.getElementById('admin-password').value === PASS) {
-                document.getElementById('auth-section').style.display = 'none';
-                document.getElementById('admin-options').style.display = 'block';
-            } else { alert("Wrong!"); }
-        }
-
-        function setAdminMode(type) {
-            adminTarget = type;
-            document.getElementById('admin-content').style.display = 'block';
-            document.getElementById('pack-fields').style.display = type === 'summary' ? 'block' : 'none';
-        }
-
-        document.getElementById('admin-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const item = {
-                title: document.getElementById('p-title').value,
-                author: document.getElementById('p-author').value,
-                imageUrl: document.getElementById('p-image').value,
-                link: document.getElementById('p-link').value,
-                price: document.getElementById('p-price').value
-            };
-            if(adminTarget === 'summary') {
-                item.summary = document.getElementById('p-summary').value;
-                item.hoodieLink = document.getElementById('p-hoodie-link').value;
-            }
-            document.getElementById('json-output').value = JSON.stringify(item, null, 2) + ",";
-        });
-
-        function toggleTheme() { document.body.classList.toggle('light-mode'); }
-        window.onload = () => loadDisplay('books.json', document.getElementById('nav-books'));
-    </script>
-</body>
-</html>
+            <p style="color: var(--gold);">Select which file you want to update:</p>
+            <div class="tab-logic">
+                <button id="btn-book" onclick="setAdminMode('book')">books.json</button>
+                <button id="btn-summary" onclick="setAdminMode('summary')">summaries.json</button>
+                <button
