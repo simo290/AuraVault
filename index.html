@@ -7,69 +7,88 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --bg-color: #0b0b0b; /* أسود ملكي */
-            --card-bg: #161616; /* أسود فاتح شوية للكارط */
+            --bg-color: #0b0b0b;
+            --card-bg: #161616;
             --text-color: #ffffff; 
-            --gold: #d4af37; /* ذهبي أصلي */
-            --gold-hover: #f1c40f; 
+            --gold: #d4af37;
+            --radius: 20px;
         }
         
         body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; line-height: 1.6; }
         
-        /* Header & Logo */
-        header { background-color: #000; padding: 50px 20px; text-align: center; border-bottom: 2px solid var(--gold); }
-        header h1 { font-family: 'Playfair Display', serif; font-size: 3.5em; margin: 0; color: var(--gold); letter-spacing: 4px; }
-        header p { letter-spacing: 5px; font-weight: 300; color: #888; font-size: 0.8em; margin-top: 10px; }
+        /* Brand Header */
+        header { background-color: #000; padding: 40px 20px; text-align: center; border-bottom: 2px solid var(--gold); }
+        header h1 { font-family: 'Playfair Display', serif; font-size: 3em; margin: 0; color: var(--gold); letter-spacing: 4px; }
         
         /* Navigation */
-        .main-nav { display: flex; justify-content: center; background: var(--gold); padding: 5px; gap: 2px; position: sticky; top: 0; z-index: 100; }
-        .nav-btn { background: #000; border: none; font-weight: bold; cursor: pointer; color: var(--gold); padding: 12px 25px; font-size: 0.85em; text-transform: uppercase; flex-grow: 1; transition: 0.3s; }
+        .main-nav { display: flex; justify-content: center; background: var(--gold); padding: 5px; position: sticky; top: 0; z-index: 100; }
+        .nav-btn { background: #000; border: none; font-weight: bold; cursor: pointer; color: var(--gold); padding: 12px 25px; flex-grow: 1; text-transform: uppercase; font-size: 0.8em; }
         .nav-btn.active { background: var(--gold); color: #000; }
 
-        /* Grid & Cards */
+        /* Grid & Rounded Cards */
         .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
-        .book-card { background: var(--card-bg); border: 1px solid #222; border-radius: 0px; padding: 20px; display: flex; flex-direction: column; transition: 0.4s; text-align: center; }
-        .book-card:hover { border-color: var(--gold); transform: translateY(-10px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.1); }
-        .book-image { width: 100%; height: 350px; object-fit: cover; border: 1px solid #333; margin-bottom: 15px; }
+        .book-card { background: var(--card-bg); border: 1px solid #222; border-radius: var(--radius); padding: 25px; transition: 0.4s; text-align: center; }
+        .book-card:hover { border-color: var(--gold); transform: translateY(-8px); }
+        .book-image { width: 100%; height: 350px; object-fit: cover; border-radius: 15px; margin-bottom: 15px; }
         
-        .buy-button { background: none; color: var(--gold); padding: 15px; border: 1px solid var(--gold); font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
-        .buy-button:hover { background: var(--gold); color: #000; }
+        .action-btn { background: none; color: var(--gold); padding: 15px; border: 1px solid var(--gold); border-radius: var(--radius); font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; text-transform: uppercase; }
+        .action-btn:hover { background: var(--gold); color: #000; }
 
-        /* Modals (The Gold Form) */
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; backdrop-filter: blur(10px); }
-        .modal-content { background: #000; max-width: 450px; margin: 80px auto; padding: 40px; border: 2px solid var(--gold); position: relative; text-align: center; }
-        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 25px; color: var(--gold); cursor: pointer; }
+        /* Checkout Overlay */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; backdrop-filter: blur(10px); overflow-y: auto; }
+        .modal-content { background: #111; max-width: 500px; margin: 40px auto; padding: 40px; border: 1px solid var(--gold); border-radius: var(--radius); position: relative; }
         
-        h2 { font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 20px; text-transform: uppercase; }
-        input { width: 100%; padding: 15px; margin: 10px 0; background: #111; border: 1px solid #333; color: white; box-sizing: border-box; }
-        input:focus { border-color: var(--gold); outline: none; }
+        .form-group { text-align: left; margin-bottom: 15px; }
+        .form-group label { display: block; color: var(--gold); font-size: 0.7em; margin-bottom: 5px; letter-spacing: 1px; }
+        input, textarea, select { width: 100%; padding: 12px; background: #000; border: 1px solid #333; color: white; border-radius: 10px; box-sizing: border-box; }
         
-        /* Summary Content Style */
-        #sum-body { color: #ccc; text-align: left; border-top: 1px solid #222; padding-top: 20px; margin-top: 10px; }
+        /* Shipping Badge */
+        .shipping-badge { background: #1a1a1a; padding: 15px; border-radius: 15px; margin-top: 20px; border: 1px dashed #444; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .shipping-badge img { height: 20px; }
 
-        .admin-panel { display: none; max-width: 600px; margin: 40px auto; background: #000; padding: 30px; border: 1px dashed var(--gold); }
+        /* Admin Dashboard */
+        .admin-trigger { text-align: center; padding: 40px; opacity: 0.1; cursor: pointer; }
+        .admin-panel { display: none; max-width: 700px; margin: 20px auto; background: #111; padding: 30px; border: 1px solid var(--gold); border-radius: var(--radius); }
     </style>
 </head>
 <body>
 
-    <div id="summary-overlay" class="overlay">
-        <div class="modal-content" style="max-width: 650px;">
-            <span class="close-btn" onclick="closeModal('summary-overlay')">&times;</span>
-            <h2 id="sum-title"></h2>
-            <div id="sum-body"></div>
-            <button class="buy-button" id="sum-order-btn" style="margin-top:30px;">Proceed to Order</button>
-        </div>
-    </div>
-
-    <div id="order-overlay" class="overlay">
+    <div id="checkout-overlay" class="overlay">
         <div class="modal-content">
-            <span class="close-btn" onclick="closeModal('order-overlay')">&times;</span>
-            <h2>AuraVault VIP</h2>
-            <p style="color: #888; font-size: 0.9em; margin-bottom: 25px;">Enter details to sync with your WhatsApp</p>
-            <input type="email" id="lead-email" placeholder="EMAIL ADDRESS">
-            <input type="text" id="lead-whatsapp" placeholder="WHATSAPP NUMBER">
-            <button class="buy-button" onclick="sendToWhatsApp()" style="margin-top: 20px;">Confirm & Open Store</button>
-            <p onclick="sendToWhatsApp()" style="font-size:0.7em; color:#555; cursor:pointer; margin-top:20px; letter-spacing: 1px;">SKIP TO GLOBAL STORE</p>
+            <h2 style="color:var(--gold); margin-top:0;">SECURE CHECKOUT</h2>
+            <p style="color:#666; font-size: 0.8em; margin-bottom: 20px;">Complete your shipping information to proceed.</p>
+            
+            <div class="form-group">
+                <label>FULL NAME</label>
+                <input type="text" id="cust-name" placeholder="John Doe">
+            </div>
+            
+            <div class="form-group">
+                <label>SHIPPING ADDRESS</label>
+                <input type="text" id="cust-address" placeholder="Street Address, P.O. Box">
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <div class="form-group">
+                    <label>CITY</label>
+                    <input type="text" id="cust-city" placeholder="Casablanca">
+                </div>
+                <div class="form-group">
+                    <label>ZIP CODE</label>
+                    <input type="text" id="cust-zip" placeholder="20000">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>EMAIL / PHONE (FOR TRACKING)</label>
+                <input type="text" id="cust-contact" placeholder="Email or Phone">
+            </div>
+
+            <div class="shipping-badge" id="carrier-info">
+                </div>
+
+            <button class="action-btn" onclick="processOrder()" style="background:var(--gold); color:#000; margin-top:20px;">Secure Payment & Order</button>
+            <p onclick="closeModal('checkout-overlay')" style="color:#444; cursor:pointer; margin-top:15px; font-size:0.8em;">Cancel Transaction</p>
         </div>
     </div>
 
@@ -79,77 +98,85 @@
     </header>
 
     <nav class="main-nav">
-        <button id="nav-summaries" class="nav-btn active" onclick="loadDisplay('summaries.json', this)">Summaries</button>
-        <button id="nav-books" class="nav-btn" onclick="loadDisplay('books.json', this)">Books</button>
-        <button id="nav-hoodies" class="nav-btn" onclick="loadDisplay('hoody.json', this)">Hoodies</button>
+        <button class="nav-btn active" onclick="switchTab('summaries')">Summaries</button>
+        <button class="nav-btn" onclick="switchTab('books')">Books</button>
+        <button class="nav-btn" onclick="switchTab('hoodies')">Hoodies</button>
     </nav>
 
     <main id="book-grid" class="book-grid"></main>
 
+    <div class="admin-trigger" onclick="openAdmin()">● System</div>
+
+    <div id="admin-panel" class="admin-panel">
+        <h2 style="color:var(--gold)">Admin Manager</h2>
+        <select id="adm-type" onchange="toggleAdmFields()">
+            <option value="book">Book (AliExpress Partner)</option>
+            <option value="hoody">Hoody (Teepublic Partner)</option>
+            <option value="summary">Summary</option>
+        </select>
+        <input type="text" id="adm-title" placeholder="Title">
+        <input type="text" id="adm-img" placeholder="Image URL">
+        <input type="text" id="adm-price" placeholder="Price">
+        <input type="text" id="adm-link" placeholder="Partner Link">
+        <textarea id="adm-desc" placeholder="Description"></textarea>
+        
+        <div id="book-fields">
+            <input type="text" id="adm-edito" placeholder="Editor">
+            <input type="text" id="adm-year" placeholder="Year">
+        </div>
+        
+        <button class="action-btn" onclick="genJSON()" style="background:var(--gold); color:#000; margin-top:15px;">Generate JSON</button>
+        <div id="json-out" style="background:#000; color:#0f0; padding:15px; margin-top:15px; display:none; white-space:pre-wrap; font-family:monospace; font-size:11px;"></div>
+    </div>
+
     <script>
-        const MY_PHONE = "212717948663"; 
-        let currentLink = "";
-        let currentItemTitle = "";
-        let currentView = 'summaries';
-        let itemsData = [];
+        let currentItem = {};
 
-        window.onload = () => loadDisplay('summaries.json', document.getElementById('nav-summaries'));
-
-        async function loadDisplay(source, btn) {
+        // Switch Tabs Logic (Placeholder)
+        function switchTab(type) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentView = source.replace('.json', '');
-            const grid = document.getElementById('book-grid');
-            grid.innerHTML = '<p style="color:var(--gold)">Loading Archive...</p>';
-
-            try {
-                const response = await fetch(source);
-                itemsData = await response.json();
-                renderItems(itemsData);
-            } catch (e) { grid.innerHTML = `<p>Ready to add items.</p>`; }
+            event.target.classList.add('active');
         }
 
-        function renderItems(items) {
-            const grid = document.getElementById('book-grid');
-            grid.innerHTML = '';
-            items.forEach((item, index) => {
-                const btnText = (currentView === 'summaries') ? 'Read Summary' : 'Order Now';
-                grid.innerHTML += `
-                    <div class="book-card">
-                        <img src="${item.imageUrl}" class="book-image">
-                        <h3 style="color:var(--gold); font-family:'Playfair Display';">${item.title}</h3>
-                        <p style="color:#fff; letter-spacing: 2px;">$${item.price}</p>
-                        <button class="buy-button" onclick="handleAction(${index})">${btnText}</button>
-                    </div>`;
-            });
-        }
-
-        function handleAction(index) {
-            const item = itemsData[index];
-            currentLink = item.link;
-            currentItemTitle = item.title;
-            if (currentView === 'summaries') {
-                document.getElementById('sum-title').innerText = item.title;
-                document.getElementById('sum-body').innerHTML = item.desc ? item.desc.replace(/-/g, '<br>• ') : "Content coming soon.";
-                document.getElementById('summary-overlay').style.display = 'block';
-                document.getElementById('sum-order-btn').onclick = () => {
-                    closeModal('summary-overlay');
-                    document.getElementById('order-overlay').style.display = 'block';
-                };
+        // Trigger Checkout
+        function openCheckout(title, link, type) {
+            currentItem = { title, link, type };
+            const carrierBox = document.getElementById('carrier-info');
+            
+            if(type === 'hoody') {
+                carrierBox.innerHTML = `<span>Carrier:</span> <img src="https://www.teepublic.com/assets/teepublic_logo_black-63e5e5d3.svg" style="filter:invert(1)"> <span>(Express Shipping)</span>`;
             } else {
-                document.getElementById('order-overlay').style.display = 'block';
+                carrierBox.innerHTML = `<span>Carrier:</span> <img src="https://upload.wikimedia.org/wikipedia/en/thumb/8/80/AliExpress_logo.svg/1200px-AliExpress_logo.svg.png"> <span>(Global Logistics)</span>`;
             }
+            
+            document.getElementById('checkout-overlay').style.display = 'block';
         }
 
-        function sendToWhatsApp() {
-            const email = document.getElementById('lead-email').value || "None";
-            const wa = document.getElementById('lead-whatsapp').value || "None";
-            const message = `AuraVault Order Idea!%0A---%0AItem: ${currentItemTitle}%0A---%0ACustomer Email: ${email}%0ACustomer WA: ${wa}`;
-            window.open(`https://wa.me/${MY_PHONE}?text=${message}`, '_blank');
-            setTimeout(() => { window.location.href = currentLink; }, 1000);
+        function processOrder() {
+            // Here you could save data to your Google Sheet first!
+            alert(`Address Saved! Redirecting to Secure Payment for: ${currentItem.title}`);
+            window.location.href = currentItem.link;
         }
 
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        // Admin
+        function openAdmin() {
+            if(prompt("Key:") === "canon_-!LB2107") document.getElementById('admin-panel').style.display = 'block';
+        }
+
+        function genJSON() {
+            const data = {
+                title: document.getElementById('adm-title').value,
+                imageUrl: document.getElementById('adm-img').value,
+                price: document.getElementById('adm-price').value,
+                link: document.getElementById('adm-link').value,
+                type: document.getElementById('adm-type').value
+            };
+            const out = document.getElementById('json-out');
+            out.innerText = JSON.stringify(data, null, 4);
+            out.style.display = 'block';
+        }
     </script>
 </body>
 </html>
