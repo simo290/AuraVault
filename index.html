@@ -3,216 +3,153 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuraVault - Global Market</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <title>AuraVault - Premium Knowledge & Style</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root { --bg-color: #1a1a1a; --card-bg: #2a2a2a; --text-color: #f5f5f5; --gold: #d4af37; --shadow: rgba(0,0,0,0.5); }
-        .light-mode { --bg-color: #f5f5f5; --card-bg: #ffffff; --text-color: #1a1a1a; --shadow: rgba(0,0,0,0.1); }
+        :root { 
+            --bg-color: #0b0b0b; /* أسود ملكي */
+            --card-bg: #161616; /* أسود فاتح شوية للكارط */
+            --text-color: #ffffff; 
+            --gold: #d4af37; /* ذهبي أصلي */
+            --gold-hover: #f1c40f; 
+        }
         
-        body { font-family: 'Playfair Display', serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; transition: 0.3s; line-height: 1.6; }
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; line-height: 1.6; }
         
-        header { background-color: var(--card-bg); padding: 30px 20px; box-shadow: 0 4px 10px var(--shadow); text-align: center; position: relative; }
+        /* Header & Logo */
+        header { background-color: #000; padding: 50px 20px; text-align: center; border-bottom: 2px solid var(--gold); }
+        header h1 { font-family: 'Playfair Display', serif; font-size: 3.5em; margin: 0; color: var(--gold); letter-spacing: 4px; }
+        header p { letter-spacing: 5px; font-weight: 300; color: #888; font-size: 0.8em; margin-top: 10px; }
         
-        .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--gold); border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; }
-
         /* Navigation */
-        .main-nav { display: flex; justify-content: center; background: var(--gold); padding: 12px; gap: 15px; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
-        .nav-btn { background: none; border: none; font-weight: bold; cursor: pointer; font-size: 1em; color: #000; transition: 0.2s; padding: 5px 10px; }
-        .nav-btn.active { border-bottom: 3px solid #000; transform: scale(1.05); }
+        .main-nav { display: flex; justify-content: center; background: var(--gold); padding: 5px; gap: 2px; position: sticky; top: 0; z-index: 100; }
+        .nav-btn { background: #000; border: none; font-weight: bold; cursor: pointer; color: var(--gold); padding: 12px 25px; font-size: 0.85em; text-transform: uppercase; flex-grow: 1; transition: 0.3s; }
+        .nav-btn.active { background: var(--gold); color: #000; }
 
         /* Grid & Cards */
-        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
-        .book-card { background: var(--card-bg); border: 1px solid var(--gold); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; transition: 0.3s; }
-        .book-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px var(--shadow); }
-        .book-image { width: 100%; height: 280px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; }
-        .buy-button { background: var(--gold); color: #000; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: auto; }
+        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+        .book-card { background: var(--card-bg); border: 1px solid #222; border-radius: 0px; padding: 20px; display: flex; flex-direction: column; transition: 0.4s; text-align: center; }
+        .book-card:hover { border-color: var(--gold); transform: translateY(-10px); box-shadow: 0 10px 20px rgba(212, 175, 55, 0.1); }
+        .book-image { width: 100%; height: 350px; object-fit: cover; border: 1px solid #333; margin-bottom: 15px; }
+        
+        .buy-button { background: none; color: var(--gold); padding: 15px; border: 1px solid var(--gold); font-weight: bold; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 2px; transition: 0.3s; }
+        .buy-button:hover { background: var(--gold); color: #000; }
 
-        /* Branded Lead Form Modal */
-        #order-overlay { 
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.9); z-index: 2000; backdrop-filter: blur(8px); 
-        }
-        .order-modal { 
-            background: #2a2a2a; max-width: 400px; margin: 100px auto; padding: 30px; 
-            border-radius: 15px; border: 1px solid var(--gold); text-align: center; color: white;
-        }
-        .order-modal input { 
-            width: 90%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid var(--gold); 
-            color: white; border-radius: 5px; 
-        }
-        .confirm-btn { 
-            background: var(--gold); color: black; width: 100%; padding: 12px; border: none; 
-            border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; 
-        }
-        .skip-text { font-size: 0.8em; color: #888; cursor: pointer; text-decoration: underline; display: block; margin-top: 15px; }
+        /* Modals (The Gold Form) */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; backdrop-filter: blur(10px); }
+        .modal-content { background: #000; max-width: 450px; margin: 80px auto; padding: 40px; border: 2px solid var(--gold); position: relative; text-align: center; }
+        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 25px; color: var(--gold); cursor: pointer; }
+        
+        h2 { font-family: 'Playfair Display', serif; color: var(--gold); margin-bottom: 20px; text-transform: uppercase; }
+        input { width: 100%; padding: 15px; margin: 10px 0; background: #111; border: 1px solid #333; color: white; box-sizing: border-box; }
+        input:focus { border-color: var(--gold); outline: none; }
+        
+        /* Summary Content Style */
+        #sum-body { color: #ccc; text-align: left; border-top: 1px solid #222; padding-top: 20px; margin-top: 10px; }
 
-        /* Admin Panel */
-        .admin-panel { display: none; max-width: 600px; margin: 40px auto; background: var(--card-bg); padding: 30px; border-radius: 15px; border: 2px solid var(--gold); }
-        .admin-form input, .admin-form select, .admin-form textarea { width: 100%; margin-bottom: 15px; padding: 10px; background: #111; color: #fff; border: 1px solid var(--gold); box-sizing: border-box; border-radius: 5px; }
-        #json-output { width: 100%; height: 100px; background: #111; color: #0f0; font-family: monospace; padding: 10px; margin-top: 10px; border: 1px dashed var(--gold); }
+        .admin-panel { display: none; max-width: 600px; margin: 40px auto; background: #000; padding: 30px; border: 1px dashed var(--gold); }
     </style>
 </head>
 <body>
 
-    <div id="order-overlay">
-        <div class="order-modal">
-            <h2 style="color:var(--gold)">AuraVault</h2>
-            <p>Processing order via our Global Store...</p>
-            <p style="font-size: 0.8em; color: #ccc;">Leave your details for tracking (Optional)</p>
-            
-            <input type="email" id="lead-email" placeholder="Email Address">
-            <input type="text" id="lead-whatsapp" placeholder="WhatsApp Number">
-            
-            <button class="confirm-btn" onclick="processOrder()">PROCEED TO CHECKOUT</button>
-            <span class="skip-text" onclick="directRedirect()">Skip and continue</span>
+    <div id="summary-overlay" class="overlay">
+        <div class="modal-content" style="max-width: 650px;">
+            <span class="close-btn" onclick="closeModal('summary-overlay')">&times;</span>
+            <h2 id="sum-title"></h2>
+            <div id="sum-body"></div>
+            <button class="buy-button" id="sum-order-btn" style="margin-top:30px;">Proceed to Order</button>
+        </div>
+    </div>
+
+    <div id="order-overlay" class="overlay">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal('order-overlay')">&times;</span>
+            <h2>AuraVault VIP</h2>
+            <p style="color: #888; font-size: 0.9em; margin-bottom: 25px;">Enter details to sync with your WhatsApp</p>
+            <input type="email" id="lead-email" placeholder="EMAIL ADDRESS">
+            <input type="text" id="lead-whatsapp" placeholder="WHATSAPP NUMBER">
+            <button class="buy-button" onclick="sendToWhatsApp()" style="margin-top: 20px;">Confirm & Open Store</button>
+            <p onclick="sendToWhatsApp()" style="font-size:0.7em; color:#555; cursor:pointer; margin-top:20px; letter-spacing: 1px;">SKIP TO GLOBAL STORE</p>
         </div>
     </div>
 
     <header>
-        <button class="theme-toggle" onclick="toggleTheme()">🌓 Light/Dark</button>
         <h1>AuraVault</h1>
-        <p>The Bridge Between Knowledge & Style</p>
+        <p>THE ARCHIVE OF SUCCESS</p>
     </header>
 
     <nav class="main-nav">
-        <button id="nav-summaries" class="nav-btn active" onclick="loadDisplay('summaries.json', this)">📝 Summaries</button>
-        <button id="nav-books" class="nav-btn" onclick="loadDisplay('books.json', this)">📚 Books</button>
-        <button id="nav-hoodies" class="nav-btn" onclick="loadDisplay('hoody.json', this)">👕 Hoodies</button>
+        <button id="nav-summaries" class="nav-btn active" onclick="loadDisplay('summaries.json', this)">Summaries</button>
+        <button id="nav-books" class="nav-btn" onclick="loadDisplay('books.json', this)">Books</button>
+        <button id="nav-hoodies" class="nav-btn" onclick="loadDisplay('hoody.json', this)">Hoodies</button>
     </nav>
 
     <main id="book-grid" class="book-grid"></main>
 
-    <div style="text-align: center; margin: 40px;">
-        <button onclick="toggleAdmin()" style="padding: 10px 30px; cursor:pointer; background:none; color:var(--gold); border:1px solid var(--gold); border-radius: 5px;">🛠 Admin Panel</button>
-    </div>
-
-    <div id="admin-panel" class="admin-panel">
-        <h2 id="admin-title" style="color:var(--gold);">Admin Access</h2>
-        <div id="auth-section">
-            <input type="password" id="admin-password" placeholder="Password" style="width: 100%; padding: 10px; margin-bottom: 10px;">
-            <button onclick="checkPass()" style="width:100%; padding:10px; background:var(--gold); border:none; cursor:pointer; font-weight:bold;">Login</button>
-        </div>
-
-        <div id="admin-options" style="display:none;">
-            <div style="display:flex; gap:5px; margin-bottom:15px;">
-                <button onclick="setAdminMode('book')">books.json</button>
-                <button onclick="setAdminMode('summary')">summaries.json</button>
-                <button onclick="setAdminMode('hoodie')">hoody.json</button>
-            </div>
-            <form id="admin-form" class="admin-form">
-                <input type="text" id="p-title" placeholder="Title" required>
-                <input type="text" id="p-author" placeholder="Author (For Books/Summaries)">
-                <input type="number" id="p-price" placeholder="Price ($)" step="0.01" required>
-                <input type="url" id="p-image" placeholder="Image URL" required>
-                <input type="url" id="p-link" placeholder="AliExpress/Affiliate Link" required>
-                <textarea id="p-desc" placeholder="Description..."></textarea>
-                <button type="submit" style="width:100%; background:var(--gold); padding:10px; border:none; cursor:pointer; font-weight:bold;">GENERATE JSON</button>
-            </form>
-            <textarea id="json-output" readonly></textarea>
-        </div>
-    </div>
-
     <script>
-        const PASS = 'canon_-!LB2107';
-        let currentTargetLink = "";
+        const MY_PHONE = "212717948663"; 
+        let currentLink = "";
+        let currentItemTitle = "";
         let currentView = 'summaries';
+        let itemsData = [];
 
-        // 1. Initial Load (Summaries First)
         window.onload = () => loadDisplay('summaries.json', document.getElementById('nav-summaries'));
 
         async function loadDisplay(source, btn) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             currentView = source.replace('.json', '');
-
             const grid = document.getElementById('book-grid');
-            grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">Loading AuraVault Collection...</p>';
+            grid.innerHTML = '<p style="color:var(--gold)">Loading Archive...</p>';
 
             try {
                 const response = await fetch(source);
-                const data = await response.json();
-                renderItems(data);
-            } catch (e) {
-                grid.innerHTML = `<p style="text-align:center; grid-column: 1/-1;">No data found in ${source}.</p>`;
-            }
+                itemsData = await response.json();
+                renderItems(itemsData);
+            } catch (e) { grid.innerHTML = `<p>Ready to add items.</p>`; }
         }
 
         function renderItems(items) {
             const grid = document.getElementById('book-grid');
             grid.innerHTML = '';
-            items.forEach(item => {
-                const btnText = (currentView === 'summaries') ? 'VIEW MORE' : 'ORDER NOW';
+            items.forEach((item, index) => {
+                const btnText = (currentView === 'summaries') ? 'Read Summary' : 'Order Now';
                 grid.innerHTML += `
                     <div class="book-card">
-                        <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/280x350?text=AuraVault'">
-                        <h3>${item.title}</h3>
-                        ${item.author ? `<p style="font-size:0.8em; color:#aaa;">By ${item.author}</p>` : ''}
-                        <p style="color:var(--gold); font-weight:bold; font-size:1.2em; margin:10px 0;">$${item.price}</p>
-                        <button class="buy-button" onclick="handleButtonClick('${item.link}')">${btnText}</button>
-                    </div>
-                `;
+                        <img src="${item.imageUrl}" class="book-image">
+                        <h3 style="color:var(--gold); font-family:'Playfair Display';">${item.title}</h3>
+                        <p style="color:#fff; letter-spacing: 2px;">$${item.price}</p>
+                        <button class="buy-button" onclick="handleAction(${index})">${btnText}</button>
+                    </div>`;
             });
         }
 
-        // 2. Logic for redirection and lead collection
-        function handleButtonClick(link) {
+        function handleAction(index) {
+            const item = itemsData[index];
+            currentLink = item.link;
+            currentItemTitle = item.title;
             if (currentView === 'summaries') {
-                // If in summaries, go to books
-                loadDisplay('books.json', document.getElementById('nav-books'));
-                window.scrollTo(0, 0);
+                document.getElementById('sum-title').innerText = item.title;
+                document.getElementById('sum-body').innerHTML = item.desc ? item.desc.replace(/-/g, '<br>• ') : "Content coming soon.";
+                document.getElementById('summary-overlay').style.display = 'block';
+                document.getElementById('sum-order-btn').onclick = () => {
+                    closeModal('summary-overlay');
+                    document.getElementById('order-overlay').style.display = 'block';
+                };
             } else {
-                // If in books or hoodies, show lead form
-                currentTargetLink = link;
                 document.getElementById('order-overlay').style.display = 'block';
             }
         }
 
-        function processOrder() {
-            const email = document.getElementById('lead-email').value;
-            const wa = document.getElementById('lead-whatsapp').value;
-            
-            if(email || wa) {
-                console.log("Lead Saved:", {email, wa}); // Here you can add Google Sheets logic
-            }
-            
-            const btn = document.querySelector('.confirm-btn');
-            btn.innerText = "Redirecting to Global Store...";
-            btn.style.background = "#555";
-            
-            setTimeout(() => {
-                window.location.href = currentTargetLink;
-            }, 1000);
+        function sendToWhatsApp() {
+            const email = document.getElementById('lead-email').value || "None";
+            const wa = document.getElementById('lead-whatsapp').value || "None";
+            const message = `AuraVault Order Idea!%0A---%0AItem: ${currentItemTitle}%0A---%0ACustomer Email: ${email}%0ACustomer WA: ${wa}`;
+            window.open(`https://wa.me/${MY_PHONE}?text=${message}`, '_blank');
+            setTimeout(() => { window.location.href = currentLink; }, 1000);
         }
 
-        function directRedirect() {
-            window.location.href = currentTargetLink;
-        }
-
-        // 3. Admin & Theme Logic
-        function toggleTheme() { document.body.classList.toggle('light-mode'); }
-        function toggleAdmin() { document.getElementById('admin-panel').style.display = 'block'; }
-        
-        function checkPass() {
-            if(document.getElementById('admin-password').value === PASS) {
-                document.getElementById('auth-section').style.display = 'none';
-                document.getElementById('admin-options').style.display = 'block';
-            } else { alert("Wrong Password"); }
-        }
-
-        let adminFile = 'book';
-        function setAdminMode(type) { adminFile = type; alert("Target set to: " + type); }
-
-        document.getElementById('admin-form').addEventListener('submit', (e) => {
-            e.preventDefault();
-            const item = {
-                title: document.getElementById('p-title').value,
-                price: document.getElementById('p-price').value,
-                imageUrl: document.getElementById('p-image').value,
-                link: document.getElementById('p-link').value,
-                author: document.getElementById('p-author').value
-            };
-            document.getElementById('json-output').value = JSON.stringify(item, null, 2) + ",";
-        });
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
     </script>
 </body>
 </html>
