@@ -8,31 +8,65 @@
     <style>
         :root { --bg-color: #1a1a1a; --card-bg: #2a2a2a; --text-color: #f5f5f5; --gold: #d4af37; --shadow: rgba(0,0,0,0.5); }
         .light-mode { --bg-color: #f5f5f5; --card-bg: #ffffff; --text-color: #1a1a1a; --shadow: rgba(0,0,0,0.1); }
+        
         body { font-family: 'Playfair Display', serif; background-color: var(--bg-color); color: var(--text-color); margin: 0; transition: 0.3s; line-height: 1.6; }
+        
         header { background-color: var(--card-bg); padding: 30px 20px; box-shadow: 0 4px 10px var(--shadow); text-align: center; position: relative; }
         
-        /* Navigation Style */
+        .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--gold); border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+
+        /* Navigation */
         .main-nav { display: flex; justify-content: center; background: var(--gold); padding: 12px; gap: 15px; position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
         .nav-btn { background: none; border: none; font-weight: bold; cursor: pointer; font-size: 1em; color: #000; transition: 0.2s; padding: 5px 10px; }
         .nav-btn.active { border-bottom: 3px solid #000; transform: scale(1.05); }
 
-        .theme-toggle { position: absolute; top: 20px; right: 20px; background: var(--gold); border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-weight: bold; }
+        /* Grid & Cards */
         .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
         .book-card { background: var(--card-bg); border: 1px solid var(--gold); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; transition: 0.3s; }
+        .book-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px var(--shadow); }
         .book-image { width: 100%; height: 280px; object-fit: cover; border-radius: 8px; margin-bottom: 15px; }
         .buy-button { background: var(--gold); color: #000; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: auto; }
 
-        /* Admin Section */
+        /* Branded Lead Form Modal */
+        #order-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.9); z-index: 2000; backdrop-filter: blur(8px); 
+        }
+        .order-modal { 
+            background: #2a2a2a; max-width: 400px; margin: 100px auto; padding: 30px; 
+            border-radius: 15px; border: 1px solid var(--gold); text-align: center; color: white;
+        }
+        .order-modal input { 
+            width: 90%; padding: 12px; margin: 10px 0; background: #111; border: 1px solid var(--gold); 
+            color: white; border-radius: 5px; 
+        }
+        .confirm-btn { 
+            background: var(--gold); color: black; width: 100%; padding: 12px; border: none; 
+            border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 10px; 
+        }
+        .skip-text { font-size: 0.8em; color: #888; cursor: pointer; text-decoration: underline; display: block; margin-top: 15px; }
+
+        /* Admin Panel */
         .admin-panel { display: none; max-width: 600px; margin: 40px auto; background: var(--card-bg); padding: 30px; border-radius: 15px; border: 2px solid var(--gold); }
-        #admin-content, #admin-options { display: none; }
         .admin-form input, .admin-form select, .admin-form textarea { width: 100%; margin-bottom: 15px; padding: 10px; background: #111; color: #fff; border: 1px solid var(--gold); box-sizing: border-box; border-radius: 5px; }
-        #json-output { width: 100%; height: 120px; background: #111; color: #0f0; font-family: monospace; padding: 10px; margin-top: 10px; border: 1px dashed var(--gold); }
-        .tab-logic { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .tab-logic button { flex: 1; padding: 10px; cursor: pointer; background: #444; color: #fff; border: none; font-weight: bold; border-radius: 5px; }
-        .tab-logic button.active { background: var(--gold); color: #000; }
+        #json-output { width: 100%; height: 100px; background: #111; color: #0f0; font-family: monospace; padding: 10px; margin-top: 10px; border: 1px dashed var(--gold); }
     </style>
 </head>
 <body>
+
+    <div id="order-overlay">
+        <div class="order-modal">
+            <h2 style="color:var(--gold)">AuraVault</h2>
+            <p>Processing order via our Global Store...</p>
+            <p style="font-size: 0.8em; color: #ccc;">Leave your details for tracking (Optional)</p>
+            
+            <input type="email" id="lead-email" placeholder="Email Address">
+            <input type="text" id="lead-whatsapp" placeholder="WhatsApp Number">
+            
+            <button class="confirm-btn" onclick="processOrder()">PROCEED TO CHECKOUT</button>
+            <span class="skip-text" onclick="directRedirect()">Skip and continue</span>
+        </div>
+    </div>
 
     <header>
         <button class="theme-toggle" onclick="toggleTheme()">🌓 Light/Dark</button>
@@ -41,79 +75,65 @@
     </header>
 
     <nav class="main-nav">
-        <button id="nav-books" class="nav-btn active" onclick="loadDisplay('books.json', this)">📚 Books</button>
-        <button id="nav-summaries" class="nav-btn" onclick="loadDisplay('summaries.json', this)">📝 Summaries</button>
+        <button id="nav-summaries" class="nav-btn active" onclick="loadDisplay('summaries.json', this)">📝 Summaries</button>
+        <button id="nav-books" class="nav-btn" onclick="loadDisplay('books.json', this)">📚 Books</button>
         <button id="nav-hoodies" class="nav-btn" onclick="loadDisplay('hoody.json', this)">👕 Hoodies</button>
     </nav>
 
-    <main id="book-grid" class="book-grid">
-        </main>
+    <main id="book-grid" class="book-grid"></main>
 
     <div style="text-align: center; margin: 40px;">
         <button onclick="toggleAdmin()" style="padding: 10px 30px; cursor:pointer; background:none; color:var(--gold); border:1px solid var(--gold); border-radius: 5px;">🛠 Admin Panel</button>
     </div>
 
     <div id="admin-panel" class="admin-panel">
-        <h2 id="admin-title" style="color:var(--gold);">Authentication</h2>
+        <h2 id="admin-title" style="color:var(--gold);">Admin Access</h2>
         <div id="auth-section">
-            <input type="password" id="admin-password" placeholder="Admin Password" style="width: 100%; padding: 10px; margin-bottom: 10px; background: #111; color: #fff; border: 1px solid var(--gold);">
-            <button onclick="checkPass()" style="width:100%; padding:10px; background:var(--gold); border:none; cursor:pointer; font-weight:bold; border-radius: 5px;">Login</button>
+            <input type="password" id="admin-password" placeholder="Password" style="width: 100%; padding: 10px; margin-bottom: 10px;">
+            <button onclick="checkPass()" style="width:100%; padding:10px; background:var(--gold); border:none; cursor:pointer; font-weight:bold;">Login</button>
         </div>
 
-        <div id="admin-options">
-            <p style="color: var(--gold);">Select which file you want to update:</p>
-            <div class="tab-logic">
-                <button id="btn-book" onclick="setAdminMode('book')">books.json</button>
-                <button id="btn-summary" onclick="setAdminMode('summary')">summaries.json</button>
-                <button id="btn-hoodie" onclick="setAdminMode('hoodie')">hoody.json</button>
+        <div id="admin-options" style="display:none;">
+            <div style="display:flex; gap:5px; margin-bottom:15px;">
+                <button onclick="setAdminMode('book')">books.json</button>
+                <button onclick="setAdminMode('summary')">summaries.json</button>
+                <button onclick="setAdminMode('hoodie')">hoody.json</button>
             </div>
-        </div>
-
-        <div id="admin-content">
             <form id="admin-form" class="admin-form">
-                <input type="text" id="p-title" placeholder="Title (e.g. Rich Dad Poor Dad)" required>
-                <div id="book-only-fields">
-                    <input type="text" id="p-author" placeholder="Author Name">
-                    <input type="number" id="p-year" placeholder="Year">
-                </div>
-                <div style="display:flex; gap:10px;">
-                    <select id="p-lang">
-                        <option value="en">English</option>
-                        <option value="ar">Arabic</option>
-                        <option value="fr">French</option>
-                    </select>
-                    <input type="text" id="p-cat" placeholder="Category (e.g. Finance)">
-                </div>
+                <input type="text" id="p-title" placeholder="Title" required>
+                <input type="text" id="p-author" placeholder="Author (For Books/Summaries)">
                 <input type="number" id="p-price" placeholder="Price ($)" step="0.01" required>
-                <input type="url" id="p-image" placeholder="Image URL (Direct link)" required>
-                <input type="url" id="p-link" placeholder="Affiliate/Redbubble/Gumroad Link" required>
-                <textarea id="p-desc" placeholder="Product Description..."></textarea>
-                <button type="submit" style="width:100%; background:var(--gold); color:#000; padding:15px; border:none; cursor:pointer; font-weight:bold; border-radius: 5px;">Generate JSON Code</button>
+                <input type="url" id="p-image" placeholder="Image URL" required>
+                <input type="url" id="p-link" placeholder="AliExpress/Affiliate Link" required>
+                <textarea id="p-desc" placeholder="Description..."></textarea>
+                <button type="submit" style="width:100%; background:var(--gold); padding:10px; border:none; cursor:pointer; font-weight:bold;">GENERATE JSON</button>
             </form>
-            <p style="font-size:0.8em; color:var(--gold); margin-top: 20px;">Copy the code below and paste it into your JSON file:</p>
             <textarea id="json-output" readonly></textarea>
         </div>
     </div>
 
     <script>
         const PASS = 'canon_-!LB2107';
-        let adminTarget = 'book';
+        let currentTargetLink = "";
+        let currentView = 'summaries';
 
-        // 1. Dynamic Loading
+        // 1. Initial Load (Summaries First)
+        window.onload = () => loadDisplay('summaries.json', document.getElementById('nav-summaries'));
+
         async function loadDisplay(source, btn) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
+            currentView = source.replace('.json', '');
 
             const grid = document.getElementById('book-grid');
             grid.innerHTML = '<p style="text-align:center; grid-column: 1/-1;">Loading AuraVault Collection...</p>';
 
             try {
                 const response = await fetch(source);
-                if (!response.ok) throw new Error('File not found');
                 const data = await response.json();
                 renderItems(data);
             } catch (e) {
-                grid.innerHTML = `<p style="text-align:center; grid-column: 1/-1;">No data found in ${source}. Use Admin Panel to generate content!</p>`;
+                grid.innerHTML = `<p style="text-align:center; grid-column: 1/-1;">No data found in ${source}.</p>`;
             }
         }
 
@@ -121,48 +141,67 @@
             const grid = document.getElementById('book-grid');
             grid.innerHTML = '';
             items.forEach(item => {
+                const btnText = (currentView === 'summaries') ? 'VIEW MORE' : 'ORDER NOW';
                 grid.innerHTML += `
                     <div class="book-card">
                         <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/280x350?text=AuraVault'">
                         <h3>${item.title}</h3>
-                        ${item.author ? `<p style="font-size:0.9em; margin:0; color:#bbb;">By: ${item.author}</p>` : ''}
-                        <p style="color:var(--gold); font-weight:bold; font-size:1.3em; margin:10px 0;">$${item.price}</p>
-                        <button class="buy-button" onclick="window.open('${item.link}')">View Details</button>
+                        ${item.author ? `<p style="font-size:0.8em; color:#aaa;">By ${item.author}</p>` : ''}
+                        <p style="color:var(--gold); font-weight:bold; font-size:1.2em; margin:10px 0;">$${item.price}</p>
+                        <button class="buy-button" onclick="handleButtonClick('${item.link}')">${btnText}</button>
                     </div>
                 `;
             });
         }
 
-        // 2. Admin Logic
-        function toggleAdmin() {
-            const p = document.getElementById('admin-panel');
-            p.style.display = p.style.display === 'block' ? 'none' : 'block';
+        // 2. Logic for redirection and lead collection
+        function handleButtonClick(link) {
+            if (currentView === 'summaries') {
+                // If in summaries, go to books
+                loadDisplay('books.json', document.getElementById('nav-books'));
+                window.scrollTo(0, 0);
+            } else {
+                // If in books or hoodies, show lead form
+                currentTargetLink = link;
+                document.getElementById('order-overlay').style.display = 'block';
+            }
         }
 
+        function processOrder() {
+            const email = document.getElementById('lead-email').value;
+            const wa = document.getElementById('lead-whatsapp').value;
+            
+            if(email || wa) {
+                console.log("Lead Saved:", {email, wa}); // Here you can add Google Sheets logic
+            }
+            
+            const btn = document.querySelector('.confirm-btn');
+            btn.innerText = "Redirecting to Global Store...";
+            btn.style.background = "#555";
+            
+            setTimeout(() => {
+                window.location.href = currentTargetLink;
+            }, 1000);
+        }
+
+        function directRedirect() {
+            window.location.href = currentTargetLink;
+        }
+
+        // 3. Admin & Theme Logic
+        function toggleTheme() { document.body.classList.toggle('light-mode'); }
+        function toggleAdmin() { document.getElementById('admin-panel').style.display = 'block'; }
+        
         function checkPass() {
             if(document.getElementById('admin-password').value === PASS) {
                 document.getElementById('auth-section').style.display = 'none';
                 document.getElementById('admin-options').style.display = 'block';
-                document.getElementById('admin-title').innerText = "Admin Access Granted";
             } else { alert("Wrong Password"); }
         }
 
-        function setAdminMode(type) {
-            adminTarget = type;
-            document.getElementById('admin-content').style.display = 'block';
-            
-            const titles = { 'book': 'books.json', 'summary': 'summaries.json', 'hoodie': 'hoody.json' };
-            document.getElementById('admin-title').innerText = "Target: " + titles[type];
-            
-            // Show author/year fields for books and summaries only
-            document.getElementById('book-only-fields').style.display = (type === 'book' || type === 'summary') ? 'block' : 'none';
-            
-            document.getElementById('btn-book').classList.toggle('active', type === 'book');
-            document.getElementById('btn-summary').classList.toggle('active', type === 'summary');
-            document.getElementById('btn-hoodie').classList.toggle('active', type === 'hoodie');
-        }
+        let adminFile = 'book';
+        function setAdminMode(type) { adminFile = type; alert("Target set to: " + type); }
 
-        // 3. Form Submission
         document.getElementById('admin-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const item = {
@@ -170,27 +209,10 @@
                 price: document.getElementById('p-price').value,
                 imageUrl: document.getElementById('p-image').value,
                 link: document.getElementById('p-link').value,
-                desc: document.getElementById('p-desc').value,
-                lang: document.getElementById('p-lang').value,
-                cat: document.getElementById('p-cat').value
+                author: document.getElementById('p-author').value
             };
-
-            if(adminTarget === 'book' || adminTarget === 'summary') {
-                item.author = document.getElementById('p-author').value;
-                item.year = document.getElementById('p-year').value;
-            }
-
-            // Generate JSON and add comma for easy list building
-            const jsonResult = JSON.stringify(item, null, 2);
-            document.getElementById('json-output').value = jsonResult + ",";
-            
-            alert("Success! Copy the code from the green box.");
+            document.getElementById('json-output').value = JSON.stringify(item, null, 2) + ",";
         });
-
-        function toggleTheme() { document.body.classList.toggle('light-mode'); }
-
-        // Initial Load
-        window.onload = () => loadDisplay('books.json', document.getElementById('nav-books'));
     </script>
 </body>
 </html>
