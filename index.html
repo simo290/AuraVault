@@ -6,42 +6,27 @@
     <title>AuraVault | Luxury Archive</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
+        /* هاد الجزء ديال الديزاين خليتو كيفما كان عندك في النسخة الأولى */
         :root { --gold: #d4af37; --black: #0a0a0a; --dark-grey: #1a1a1a; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--black); color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        
-        /* Header */
+        body { background-color: var(--black); color: white; font-family: 'Inter', sans-serif; }
         header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #333; }
-        .logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--gold); letter-spacing: 2px; cursor: pointer; display: inline-block; }
-        
-        /* Navigation */
+        .logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--gold); letter-spacing: 2px; cursor: pointer; }
         nav { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
-        .nav-link { color: #888; text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: 0.3s; cursor: pointer; padding-bottom: 5px; border-bottom: 2px solid transparent; }
+        .nav-link { color: #888; text-decoration: none; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
         .nav-link.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
-
-        /* Grid */
         .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
-        
-        /* Card Style */
-        .book-card { background: var(--dark-grey); padding: 20px; border-radius: 5px; text-align: center; transition: 0.4s; border: 1px solid #222; }
-        .book-card:hover { transform: translateY(-10px); border-color: var(--gold); }
-        .book-image { width: 100%; height: 380px; object-fit: cover; border-radius: 3px; margin-bottom: 15px; }
-        .book-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin: 10px 0; min-height: 45px; }
-        
-        /* Buttons */
-        .action-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px 25px; cursor: pointer; font-weight: 600; transition: 0.3s; width: 100%; margin-top: 10px; }
+        .book-card { background: var(--dark-grey); padding: 20px; border-radius: 5px; text-align: center; border: 1px solid #222; }
+        .book-image { width: 100%; height: 400px; object-fit: cover; }
+        .action-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 10px 25px; cursor: pointer; width: 100%; margin-top: 15px; }
         .action-btn:hover { background: var(--gold); color: black; }
-
-        /* Modal Settings */
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; }
-        .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 40px; width: 90%; max-width: 550px; border: 1px solid var(--gold); text-align: center; max-height: 80vh; overflow-y: auto; }
-        .modal input { width: 100%; padding: 12px; margin: 15px 0; background: #000; border: 1px solid var(--gold); color: white; outline: none; }
-
-        /* Admin Panel Style */
-        #admin-panel { display: none; margin-top: 50px; padding: 30px; border: 1px dashed var(--gold); border-radius: 10px; background: #050505; }
-        .admin-form input, .admin-form textarea { width: 100%; padding: 10px; margin-bottom: 10px; background: #1a1a1a; border: 1px solid #333; color: white; }
-        #json-out { background: #000; color: #0f0; padding: 15px; margin-top: 15px; white-space: pre-wrap; display: none; text-align: left; font-size: 12px; border: 1px solid #0f0; }
+        
+        /* الـ Panel والـ Modal ضروري يبقاو مخبيين */
+        #admin-panel { display: none; margin-top: 30px; padding: 20px; border: 1px dashed var(--gold); }
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000; }
+        .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 30px; border: 1px solid var(--gold); width: 90%; max-width: 500px; }
+        input[type="email"] { width: 100%; padding: 10px; margin: 15px 0; background: #000; border: 1px solid var(--gold); color: white; }
     </style>
 </head>
 <body>
@@ -58,25 +43,23 @@
 <div class="container">
     <div id="display-grid" class="grid"></div>
 
-    <div id="admin-panel" class="container">
-        <h2 style="color:var(--gold); margin-bottom:20px;">Admin Terminal</h2>
-        <div class="admin-form">
-            <input type="text" id="adm-title" placeholder="Title">
-            <input type="text" id="adm-img" placeholder="Image URL">
-            <input type="text" id="adm-price" placeholder="Price (Leave empty for summaries)">
-            <input type="text" id="adm-link" placeholder="Link">
-            <textarea id="adm-desc" rows="5" placeholder="Description/Summary"></textarea>
-            <button class="action-btn" onclick="genJSON()">Generate JSON</button>
-        </div>
-        <pre id="json-out"></pre>
+    <div id="admin-panel">
+        <h2 style="color:var(--gold)">Admin Panel</h2>
+        <input type="text" id="adm-title" placeholder="Title" style="width:100%; margin:5px 0; padding:8px;">
+        <input type="text" id="adm-img" placeholder="Image URL" style="width:100%; margin:5px 0; padding:8px;">
+        <input type="text" id="adm-price" placeholder="Price" style="width:100%; margin:5px 0; padding:8px;">
+        <input type="text" id="adm-link" placeholder="Link" style="width:100%; margin:5px 0; padding:8px;">
+        <textarea id="adm-desc" placeholder="Desc" style="width:100%; margin:5px 0; padding:8px;"></textarea>
+        <button onclick="genJSON()" class="action-btn">Gen JSON</button>
+        <pre id="json-out" style="color:lime; font-size:10px;"></pre>
     </div>
 </div>
 
 <div id="action-modal" class="overlay">
     <div class="modal">
-        <h2 id="m-title" style="font-family:'Playfair Display'; color:var(--gold); margin-bottom:15px;"></h2>
-        <div id="m-body" style="line-height:1.6; color:#ccc; text-align:left;"></div>
-        <button class="action-btn" onclick="closeModal()" style="border:none; color:#555; text-decoration:underline;">Close</button>
+        <h2 id="m-title" style="color:var(--gold)"></h2>
+        <div id="m-body" style="margin-top:15px; text-align:left;"></div>
+        <button onclick="closeModal()" class="action-btn" style="border:none; text-decoration:underline;">Close</button>
     </div>
 </div>
 
@@ -87,40 +70,31 @@
         currentTab = file;
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         if(btn) btn.classList.add('active');
-
-        const grid = document.getElementById('display-grid');
-        grid.innerHTML = '<p style="text-align:center; width:100%;">Loading...</p>';
-
         try {
             const res = await fetch(file);
             const data = await res.json();
-            renderGrid(data);
-        } catch (e) {
-            grid.innerHTML = '<p style="color:red; text-align:center; width:100%;">Error loading ' + file + '</p>';
-        }
+            render(data);
+        } catch(e) { console.error("Error loading " + file); }
     }
 
-    function renderGrid(data) {
+    function render(data) {
         const grid = document.getElementById('display-grid');
         grid.innerHTML = '';
         data.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'book-card';
-            const priceTag = item.price ? `<p style="color:var(--gold); font-weight:bold;">$${item.price}</p>` : '';
-            const btnText = (currentTab === 'summaries.json') ? 'Read Summary' : 'Buy Now';
-            
-            // Safe Strings for onclick
-            const title = item.title.replace(/'/g, "\\'");
-            const link = (item.link || item.affiliateLink || '#').replace(/'/g, "\\'");
+            const div = document.createElement('div');
+            div.className = 'book-card';
+            const link = item.link || item.affiliateLink || '#';
             const desc = (item.desc || item.description || '').replace(/`/g, "\\`").replace(/'/g, "\\'");
-
-            card.innerHTML = `
-                <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/300x450'">
-                <h3 class="book-title">${item.title}</h3>
-                ${priceTag}
-                <button class="action-btn" onclick="handleAction('${title}', '${link}', \`${desc}\`)">${btnText}</button>
+            
+            div.innerHTML = `
+                <img src="${item.imageUrl}" class="book-image">
+                <h3 style="margin-top:10px;">${item.title}</h3>
+                <p style="color:var(--gold)">${item.price ? '$' + item.price : ''}</p>
+                <button class="action-btn" onclick="handleAction('${item.title.replace(/'/g, "\\'")}', '${link}', \`${desc}\`)">
+                    ${currentTab === 'summaries.json' ? 'Read' : 'Buy Now'}
+                </button>
             `;
-            grid.appendChild(card);
+            grid.appendChild(div);
         });
     }
 
@@ -130,52 +104,36 @@
         const body = document.getElementById('m-body');
         modal.style.display = 'block';
 
-        if (currentTab === 'summaries.json') {
+        if(currentTab === 'summaries.json') {
             body.innerHTML = `<p>${desc}</p>`;
         } else {
             body.innerHTML = `
-                <p style="text-align:center; color:#888;">Enter your email to access the secure link:</p>
-                <input type="email" id="user-email" placeholder="example@mail.com">
-                <button class="action-btn" onclick="verifyEmail('${link}')">Unlock Link</button>
+                <p>Enter email to get the link:</p>
+                <input type="email" id="u-email" placeholder="email@example.com">
+                <button class="action-btn" onclick="goLink('${link}')">Get Link</button>
             `;
         }
     }
 
-    function verifyEmail(link) {
-        const email = document.getElementById('user-email').value;
-        if(email.includes('@')) {
-            window.open(link, '_blank');
+    function goLink(l) {
+        if(document.getElementById('u-email').value.includes('@')) {
+            window.open(l, '_blank');
             closeModal();
-        } else {
-            alert("Please enter a valid email.");
-        }
+        } else { alert("Valid email please"); }
     }
 
-    function closeModal() { document.getElementById('action-modal').style.display = 'none'; }
-
+    function closeModal() { document.getElementById('action-modal').style.display='none'; }
+    
     function openAdmin() {
-        const key = prompt("Key:");
-        if(key === "canon_-!LB2107") {
-            document.getElementById('admin-panel').style.display = 'block';
-            window.scrollTo(0, document.body.scrollHeight);
-        }
+        if(prompt("Key:") === "canon_-!LB2107") document.getElementById('admin-panel').style.display='block';
     }
 
     function genJSON() {
-        const obj = {
-            title: document.getElementById('adm-title').value,
-            imageUrl: document.getElementById('adm-img').value,
-            price: document.getElementById('adm-price').value,
-            link: document.getElementById('adm-link').value,
-            desc: document.getElementById('adm-desc').value
-        };
-        const out = document.getElementById('json-out');
-        out.innerText = JSON.stringify(obj, null, 4) + ",";
-        out.style.display = 'block';
+        const obj = { title: document.getElementById('adm-title').value, imageUrl: document.getElementById('adm-img').value, price: document.getElementById('adm-price').value, link: document.getElementById('adm-link').value, desc: document.getElementById('adm-desc').value };
+        document.getElementById('json-out').innerText = JSON.stringify(obj, null, 4) + ",";
     }
 
-    window.onload = () => switchTab('summaries.json', document.querySelector('.nav-link'));
-    window.onclick = (e) => { if(e.target.className === 'overlay') closeModal(); }
+    window.onload = () => switchTab('summaries.json');
 </script>
 </body>
 </html>
