@@ -114,6 +114,8 @@
 <script>
     let currentTab = 'summaries.json';
     let allData = [];
+    // الرابط ديالك في Formspree
+    const FORMSPREE_URL = "https://formspree.io/f/mreaapkg"; 
 
     async function switchTab(file, btn) {
         currentTab = file;
@@ -153,37 +155,23 @@
         const body = document.getElementById('m-body');
         modal.style.display = 'block';
 
-        const mainLink = item.link || item.affiliateLink || '#';
-
         if(currentTab === 'summaries.json') {
             body.innerHTML = `
                 <div class="modal-products">
-                    ${item.bookLink ? `
-                    <div class="mini-card">
-                        <img src="${item.bookImg}">
-                        <h4>The Masterpiece</h4>
-                        <button class="mini-buy-btn" onclick="showEmailSection('${item.bookLink}')">GET BOOK</button>
-                    </div>` : ''}
-                    
-                    ${item.hoodyLink ? `
-                    <div class="mini-card">
-                        <img src="${item.hoodyImg}">
-                        <h4>The Apparel</h4>
-                        <button class="mini-buy-btn" onclick="showEmailSection('${item.hoodyLink}')">GET HOODY</button>
-                    </div>` : ''}
+                    ${item.bookLink ? `<div class="mini-card"><img src="${item.bookImg}"><h4>The Masterpiece</h4><button class="mini-buy-btn" onclick="showEmailSection('${item.bookLink}')">GET BOOK</button></div>` : ''}
+                    ${item.hoodyLink ? `<div class="mini-card"><img src="${item.hoodyImg}"><h4>The Apparel</h4><button class="mini-buy-btn" onclick="showEmailSection('${item.hoodyLink}')">GET HOODY</button></div>` : ''}
                 </div>
-                
                 <div id="email-unlock-section" style="display:none;">
                     <p style="font-size:0.8rem; margin-bottom:10px;">Enter email to unlock secure link:</p>
                     <input type="email" id="modal-u-email" placeholder="your@email.com" style="width:100%; padding:10px; background:#000; border:1px solid var(--gold); color:#fff; margin-bottom:10px;">
                     <button id="proceed-link-btn" class="action-btn" style="margin-top:0;">UNLOCK NOW</button>
                 </div>
-
                 <div style="border-top: 1px solid #333; padding-top:15px; max-height:250px; overflow-y:auto;">
                     <p style="font-size:0.9rem; line-height:1.6; color:#bbb; white-space: pre-line;">${item.desc || item.description || ''}</p>
                 </div>
             `;
         } else {
+            const mainLink = item.link || item.affiliateLink || '#';
             body.innerHTML = `
                 <p style="text-align:center; margin-bottom:15px;">Enter email to unlock secure link:</p>
                 <input type="email" id="u-email" placeholder="your@email.com" style="width:100%; padding:12px; background:#000; border:1px solid var(--gold); color:#fff; margin-bottom:15px;">
@@ -192,42 +180,50 @@
         }
     }
 
+    async function sendToFormspree(email, product, link) {
+        try {
+            await fetch(FORMSPREE_URL, {
+                method: 'POST',
+                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, product_name: product, target_url: link })
+            });
+        } catch (e) { console.log("Error sending data"); }
+    }
+
     function showEmailSection(link) {
         const section = document.getElementById('email-unlock-section');
         const btn = document.getElementById('proceed-link-btn');
         section.style.display = 'block';
-        btn.onclick = function() {
+        section.scrollIntoView({ behavior: 'smooth' });
+
+        btn.onclick = async function() {
             const email = document.getElementById('modal-u-email').value;
             if(email.includes('@')) {
+                btn.innerText = "SENDING...";
+                await sendToFormspree(email, document.getElementById('m-title').innerText, link);
                 window.open(link, '_blank');
                 section.style.display = 'none';
-            } else {
-                alert("Please enter a valid email address.");
-            }
+                btn.innerText = "UNLOCK NOW";
+            } else { alert("Please enter a valid email address."); }
         };
-        section.scrollIntoView({ behavior: 'smooth' });
     }
 
-    function goLink(l) {
+    async function goLink(l) {
         const mail = document.getElementById('u-email').value;
-        if(mail.includes('@')) { window.open(l, '_blank'); closeModal(); } else { alert("Valid email required"); }
+        if(mail.includes('@')) {
+            const btn = document.querySelector('.modal .action-btn');
+            btn.innerText = "SENDING...";
+            await sendToFormspree(mail, document.getElementById('m-title').innerText, l);
+            window.open(l, '_blank');
+            closeModal();
+        } else { alert("Valid email required"); }
     }
 
     function closeModal() { document.getElementById('action-modal').style.display='none'; }
     function openAdmin() { if(prompt("Key:") === "canon_-!LB2107") { document.getElementById('admin-panel').style.display='block'; window.scrollTo(0,document.body.scrollHeight); } }
 
     function genJSON() {
-        const obj = { 
-            title: document.getElementById('adm-title').value, 
-            imageUrl: document.getElementById('adm-img').value, 
-            price: document.getElementById('adm-price').value,
-            link: document.getElementById('adm-link').value,
-            bookImg: document.getElementById('adm-book-img').value,
-            bookLink: document.getElementById('adm-book-link').value,
-            hoodyImg: document.getElementById('adm-hoody-img').value,
-            hoodyLink: document.getElementById('adm-hoody-link').value,
-            desc: document.getElementById('adm-desc').value 
-        };
+        const obj = { title: document.getElementById('adm-title').value, imageUrl: document.getElementById('adm-img').value, price: document.getElementById('adm-price').value, link: document.getElementById('adm-link').value, bookImg: document.getElementById('adm-book-img').value, bookLink: document.getElementById('adm-book-link').value, hoodyImg: document.getElementById('adm-hoody-img').value, hoodyLink: document.getElementById('adm-hoody-link').value, desc: document.getElementById('adm-desc').value };
         const out = document.getElementById('json-out');
         out.innerText = JSON.stringify(obj, null, 4) + ",";
         out.style.display = 'block';
