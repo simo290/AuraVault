@@ -19,7 +19,7 @@
         header h1 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 3.5em; margin: 0; letter-spacing: 8px; text-transform: uppercase; }
         header p { color: #444; letter-spacing: 5px; font-size: 0.7em; margin-top: 10px; font-weight: 600; }
 
-        /* Navigation */
+        /* Navigation Minimalist (المستطيلات اللي حيدنا) */
         .main-nav { 
             display: flex; justify-content: center; gap: 30px; padding: 20px; 
             position: sticky; top: 0; z-index: 1000; background: rgba(8,8,8,0.9); backdrop-filter: blur(10px);
@@ -32,7 +32,7 @@
         .nav-link.active { color: var(--gold); }
         .nav-link.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: var(--gold); }
 
-        /* Grid */
+        /* Grid & Cards */
         .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 40px; padding: 40px; max-width: 1300px; margin: 0 auto; }
         .book-card { 
             background: var(--card); border: 1px solid #1a1a1a; border-radius: var(--radius); 
@@ -49,16 +49,16 @@
         }
         .action-btn:hover { background: var(--gold); color: #000; }
 
-        /* Modal Overlay */
+        /* Popups */
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); z-index: 2000; backdrop-filter: blur(15px); }
         .modal-content { background: #0a0a0a; max-width: 480px; margin: 60px auto; padding: 50px; border: 1px solid #222; border-radius: var(--radius); text-align: center; position: relative; }
         .close-btn { position: absolute; top: 20px; right: 25px; color: var(--gold); cursor: pointer; font-size: 1.5em; }
 
         input { width: 100%; padding: 15px; background: #111; border: 1px solid #222; color: #fff; border-radius: 15px; margin-bottom: 15px; box-sizing: border-box; }
 
-        /* Admin */
-        .admin-trigger { text-align: center; padding: 60px; opacity: 0.1; cursor: pointer; color: #333; }
-        .admin-panel { display: none; max-width: 600px; margin: 20px auto; background: #111; padding: 40px; border: 1px solid var(--gold); border-radius: var(--radius); }
+        /* Admin Section */
+        .admin-trigger { text-align: center; padding: 60px; opacity: 0.05; cursor: pointer; color: #333; }
+        .admin-panel { display: none; max-width: 600px; margin: 20px auto; background: #111; padding: 40px; border: 1px solid var(--gold); border-radius: var(--radius); text-align: left; }
     </style>
 </head>
 <body>
@@ -69,9 +69,9 @@
     </header>
 
     <nav class="main-nav">
-        <button class="nav-link active" onclick="switchTab('./summaries.json', this)">Summaries</button>
-        <button class="nav-link" onclick="switchTab('./books.json', this)">Books</button>
-        <button class="nav-link" onclick="switchTab('./hoody.json', this)">Hoodies</button>
+        <button class="nav-link active" onclick="switchTab('summaries.json', this)">Summaries</button>
+        <button class="nav-link" onclick="switchTab('books.json', this)">Books</button>
+        <button class="nav-link" onclick="switchTab('hoody.json', this)">Hoodies</button>
     </nav>
 
     <main id="display-grid" class="book-grid"></main>
@@ -87,26 +87,22 @@
     <div class="admin-trigger" onclick="openAdmin()">● System</div>
     <div id="admin-panel" class="admin-panel">
         <h2 style="color:var(--gold)">Admin Manager</h2>
-        <select id="adm-type">
-            <option value="summary">Summary</option>
-            <option value="book">Book</option>
-            <option value="hoody">Hoody</option>
-        </select>
         <input type="text" id="adm-title" placeholder="Title">
         <input type="text" id="adm-img" placeholder="Image URL">
         <input type="text" id="adm-price" placeholder="Price">
         <input type="text" id="adm-link" placeholder="Partner Link">
-        <textarea id="adm-desc" placeholder="Content/Description" rows="5" style="width:100%; background:#000; color:#fff; border:1px solid #333; border-radius:10px;"></textarea>
+        <textarea id="adm-desc" placeholder="Summary Content / Product Info" rows="5" style="width:100%; background:#000; color:#fff; border:1px solid #333; border-radius:10px; padding:10px;"></textarea>
         <button class="action-btn" onclick="genJSON()" style="background:var(--gold); color:#000; margin-top:10px;">Generate JSON</button>
         <div id="json-out" style="background:#000; color:#0f0; padding:15px; margin-top:15px; display:none; white-space:pre-wrap; font-family:monospace; font-size:11px; border-radius:10px;"></div>
     </div>
 
     <script>
         let itemsData = [];
-        let currentFile = './summaries.json';
+        let currentTabFile = 'summaries.json';
 
+        // دالة ذكية باش تجيب الملف واخا يكون السيت ف GitHub Pages
         async function switchTab(jsonFile, element) {
-            currentFile = jsonFile;
+            currentTabFile = jsonFile;
             document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
             element.classList.add('active');
 
@@ -114,23 +110,24 @@
             grid.innerHTML = "<p style='color:var(--gold); text-align:center;'>ACCESSING ARCHIVE...</p>";
 
             try {
-                const response = await fetch(jsonFile);
+                // هاد السطر كيعيط على الملف مباشرة من الـ Root
+                const response = await fetch('./' + jsonFile);
                 if (!response.ok) throw new Error("404");
                 itemsData = await response.json();
                 
                 grid.innerHTML = "";
                 itemsData.forEach((item, index) => {
-                    const btnLabel = jsonFile.includes('summaries') ? 'Explore' : 'Buy Now';
+                    const btnText = jsonFile.includes('summaries') ? 'Read Summary' : 'Buy Now';
                     grid.innerHTML += `
                         <div class="book-card">
-                            <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/350x500'">
+                            <img src="${item.imageUrl}" class="book-image">
                             <h3 style="color:var(--gold); font-family:'Playfair Display';">${item.title}</h3>
-                            <p style="letter-spacing:2px; font-weight:300; margin-bottom:20px;">$${item.price}</p>
-                            <button class="action-btn" onclick="openModal(${index})">${btnLabel}</button>
+                            <p>$${item.price}</p>
+                            <button class="action-btn" onclick="openModal(${index})">${btnText}</button>
                         </div>`;
                 });
             } catch (error) {
-                grid.innerHTML = `<p style='color:#333; text-align:center;'>No Data Found in ${jsonFile}</p>`;
+                grid.innerHTML = `<p style='color:#333; text-align:center;'>Section Empty (${jsonFile} not found in root)</p>`;
             }
         }
 
@@ -139,20 +136,21 @@
             const title = document.getElementById('m-title');
             const body = document.getElementById('m-body');
 
-            if (currentFile.includes('summaries')) {
+            if (currentTabFile.includes('summaries')) {
                 title.innerText = item.title;
                 body.innerHTML = `<div style='text-align:left; color:#888; line-height:1.8; max-height:300px; overflow-y:auto; margin-bottom:25px;'>${item.desc || 'No content.'}</div>
                 <button class="action-btn" style="background:var(--gold); color:#000;" onclick="window.open('${item.link}', '_blank')">Full Access</button>`;
             } else {
                 title.innerText = "CHECKOUT";
-                const isHoody = currentFile.includes('hoody');
+                const isHoody = currentTabFile.includes('hoody');
                 const logo = isHoody ? 'https://www.teepublic.com/assets/teepublic_logo_black-63e5e5d3.svg' : 'https://upload.wikimedia.org/wikipedia/en/thumb/8/80/AliExpress_logo.svg/1200px-AliExpress_logo.svg.png';
                 body.innerHTML = `
                     <input type="text" placeholder="SHIPPING NAME">
+                    <input type="text" placeholder="SHIPPING ADDRESS">
                     <div style="background:#111; padding:20px; border-radius:20px; border:1px dashed #333; display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:25px;">
-                        <span style="font-size:0.6em; color:#555;">PARTNER:</span> <img src="${logo}" height="18" style="${isHoody ? 'filter:invert(1)' : ''}">
+                        <span style="font-size:0.6em; color:#555;">VERIFIED PARTNER:</span> <img src="${logo}" height="18" style="${isHoody ? 'filter:invert(1)' : ''}">
                     </div>
-                    <button class="action-btn" style="background:var(--gold); color:#000;" onclick="window.open('${item.link}', '_blank')">Process Order</button>`;
+                    <button class="action-btn" style="background:var(--gold); color:#000;" onclick="window.open('${item.link}', '_blank')">Proceed to Payment</button>`;
             }
             document.getElementById('action-modal').style.display = 'block';
         }
@@ -162,19 +160,13 @@
         function openAdmin() { if(prompt("Key:") === "canon_-!LB2107") document.getElementById('admin-panel').style.display = 'block'; }
         
         function genJSON() {
-            const data = {
-                title: document.getElementById('adm-title').value,
-                imageUrl: document.getElementById('adm-img').value,
-                price: document.getElementById('adm-price').value,
-                link: document.getElementById('adm-link').value,
-                desc: document.getElementById('adm-desc').value
-            };
+            const data = { title: document.getElementById('adm-title').value, imageUrl: document.getElementById('adm-img').value, price: document.getElementById('adm-price').value, link: document.getElementById('adm-link').value, desc: document.getElementById('adm-desc').value };
             const out = document.getElementById('json-out');
             out.innerText = JSON.stringify(data, null, 4);
             out.style.display = 'block';
         }
 
-        window.onload = () => switchTab('./summaries.json', document.querySelector('.nav-link'));
+        window.onload = () => switchTab('summaries.json', document.querySelector('.nav-link'));
     </script>
 </body>
 </html>
