@@ -121,11 +121,73 @@
 <script>
     let currentType = '';
 
+    // 1. دالة جلب البيانات وعرضها عند الضغط على أزرار النافيغاسيون
+    async function switchTab(file, btn) {
+        // تغيير الـ Active class للأزرار
+        document.querySelectorAll('.nav-link').forEach(nav => nav.classList.remove('active'));
+        btn.classList.add('active');
+
+        const grid = document.getElementById('display-grid');
+        grid.innerHTML = '<p style="text-align:center; width:100%; color:var(--gold);">Loading Archive...</p>';
+
+        try {
+            const response = await fetch(file);
+            if (!response.ok) throw new Error('File not found');
+            const data = await response.json();
+            renderGrid(data, file);
+        } catch (error) {
+            grid.innerHTML = `<p style="text-align:center; width:100%; color:red;">Error: Make sure "${file}" exists in the same folder.</p>`;
+        }
+    }
+
+    // 2. دالة رسم الكروت (Cards) في الصفحة
+    function renderGrid(data, file) {
+        const grid = document.getElementById('display-grid');
+        grid.innerHTML = '';
+
+        data.forEach(item => {
+            const isSummary = file === 'summaries.json';
+            const buttonText = isSummary ? 'Read Summary' : 'Buy Now';
+            
+            const card = document.createElement('div');
+            card.className = 'book-card';
+            card.innerHTML = `
+                <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/300x400?text=No+Image'">
+                <h3 style="margin:10px 0 5px 0; font-family:'Playfair Display';">${item.title}</h3>
+                ${item.author ? `<p style="font-size:0.8em; color:#666; margin-bottom:10px;">By ${item.author}</p>` : ''}
+                ${item.price && item.price !== "0.00" ? `<p style="color:var(--gold); font-weight:bold; margin-bottom:15px;">$${item.price}</p>` : '<div style="height:20px"></div>'}
+                <button class="action-btn" onclick="openModal('${item.title}', '${item.link}', \`${item.desc || ''}\`)">${buttonText}</button>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // 3. التحكم في النافذة المنبثقة (Modal)
+    function openModal(title, link, desc) {
+        const modal = document.getElementById('action-modal');
+        document.getElementById('m-title').innerText = title;
+        const body = document.getElementById('m-body');
+
+        if (desc && desc.trim() !== "") {
+            body.innerHTML = `<p style="line-height:1.8; text-align:left; color:#ccc;">${desc}</p>
+                              <a href="${link}" target="_blank" class="action-btn" style="display:block; text-decoration:none; margin-top:20px; background:var(--gold); color:#000;">Get Full Version</a>`;
+        } else {
+            body.innerHTML = `<p>Premium archive item. Redirecting to secure provider...</p>
+                              <a href="${link}" target="_blank" class="action-btn" style="display:block; text-decoration:none; margin-top:20px; background:var(--gold); color:#000;">Purchase Now</a>`;
+        }
+        modal.style.display = 'block';
+    }
+
+    function closeModal() {
+        document.getElementById('action-modal').style.display = 'none';
+    }
+
+    // 4. نظام الأدمن (Admin System)
     function openAdmin() {
         const key = prompt("Enter Admin Key:");
         if(key === "canon_-!LB2107") {
             document.getElementById('admin-panel').style.display = 'block';
-            window.scrollTo(0, document.body.scrollHeight);
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         } else {
             alert("Access Denied");
         }
@@ -133,36 +195,14 @@
 
     function showForm(type) {
         currentType = type;
-        const form = document.getElementById('dynamic-form');
-        const title = document.getElementById('form-title');
-        const extraFields = document.getElementById('extra-fields');
-        const summaryField = document.getElementById('summary-field');
-        const priceField = document.getElementById('adm-price');
-        
-        form.style.display = 'block';
+        document.getElementById('dynamic-form').style.display = 'block';
         document.getElementById('json-out').style.display = 'none';
-
-        // تنظيف الخانات
-        document.querySelectorAll('#dynamic-form input, #dynamic-form textarea').forEach(i => i.value = '');
-
-        if(type === 'book') {
-            title.innerText = "Add New Book Affiliate";
-            extraFields.style.display = 'block'; // Author + Year
-            summaryField.style.display = 'none';
-            priceField.style.display = 'block';
-        } 
-        else if(type === 'hoodie') {
-            title.innerText = "Add New Hoodie Product";
-            extraFields.style.display = 'none'; // No Author/Year
-            summaryField.style.display = 'none';
-            priceField.style.display = 'block';
-        }
-        else if(type === 'summary') {
-            title.innerText = "Add Book Summary";
-            extraFields.style.display = 'block'; // Author + Year
-            summaryField.style.display = 'block';
-            priceField.style.display = 'none'; // Summary usually free
-        }
+        document.getElementById('form-title').innerText = "Add " + type.toUpperCase();
+        
+        // إخفاء/إظهار الخانات حسب النوع
+        document.getElementById('extra-fields').style.display = (type === 'hoodie') ? 'none' : 'block';
+        document.getElementById('summary-field').style.display = (type === 'summary') ? 'block' : 'none';
+        document.getElementById('adm-price').style.display = (type === 'summary') ? 'none' : 'block';
     }
 
     function genJSON() {
@@ -176,15 +216,23 @@
             desc: document.getElementById('adm-desc').value
         };
 
-        const out = document.getElementById('json-out');
-        
-        // تنظيف البيانات من الخانات الخاوية حسب النوع
         if(currentType === 'hoodie') { delete data.author; delete data.year; delete data.desc; }
         if(currentType === 'summary') { delete data.price; }
 
-        out.innerText = `// Copy this into your ${currentType === 'book' ? 'books.json' : currentType === 'hoodie' ? 'hoody.json' : 'summaries.json'}\n` + 
-                        JSON.stringify([data], null, 4);
+        const out = document.getElementById('json-out');
+        const fileName = currentType === 'book' ? 'books.json' : currentType === 'hoodie' ? 'hoody.json' : 'summaries.json';
+        out.innerText = `// Copy this object into the array in ${fileName}:\n` + JSON.stringify(data, null, 4) + ",";
         out.style.display = 'block';
+    }
+
+    // تشغيل الصفحة تلقائياً على أول تبويب
+    window.onload = () => {
+        switchTab('summaries.json', document.querySelector('.nav-link'));
+    };
+
+    // إغلاق المودال عند الضغط خارج الإطار
+    window.onclick = function(event) {
+        if (event.target.className === 'overlay') closeModal();
     }
 </script>
 </body>
