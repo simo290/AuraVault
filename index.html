@@ -163,24 +163,49 @@
     }
 
     // 3. التحكم في النافذة المنبثقة (Modal)
-    function openModal(title, link, desc) {
-        const modal = document.getElementById('action-modal');
-        document.getElementById('m-title').innerText = title;
-        const body = document.getElementById('m-body');
+   function openModal(title, link, desc) {
+    const modal = document.getElementById('action-modal');
+    const mTitle = document.getElementById('m-title');
+    const mBody = document.getElementById('m-body');
 
-        if (desc && desc.trim() !== "") {
-            body.innerHTML = `<p style="line-height:1.8; text-align:left; color:#ccc;">${desc}</p>
-                              <a href="${link}" target="_blank" class="action-btn" style="display:block; text-decoration:none; margin-top:20px; background:var(--gold); color:#000;">Get Full Version</a>`;
-        } else {
-            body.innerHTML = `<p>Premium archive item. Redirecting to secure provider...</p>
-                              <a href="${link}" target="_blank" class="action-btn" style="display:block; text-decoration:none; margin-top:20px; background:var(--gold); color:#000;">Purchase Now</a>`;
-        }
-        modal.style.display = 'block';
-    }
+    modal.style.display = 'block';
+    mTitle.innerText = title;
 
-    function closeModal() {
-        document.getElementById('action-modal').style.display = 'none';
+    // إذا كان ملخص (Summary) كنعرضو النص
+    if (desc && desc.trim() !== "") {
+        mBody.innerHTML = `
+            <p style="line-height:1.6; text-align:left; color:#ccc; margin-bottom:20px;">${desc}</p>
+            <button class="action-btn" onclick="closeModal()">Close</button>
+        `;
+    } 
+    // إذا كان منتج (Buy Now) كنطلبوا الإيميل الأول
+    else {
+        mBody.innerHTML = `
+            <p style="margin-bottom:20px; font-size:0.9em; color:#888;">Enter your email to receive exclusive offers and proceed to the archive.</p>
+            
+            <input type="email" id="user-email" placeholder="Your Luxury Email" required 
+                   style="margin-bottom:15px; border: 1px solid var(--gold); background: #000;">
+            
+            <button class="action-btn" id="proceed-btn" 
+                    style="background:var(--gold); color:#000;">
+                Unlock & Proceed
+            </button>
+        `;
+
+        // ملي يضغط على "Unlock" كنسيفطوه للرابط
+        document.getElementById('proceed-btn').onclick = function() {
+            const email = document.getElementById('user-email').value;
+            if(email.includes('@')) {
+                // هنا تقدر تزيد كود صيفط الإيميل لـ Google Sheets مثلاً
+                console.log("Email captured: " + email); 
+                window.open(link, '_blank'); // كتحل رابط الشراء
+                closeModal();
+            } else {
+                alert("Please enter a valid email address.");
+            }
+        };
     }
+}
 
     // 4. نظام الأدمن (Admin System)
     function openAdmin() {
