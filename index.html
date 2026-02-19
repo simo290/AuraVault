@@ -10,18 +10,15 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { background-color: var(--black); color: white; font-family: 'Inter', sans-serif; }
         
-        /* Header & Nav */
         header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #333; }
         .logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--gold); letter-spacing: 2px; cursor: pointer; }
         nav { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
         .nav-link { color: #888; text-decoration: none; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding-bottom: 5px; }
         .nav-link.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
 
-        /* Grid System */
         .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
         
-        /* Book Card */
         .book-card { background: var(--dark-grey); padding: 20px; border-radius: 5px; text-align: center; border: 1px solid #222; transition: 0.3s; }
         .book-card:hover { border-color: var(--gold); transform: translateY(-5px); }
         .book-image { width: 100%; height: 400px; object-fit: cover; border-radius: 3px; }
@@ -29,19 +26,44 @@
         .action-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 25px; cursor: pointer; width: 100%; margin-top: 15px; font-weight: 600; transition: 0.3s; }
         .action-btn:hover { background: var(--gold); color: black; }
 
-        /* Modal & Overlay */
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; }
-        .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 30px; border: 1px solid var(--gold); width: 90%; max-width: 550px; max-height: 85vh; overflow-y: auto; }
+        .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 30px; border: 1px solid var(--gold); width: 95%; max-width: 650px; max-height: 85vh; overflow-y: auto; }
         
-        /* Mini Cards inside Modal */
-        .modal-products { display: flex; gap: 15px; margin-bottom: 25px; justify-content: center; }
-        .mini-card { background: var(--dark-grey); border: 1px solid #333; padding: 10px; width: 140px; text-align: center; }
-        .mini-card img { width: 100%; height: 160px; object-fit: cover; }
-        .mini-card h4 { font-size: 0.7rem; margin: 8px 0; font-family: 'Playfair Display'; }
-        .mini-buy-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); font-size: 0.6rem; padding: 5px; width: 100%; cursor: pointer; }
+        /* Modal Products Side-by-Side */
+        .modal-products { 
+            display: flex; 
+            flex-direction: row; 
+            flex-wrap: nowrap; 
+            gap: 20px; 
+            margin-bottom: 25px; 
+            justify-content: center; 
+            align-items: flex-start;
+        }
+
+        .mini-card { 
+            background: var(--dark-grey); 
+            border: 1px solid #333; 
+            padding: 10px; 
+            width: 180px; 
+            text-align: center; 
+            flex-shrink: 0; 
+        }
+
+        .mini-card img { width: 100%; height: 220px; object-fit: cover; border-radius: 2px; }
+        .mini-card h4 { font-size: 0.75rem; margin: 10px 0; font-family: 'Playfair Display'; color: var(--gold); }
+        
+        .mini-buy-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); font-size: 0.65rem; padding: 8px; width: 100%; cursor: pointer; transition: 0.3s; }
         .mini-buy-btn:hover { background: var(--gold); color: black; }
 
-        /* Admin Panel */
+        /* Email Section Styling */
+        #email-unlock-section { 
+            margin-bottom: 20px; 
+            text-align: center; 
+            padding: 15px; 
+            border: 1px solid var(--gold); 
+            background: #000;
+        }
+
         #admin-panel { display: none; margin-top: 50px; padding: 30px; border: 1px dashed var(--gold); background: #050505; }
         .admin-form input, .admin-form textarea { width: 100%; padding: 10px; margin-bottom: 10px; background: #1a1a1a; border: 1px solid #333; color: white; }
         #json-out { background: #000; color: #0f0; padding: 15px; margin-top: 15px; white-space: pre-wrap; font-size: 11px; display: none; border: 1px solid #0f0; }
@@ -91,34 +113,27 @@
 
 <script>
     let currentTab = 'summaries.json';
-    let allData = []; // ضرورية باش نخزنو البيانات ونمنعوا الـ Error ديال الرموز
+    let allData = [];
 
     async function switchTab(file, btn) {
         currentTab = file;
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         if(btn) btn.classList.add('active');
-        
         const grid = document.getElementById('display-grid');
         grid.innerHTML = '<p style="text-align:center; width:100%;">Accessing Vault...</p>';
-        
         try {
             const res = await fetch(file);
             allData = await res.json();
             render(allData);
-        } catch(e) { 
-            grid.innerHTML = '<p style="color:red; text-align:center; width:100%;">Error loading data.</p>'; 
-        }
+        } catch(e) { grid.innerHTML = '<p style="color:red; text-align:center; width:100%;">Error loading data.</p>'; }
     }
 
     function render(data) {
         const grid = document.getElementById('display-grid');
         grid.innerHTML = '';
-        
         data.forEach((item, index) => {
             const div = document.createElement('div');
             div.className = 'book-card';
-            
-            // استعملنا index باش نصلحو مشكل الـ 7 كتب اللي مابغوش يتكليكاو
             div.innerHTML = `
                 <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/400x600?text=AuraVault'">
                 <h3 class="book-title">${item.title}</h3>
@@ -131,7 +146,6 @@
         });
     }
 
-    // هادي هي الدالة اللي كانت عندك، صلحناها دابا باش تقرأ من allData
     function handleAction(index) {
         const item = allData[index]; 
         const modal = document.getElementById('action-modal');
@@ -144,11 +158,29 @@
         if(currentTab === 'summaries.json') {
             body.innerHTML = `
                 <div class="modal-products">
-                    ${item.bookLink ? `<div class="mini-card"><img src="${item.bookImg}"><h4>The Book</h4><button class="mini-buy-btn" onclick="askEmail('${item.bookLink}')">BUY BOOK</button></div>` : ''}
-                    ${item.hoodieLink ? `<div class="mini-card"><img src="${item.hoodyImg}"><h4>The Hoody</h4><button class="mini-buy-btn" onclick="askEmail('${item.hoodieLink}')">BUY HOODY</button></div>` : ''}
+                    ${item.bookLink ? `
+                    <div class="mini-card">
+                        <img src="${item.bookImg}">
+                        <h4>The Masterpiece</h4>
+                        <button class="mini-buy-btn" onclick="showEmailSection('${item.bookLink}')">GET BOOK</button>
+                    </div>` : ''}
+                    
+                    ${item.hoodyLink ? `
+                    <div class="mini-card">
+                        <img src="${item.hoodyImg}">
+                        <h4>The Apparel</h4>
+                        <button class="mini-buy-btn" onclick="showEmailSection('${item.hoodyLink}')">GET HOODY</button>
+                    </div>` : ''}
                 </div>
+                
+                <div id="email-unlock-section" style="display:none;">
+                    <p style="font-size:0.8rem; margin-bottom:10px;">Enter email to unlock secure link:</p>
+                    <input type="email" id="modal-u-email" placeholder="your@email.com" style="width:100%; padding:10px; background:#000; border:1px solid var(--gold); color:#fff; margin-bottom:10px;">
+                    <button id="proceed-link-btn" class="action-btn" style="margin-top:0;">UNLOCK NOW</button>
+                </div>
+
                 <div style="border-top: 1px solid #333; padding-top:15px; max-height:250px; overflow-y:auto;">
-                    <p style="font-size:0.9rem; line-height:1.6; color:#bbb;">${item.desc || item.description || ''}</p>
+                    <p style="font-size:0.9rem; line-height:1.6; color:#bbb; white-space: pre-line;">${item.desc || item.description || ''}</p>
                 </div>
             `;
         } else {
@@ -160,9 +192,20 @@
         }
     }
 
-    function askEmail(l) {
-        const mail = prompt("Enter your email to proceed:");
-        if(mail && mail.includes('@')) window.open(l, '_blank');
+    function showEmailSection(link) {
+        const section = document.getElementById('email-unlock-section');
+        const btn = document.getElementById('proceed-link-btn');
+        section.style.display = 'block';
+        btn.onclick = function() {
+            const email = document.getElementById('modal-u-email').value;
+            if(email.includes('@')) {
+                window.open(link, '_blank');
+                section.style.display = 'none';
+            } else {
+                alert("Please enter a valid email address.");
+            }
+        };
+        section.scrollIntoView({ behavior: 'smooth' });
     }
 
     function goLink(l) {
@@ -171,13 +214,7 @@
     }
 
     function closeModal() { document.getElementById('action-modal').style.display='none'; }
-    
-    function openAdmin() { 
-        if(prompt("Key:") === "canon_-!LB2107") { 
-            document.getElementById('admin-panel').style.display='block'; 
-            window.scrollTo(0,document.body.scrollHeight); 
-        } 
-    }
+    function openAdmin() { if(prompt("Key:") === "canon_-!LB2107") { document.getElementById('admin-panel').style.display='block'; window.scrollTo(0,document.body.scrollHeight); } }
 
     function genJSON() {
         const obj = { 
