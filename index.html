@@ -91,79 +91,71 @@
 
 <script>
     let currentTab = 'summaries.json';
+    let allData = []; // ضرورية باش نخزنو البيانات ونمنعوا الـ Error ديال الرموز
 
     async function switchTab(file, btn) {
         currentTab = file;
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         if(btn) btn.classList.add('active');
+        
         const grid = document.getElementById('display-grid');
         grid.innerHTML = '<p style="text-align:center; width:100%;">Accessing Vault...</p>';
+        
         try {
             const res = await fetch(file);
-            const data = await res.json();
-            render(data);
-        } catch(e) { grid.innerHTML = '<p style="color:red; text-align:center; width:100%;">Error loading data.</p>'; }
+            allData = await res.json();
+            render(allData);
+        } catch(e) { 
+            grid.innerHTML = '<p style="color:red; text-align:center; width:100%;">Error loading data.</p>'; 
+        }
     }
-function render(data) {
-    const grid = document.getElementById('display-grid');
-    grid.innerHTML = '';
-    data.forEach((item, index) => {
-        const div = document.createElement('div');
-        div.className = 'book-card';
+
+    function render(data) {
+        const grid = document.getElementById('display-grid');
+        grid.innerHTML = '';
         
-        // تحويل البيانات لـ String آمن باش ما يوقعش مشكل في الأزرار
-        const safeTitle = encodeURIComponent(item.title);
-        const safeLink = encodeURIComponent(item.link || item.affiliateLink || '#');
-        const safeDesc = encodeURIComponent(item.desc || item.description || '');
-        const safeBImg = encodeURIComponent(item.bookImg || '');
-        const safeBLink = encodeURIComponent(item.bookLink || '');
-        const safeHImg = encodeURIComponent(item.hoodyImg || '');
-        const safeHLink = encodeURIComponent(item.hoodyLink || '');
+        data.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'book-card';
+            
+            // استعملنا index باش نصلحو مشكل الـ 7 كتب اللي مابغوش يتكليكاو
+            div.innerHTML = `
+                <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/400x600?text=AuraVault'">
+                <h3 class="book-title">${item.title}</h3>
+                ${item.price ? `<p style="color:var(--gold); font-weight:bold;">$${item.price}</p>` : ''}
+                <button class="action-btn" onclick="handleAction(${index})">
+                    ${currentTab === 'summaries.json' ? 'LEARN MORE' : 'BUY NOW'}
+                </button>
+            `;
+            grid.appendChild(div);
+        });
+    }
 
-        div.innerHTML = `
-            <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/400x600?text=AuraVault'">
-            <h3 class="book-title">${item.title}</h3>
-            ${item.price ? `<p style="color:var(--gold); font-weight:bold;">$${item.price}</p>` : ''}
-            <button class="action-btn" onclick="processAction('${safeTitle}', '${safeLink}', '${safeDesc}', '${safeBImg}', '${safeBLink}', '${safeHImg}', '${safeHLink}')">
-                ${currentTab === 'summaries.json' ? 'LEARN MORE' : 'BUY NOW'}
-            </button>
-        `;
-        grid.appendChild(div);
-    });
-}
-
-// دالة جديدة كتحل التشفير وكتعرض المودال بلا أخطاء
-function processAction(title, link, desc, bImg, bLink, hImg, hLink) {
-    handleAction(
-        decodeURIComponent(title),
-        decodeURIComponent(link),
-        decodeURIComponent(desc),
-        decodeURIComponent(bImg),
-        decodeURIComponent(bLink),
-        decodeURIComponent(hImg),
-        decodeURIComponent(hLink)
-    );
-}
-
-    function handleAction(title, link, desc, bImg, bLink, hImg, hLink) {
+    // هادي هي الدالة اللي كانت عندك، صلحناها دابا باش تقرأ من allData
+    function handleAction(index) {
+        const item = allData[index]; 
         const modal = document.getElementById('action-modal');
-        document.getElementById('m-title').innerText = title;
+        document.getElementById('m-title').innerText = item.title;
         const body = document.getElementById('m-body');
         modal.style.display = 'block';
+
+        const mainLink = item.link || item.affiliateLink || '#';
 
         if(currentTab === 'summaries.json') {
             body.innerHTML = `
                 <div class="modal-products">
-                    ${bLink ? `<div class="mini-card"><img src="${bImg}"><h4>The Book</h4><button class="mini-buy-btn" onclick="askEmail('${bLink}')">BUY BOOK</button></div>` : ''}
-                    ${hLink ? `<div class="mini-card"><img src="${hImg}"><h4>The Hoody</h4><button class="mini-buy-btn" onclick="askEmail('${hLink}')">BUY HOODY</button></div>` : ''}
+                    ${item.bookLink ? `<div class="mini-card"><img src="${item.bookImg}"><h4>The Book</h4><button class="mini-buy-btn" onclick="askEmail('${item.bookLink}')">BUY BOOK</button></div>` : ''}
+                    ${item.hoodieLink ? `<div class="mini-card"><img src="${item.hoodyImg}"><h4>The Hoody</h4><button class="mini-buy-btn" onclick="askEmail('${item.hoodieLink}')">BUY HOODY</button></div>` : ''}
                 </div>
-                <div style="border-top: 1px solid #333; padding-top:15px;"><p style="font-size:0.9rem; line-height:1.6; color:#bbb;">${desc}</p></div>
+                <div style="border-top: 1px solid #333; padding-top:15px; max-height:250px; overflow-y:auto;">
+                    <p style="font-size:0.9rem; line-height:1.6; color:#bbb;">${item.desc || item.description || ''}</p>
+                </div>
             `;
         } else {
             body.innerHTML = `
                 <p style="text-align:center; margin-bottom:15px;">Enter email to unlock secure link:</p>
                 <input type="email" id="u-email" placeholder="your@email.com" style="width:100%; padding:12px; background:#000; border:1px solid var(--gold); color:#fff; margin-bottom:15px;">
-                <button class="action-btn" onclick="goLink('${link}')">UNLOCK & PROCEED</button>
+                <button class="action-btn" onclick="goLink('${mainLink}')">UNLOCK & PROCEED</button>
             `;
         }
     }
@@ -179,7 +171,13 @@ function processAction(title, link, desc, bImg, bLink, hImg, hLink) {
     }
 
     function closeModal() { document.getElementById('action-modal').style.display='none'; }
-    function openAdmin() { if(prompt("Key:") === "canon_-!LB2107") { document.getElementById('admin-panel').style.display='block'; window.scrollTo(0,document.body.scrollHeight); } }
+    
+    function openAdmin() { 
+        if(prompt("Key:") === "canon_-!LB2107") { 
+            document.getElementById('admin-panel').style.display='block'; 
+            window.scrollTo(0,document.body.scrollHeight); 
+        } 
+    }
 
     function genJSON() {
         const obj = { 
