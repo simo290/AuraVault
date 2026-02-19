@@ -104,31 +104,46 @@
             render(data);
         } catch(e) { grid.innerHTML = '<p style="color:red; text-align:center; width:100%;">Error loading data.</p>'; }
     }
+function render(data) {
+    const grid = document.getElementById('display-grid');
+    grid.innerHTML = '';
+    data.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'book-card';
+        
+        // تحويل البيانات لـ String آمن باش ما يوقعش مشكل في الأزرار
+        const safeTitle = encodeURIComponent(item.title);
+        const safeLink = encodeURIComponent(item.link || item.affiliateLink || '#');
+        const safeDesc = encodeURIComponent(item.desc || item.description || '');
+        const safeBImg = encodeURIComponent(item.bookImg || '');
+        const safeBLink = encodeURIComponent(item.bookLink || '');
+        const safeHImg = encodeURIComponent(item.hoodyImg || '');
+        const safeHLink = encodeURIComponent(item.hoodyLink || '');
 
-    function render(data) {
-        const grid = document.getElementById('display-grid');
-        grid.innerHTML = '';
-        data.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'book-card';
-            const link = item.link || item.affiliateLink || '#';
-            const desc = (item.desc || item.description || '').replace(/`/g, "\\`").replace(/'/g, "\\'");
-            
-            // Short preview for summary tab
-            let preview = "";
-            if(currentTab === 'summaries.json') preview = `<p style="font-size:0.8rem; color:#666; margin-bottom:10px;">${(item.desc || "").substring(0, 80)}...</p>`;
+        div.innerHTML = `
+            <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/400x600?text=AuraVault'">
+            <h3 class="book-title">${item.title}</h3>
+            ${item.price ? `<p style="color:var(--gold); font-weight:bold;">$${item.price}</p>` : ''}
+            <button class="action-btn" onclick="processAction('${safeTitle}', '${safeLink}', '${safeDesc}', '${safeBImg}', '${safeBLink}', '${safeHImg}', '${safeHLink}')">
+                ${currentTab === 'summaries.json' ? 'LEARN MORE' : 'BUY NOW'}
+            </button>
+        `;
+        grid.appendChild(div);
+    });
+}
 
-            div.innerHTML = `
-                <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/400x600?text=AuraVault'">
-                <h3 class="book-title">${item.title}</h3>
-                ${item.price ? `<p style="color:var(--gold); font-weight:bold;">$${item.price}</p>` : preview}
-                <button class="action-btn" onclick="handleAction('${item.title.replace(/'/g, "\\'")}', '${link}', \`${desc}\`, '${item.bookImg||""}', '${item.bookLink||""}', '${item.hoodyImg||""}', '${item.hoodyLink||""}')">
-                    ${currentTab === 'summaries.json' ? 'LEARN MORE' : 'BUY NOW'}
-                </button>
-            `;
-            grid.appendChild(div);
-        });
-    }
+// دالة جديدة كتحل التشفير وكتعرض المودال بلا أخطاء
+function processAction(title, link, desc, bImg, bLink, hImg, hLink) {
+    handleAction(
+        decodeURIComponent(title),
+        decodeURIComponent(link),
+        decodeURIComponent(desc),
+        decodeURIComponent(bImg),
+        decodeURIComponent(bLink),
+        decodeURIComponent(hImg),
+        decodeURIComponent(hLink)
+    );
+}
 
     function handleAction(title, link, desc, bImg, bLink, hImg, hLink) {
         const modal = document.getElementById('action-modal');
