@@ -83,113 +83,109 @@
             <div id="m-body"></div>
         </div>
     </div>
-
     <div class="admin-trigger" onclick="openAdmin()">● System</div>
-    <div id="admin-panel" class="admin-panel">
-        <h2 style="color:var(--gold)">Admin Manager</h2>
-        <input type="text" id="adm-title" placeholder="Title">
-        <input type="text" id="adm-img" placeholder="Image URL">
-        <input type="text" id="adm-price" placeholder="Price">
-        <input type="text" id="adm-link" placeholder="Partner Link">
-        <textarea id="adm-desc" placeholder="Summary Content / Product Info" rows="5" style="width:100%; background:#000; color:#fff; border:1px solid #333; border-radius:10px; padding:10px;"></textarea>
-        <button class="action-btn" onclick="genJSON()" style="background:var(--gold); color:#000; margin-top:10px;">Generate JSON</button>
-        <div id="json-out" style="background:#000; color:#0f0; padding:15px; margin-top:15px; display:none; white-space:pre-wrap; font-family:monospace; font-size:11px; border-radius:10px;"></div>
+
+<div id="admin-panel" class="admin-panel" style="display:none;">
+    <h2 style="color:var(--gold); text-align:center;">VAULT MANAGER</h2>
+    
+    <div style="display:flex; gap:10px; margin-bottom:20px;">
+        <button class="action-btn" onclick="showForm('book')">Add Book</button>
+        <button class="action-btn" onclick="showForm('hoodie')">Add Hoodie</button>
+        <button class="action-btn" onclick="showForm('summary')">Add Summary</button>
     </div>
 
-    <script>
-        let itemsData = [];
-        let currentTabFile = 'summaries.json';
-
-        async function switchTab(jsonFile, element) {
-            currentTabFile = jsonFile;
-            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
-
-            const grid = document.getElementById('display-grid');
-            grid.innerHTML = "<p style='color:var(--gold); text-align:center;'>ACCESSING ARCHIVE...</p>";
-
-            try {
-                const response = await fetch('./' + jsonFile);
-                if (!response.ok) throw new Error(`404: ${jsonFile}`);
-                
-                itemsData = await response.json();
-                grid.innerHTML = "";
-                
-                if (itemsData.length === 0) {
-                    grid.innerHTML = "<p style='color:#666; text-align:center;'>This section is currently empty.</p>";
-                    return;
-                }
-
-                itemsData.forEach((item, index) => {
-                    const btnText = jsonFile.includes('summaries') ? 'Read Summary' : 'Buy Now';
-                    grid.innerHTML += `
-                        <div class="book-card">
-                            <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/350x500?text=Image+Not+Found'">
-                            <h3 style="color:var(--gold); font-family:'Playfair Display';">${item.title}</h3>
-                            <p>$${item.price}</p>
-                            <button class="action-btn" onclick="openModal(${index})">${btnText}</button>
-                        </div>`;
-                });
-            } catch (error) {
-                console.error("Error loading JSON:", error);
-                grid.innerHTML = `<div style="text-align:center; padding:20px;"><p style='color:#ff4444;'>[!] ERROR: ${jsonFile} Missing</p></div>`;
-            }
-        }
-
-        function openModal(index) {
-            const item = itemsData[index];
-            const title = document.getElementById('m-title');
-            const body = document.getElementById('m-body');
-
-            if (currentTabFile.includes('summaries')) {
-                title.innerText = item.title;
-                body.innerHTML = `
-                    <div style='text-align:left; color:#ccc; line-height:1.8; max-height:300px; overflow-y:auto; margin-bottom:25px; white-space: pre-wrap;'>${item.desc || 'No content available.'}</div>
-                    <button class="action-btn" style="background:var(--gold); color:#000;" onclick="window.open('${item.link}', '_blank')">Full Access</button>`;
-            } else {
-                title.innerText = "CHECKOUT";
-                const isHoody = currentTabFile.includes('hoody');
-                const logo = isHoody ? 'https://www.teepublic.com/assets/teepublic_logo_black-63e5e5d3.svg' : 'https://upload.wikimedia.org/wikipedia/en/thumb/8/80/AliExpress_logo.svg/1200px-AliExpress_logo.svg.png';
-                
-                body.innerHTML = `
-                    <p style="color:#888; margin-bottom:15px;">${item.title}</p>
-                    <input type="text" placeholder="SHIPPING NAME">
-                    <input type="text" placeholder="SHIPPING ADDRESS">
-                    <div style="background:#111; padding:20px; border-radius:20px; border:1px dashed #333; display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:25px;">
-                        <span style="font-size:0.6em; color:#555;">VERIFIED PARTNER:</span> 
-                        <img src="${logo}" height="18" style="${isHoody ? 'filter:invert(1)' : ''}">
-                    </div>
-                    <button class="action-btn" style="background:var(--gold); color:#000;" onclick="window.open('${item.link}', '_blank')">Confirm Order</button>`;
-            }
-            document.getElementById('action-modal').style.display = 'block';
-        }
-
-        function closeModal() { document.getElementById('action-modal').style.display = 'none'; }
+    <div id="dynamic-form" style="display:none; background:#000; padding:20px; border-radius:15px; border:1px solid #222;">
+        <h3 id="form-title" style="color:var(--gold); margin-top:0;"></h3>
         
-        function openAdmin() { 
-            const key = prompt("Enter Admin Key:");
-            if(key === "canon_-!LB2107") {
-                document.getElementById('admin-panel').style.display = 'block';
-                window.scrollTo(0, document.body.scrollHeight);
-            } else {
-                alert("Access Denied");
-            }
-        }
+        <input type="text" id="adm-title" placeholder="Title / Name">
+        <input type="text" id="adm-img" placeholder="Image URL">
+        <input type="text" id="adm-price" placeholder="Price ($)">
         
-        function genJSON() {
-            const data = { 
-                title: document.getElementById('adm-title').value, 
-                imageUrl: document.getElementById('adm-img').value, 
-                price: document.getElementById('adm-price').value, 
-                link: document.getElementById('adm-link').value, 
-                desc: document.getElementById('adm-desc').value 
-            };
-            const out = document.getElementById('json-out');
-            out.innerText = JSON.stringify([data], null, 4);
-            out.style.display = 'block';
-        }
+        <div id="extra-fields">
+            <input type="text" id="adm-author" placeholder="Author Name">
+            <input type="text" id="adm-year" placeholder="Release Year">
+        </div>
 
-        window.onload = () => switchTab('summaries.json', document.querySelector('.nav-link'));
-    </script>
+        <input type="text" id="adm-link" placeholder="Affiliate / Partner Link">
+        
+        <div id="summary-field" style="display:none;">
+            <textarea id="adm-desc" placeholder="Write the summary here..." rows="8" style="width:100%; background:#111; color:#fff; border:1px solid #333; border-radius:10px; padding:10px;"></textarea>
+        </div>
+
+        <button class="action-btn" onclick="genJSON()" style="background:var(--gold); color:#000; margin-top:15px;">Generate JSON Data</button>
+    </div>
+
+    <div id="json-out" style="background:#000; color:#0f0; padding:15px; margin-top:15px; display:none; white-space:pre-wrap; font-family:monospace; font-size:11px; border-radius:10px; border:1px solid #0f0;"></div>
+</div>
+
+<script>
+    let currentType = '';
+
+    function openAdmin() {
+        const key = prompt("Enter Admin Key:");
+        if(key === "canon_-!LB2107") {
+            document.getElementById('admin-panel').style.display = 'block';
+            window.scrollTo(0, document.body.scrollHeight);
+        } else {
+            alert("Access Denied");
+        }
+    }
+
+    function showForm(type) {
+        currentType = type;
+        const form = document.getElementById('dynamic-form');
+        const title = document.getElementById('form-title');
+        const extraFields = document.getElementById('extra-fields');
+        const summaryField = document.getElementById('summary-field');
+        const priceField = document.getElementById('adm-price');
+        
+        form.style.display = 'block';
+        document.getElementById('json-out').style.display = 'none';
+
+        // تنظيف الخانات
+        document.querySelectorAll('#dynamic-form input, #dynamic-form textarea').forEach(i => i.value = '');
+
+        if(type === 'book') {
+            title.innerText = "Add New Book Affiliate";
+            extraFields.style.display = 'block'; // Author + Year
+            summaryField.style.display = 'none';
+            priceField.style.display = 'block';
+        } 
+        else if(type === 'hoodie') {
+            title.innerText = "Add New Hoodie Product";
+            extraFields.style.display = 'none'; // No Author/Year
+            summaryField.style.display = 'none';
+            priceField.style.display = 'block';
+        }
+        else if(type === 'summary') {
+            title.innerText = "Add Book Summary";
+            extraFields.style.display = 'block'; // Author + Year
+            summaryField.style.display = 'block';
+            priceField.style.display = 'none'; // Summary usually free
+        }
+    }
+
+    function genJSON() {
+        const data = {
+            title: document.getElementById('adm-title').value,
+            imageUrl: document.getElementById('adm-img').value,
+            price: document.getElementById('adm-price').value || "0.00",
+            link: document.getElementById('adm-link').value,
+            author: document.getElementById('adm-author').value,
+            year: document.getElementById('adm-year').value,
+            desc: document.getElementById('adm-desc').value
+        };
+
+        const out = document.getElementById('json-out');
+        
+        // تنظيف البيانات من الخانات الخاوية حسب النوع
+        if(currentType === 'hoodie') { delete data.author; delete data.year; delete data.desc; }
+        if(currentType === 'summary') { delete data.price; }
+
+        out.innerText = `// Copy this into your ${currentType === 'book' ? 'books.json' : currentType === 'hoodie' ? 'hoody.json' : 'summaries.json'}\n` + 
+                        JSON.stringify([data], null, 4);
+        out.style.display = 'block';
+    }
+</script>
 </body>
 </html>
