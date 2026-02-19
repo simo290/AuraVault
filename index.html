@@ -109,24 +109,30 @@
             grid.innerHTML = "<p style='color:var(--gold); text-align:center;'>ACCESSING ARCHIVE...</p>";
 
             try {
-                // الكود كيجيب الملف نيشان من نفس البلاصة
                 const response = await fetch('./' + jsonFile);
-                if (!response.ok) throw new Error("404");
-                itemsData = await response.json();
+                if (!response.ok) throw new Error(`404: ${jsonFile}`);
                 
+                itemsData = await response.json();
                 grid.innerHTML = "";
+                
+                if (itemsData.length === 0) {
+                    grid.innerHTML = "<p style='color:#666; text-align:center;'>This section is currently empty.</p>";
+                    return;
+                }
+
                 itemsData.forEach((item, index) => {
                     const btnText = jsonFile.includes('summaries') ? 'Read Summary' : 'Buy Now';
                     grid.innerHTML += `
                         <div class="book-card">
-                            <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/350x500'">
+                            <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/350x500?text=Image+Not+Found'">
                             <h3 style="color:var(--gold); font-family:'Playfair Display';">${item.title}</h3>
                             <p>$${item.price}</p>
                             <button class="action-btn" onclick="openModal(${index})">${btnText}</button>
                         </div>`;
                 });
             } catch (error) {
-                grid.innerHTML = `<p style='color:#333; text-align:center;'>Vault Section Empty</p>`;
+                console.error("Error loading JSON:", error);
+                grid.innerHTML = `<div style="text-align:center; padding:20px;"><p style='color:#ff4444;'>[!] ERROR: ${jsonFile} Missing</p></div>`;
             }
         }
 
@@ -137,17 +143,21 @@
 
             if (currentTabFile.includes('summaries')) {
                 title.innerText = item.title;
-                body.innerHTML = `<div style='text-align:left; color:#888; line-height:1.8; max-height:300px; overflow-y:auto; margin-bottom:25px;'>${item.desc || 'No content.'}</div>
-                <button class="action-btn" style="background:var(--gold); color:#000;" onclick="window.open('${item.link}', '_blank')">Full Access</button>`;
+                body.innerHTML = `
+                    <div style='text-align:left; color:#ccc; line-height:1.8; max-height:300px; overflow-y:auto; margin-bottom:25px; white-space: pre-wrap;'>${item.desc || 'No content available.'}</div>
+                    <button class="action-btn" style="background:var(--gold); color:#000;" onclick="window.open('${item.link}', '_blank')">Full Access</button>`;
             } else {
                 title.innerText = "CHECKOUT";
                 const isHoody = currentTabFile.includes('hoody');
                 const logo = isHoody ? 'https://www.teepublic.com/assets/teepublic_logo_black-63e5e5d3.svg' : 'https://upload.wikimedia.org/wikipedia/en/thumb/8/80/AliExpress_logo.svg/1200px-AliExpress_logo.svg.png';
+                
                 body.innerHTML = `
+                    <p style="color:#888; margin-bottom:15px;">${item.title}</p>
                     <input type="text" placeholder="SHIPPING NAME">
                     <input type="text" placeholder="SHIPPING ADDRESS">
                     <div style="background:#111; padding:20px; border-radius:20px; border:1px dashed #333; display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:25px;">
-                        <span style="font-size:0.6em; color:#555;">VERIFIED PARTNER:</span> <img src="${logo}" height="18" style="${isHoody ? 'filter:invert(1)' : ''}">
+                        <span style="font-size:0.6em; color:#555;">VERIFIED PARTNER:</span> 
+                        <img src="${logo}" height="18" style="${isHoody ? 'filter:invert(1)' : ''}">
                     </div>
                     <button class="action-btn" style="background:var(--gold); color:#000;" onclick="window.open('${item.link}', '_blank')">Confirm Order</button>`;
             }
@@ -156,12 +166,26 @@
 
         function closeModal() { document.getElementById('action-modal').style.display = 'none'; }
         
-        function openAdmin() { if(prompt("Key:") === "canon_-!LB2107") document.getElementById('admin-panel').style.display = 'block'; }
+        function openAdmin() { 
+            const key = prompt("Enter Admin Key:");
+            if(key === "canon_-!LB2107") {
+                document.getElementById('admin-panel').style.display = 'block';
+                window.scrollTo(0, document.body.scrollHeight);
+            } else {
+                alert("Access Denied");
+            }
+        }
         
         function genJSON() {
-            const data = { title: document.getElementById('adm-title').value, imageUrl: document.getElementById('adm-img').value, price: document.getElementById('adm-price').value, link: document.getElementById('adm-link').value, desc: document.getElementById('adm-desc').value };
+            const data = { 
+                title: document.getElementById('adm-title').value, 
+                imageUrl: document.getElementById('adm-img').value, 
+                price: document.getElementById('adm-price').value, 
+                link: document.getElementById('adm-link').value, 
+                desc: document.getElementById('adm-desc').value 
+            };
             const out = document.getElementById('json-out');
-            out.innerText = JSON.stringify(data, null, 4);
+            out.innerText = JSON.stringify([data], null, 4);
             out.style.display = 'block';
         }
 
