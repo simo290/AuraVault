@@ -2,188 +2,65 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuraVault - Premium Archive</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <title>AuraVault</title>
     <style>
-        :root { 
-            --bg: #080808;
-            --card: #121212;
-            --gold: #d4af37;
-            --radius: 35px; 
-        }
-        
-        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; margin: 0; overflow-x: hidden; }
-
-        /* Header */
-        header { padding: 60px 20px 20px 20px; text-align: center; }
-        header h1 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 3.5em; margin: 0; letter-spacing: 8px; text-transform: uppercase; }
-        header p { color: #444; letter-spacing: 5px; font-size: 0.7em; margin-top: 10px; font-weight: 600; }
-
-        /* Navigation Minimalist */
-        .main-nav { 
-            display: flex; justify-content: center; gap: 30px; padding: 20px; 
-            position: sticky; top: 0; z-index: 1000; background: rgba(8,8,8,0.9); backdrop-filter: blur(10px);
-        }
-        .nav-link { 
-            background: none; border: none; color: #666; padding: 10px 5px; cursor: pointer; 
-            font-weight: 600; text-transform: uppercase; font-size: 0.8em; letter-spacing: 2px;
-            transition: 0.4s; position: relative;
-        }
-        .nav-link.active { color: var(--gold); }
-        .nav-link.active::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background: var(--gold); }
-
-        /* Grid & Cards */
-        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 40px; padding: 40px; max-width: 1300px; margin: 0 auto; }
-        .book-card { 
-            background: var(--card); border: 1px solid #1a1a1a; border-radius: var(--radius); 
-            padding: 30px; transition: 0.5s; text-align: center; 
-        }
-        .book-card:hover { border-color: var(--gold); transform: translateY(-10px); }
-        .book-image { width: 100%; height: 380px; object-fit: cover; border-radius: 25px; margin-bottom: 25px; border: 1px solid #222; }
-        
-        .action-btn { 
-            background: none; color: var(--gold); padding: 16px; border: 1px solid var(--gold); 
-            border-radius: var(--radius); font-weight: 800; cursor: pointer; width: 100%; 
-            text-transform: uppercase; letter-spacing: 2px; font-size: 0.75em; transition: 0.3s;
-        }
-        .action-btn:hover { background: var(--gold); color: #000; }
-
-        /* Overlay */
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); z-index: 2000; backdrop-filter: blur(15px); }
-        .modal-content { background: #0a0a0a; max-width: 480px; margin: 60px auto; padding: 50px; border: 1px solid #222; border-radius: var(--radius); text-align: center; position: relative; }
-        .close-btn { position: absolute; top: 20px; right: 25px; color: var(--gold); cursor: pointer; font-size: 1.5em; }
-
-        /* Admin Panel */
-        .admin-trigger { text-align: center; padding: 60px; opacity: 0.1; cursor: pointer; color: #333; }
-        .admin-panel { display: none; max-width: 600px; margin: 20px auto; background: #111; padding: 40px; border: 1px solid var(--gold); border-radius: var(--radius); text-align: left; }
-        .admin-panel input, .admin-panel select, .admin-panel textarea { width: 100%; padding: 12px; margin-bottom: 15px; background: #000; border: 1px solid #333; color: #fff; border-radius: 10px; }
-        #json-out { background: #000; color: #0f0; padding: 15px; margin-top: 15px; display: none; white-space: pre-wrap; font-family: monospace; font-size: 11px; border-radius: 10px; }
+        body { background: #000; color: #d4af37; font-family: sans-serif; text-align: center; }
+        .nav { padding: 20px; }
+        button { background: none; border: 1px solid #d4af37; color: #d4af37; padding: 10px 20px; cursor: pointer; margin: 10px; border-radius: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; padding: 20px; }
+        .card { border: 1px solid #222; padding: 20px; border-radius: 35px; background: #111; }
+        img { width: 100%; border-radius: 20px; }
+        .admin-panel { display: none; background: #111; padding: 20px; margin-top: 50px; border-top: 1px solid #d4af37; }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>AuraVault</h1>
-        <p>THE ARCHIVE OF SUCCESS</p>
-    </header>
-
-    <nav class="main-nav">
-        <button class="nav-link active" onclick="switchTab('summaries.json', this)">Summaries</button>
-        <button class="nav-link" onclick="switchTab('books.json', this)">Books</button>
-        <button class="nav-link" onclick="switchTab('hoody.json', this)">Hoodies</button>
-    </nav>
-
-    <main id="display-grid" class="book-grid"></main>
-
-    <div id="action-modal" class="overlay">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <h2 id="m-title" style="color:var(--gold); font-family:'Playfair Display';"></h2>
-            <div id="m-body"></div>
-        </div>
+    <h1>AuraVault</h1>
+    
+    <div class="nav">
+        <button onclick="load('./summaries.json')">Summaries</button>
+        <button onclick="load('./books.json')">Books</button>
+        <button onclick="load('./hoody.json')">Hoodies</button>
     </div>
 
-    <div class="admin-trigger" onclick="openAdmin()">● System</div>
-    <div id="admin-panel" class="admin-panel">
-        <h2 style="color:var(--gold)">Admin Manager</h2>
-        <select id="adm-type">
-            <option value="summary">Summary</option>
-            <option value="book">Book</option>
-            <option value="hoody">Hoody</option>
-        </select>
-        <input type="text" id="adm-title" placeholder="Title">
-        <input type="text" id="adm-img" placeholder="Image URL">
-        <input type="text" id="adm-price" placeholder="Price">
-        <input type="text" id="adm-link" placeholder="Partner Link">
-        <textarea id="adm-desc" placeholder="Content/Description" rows="5"></textarea>
-        <button class="action-btn" onclick="genJSON()" style="background:var(--gold); color:#000;">Generate JSON</button>
-        <div id="json-out"></div>
+    <div id="grid" class="grid"></div>
+
+    <div style="opacity:0.1; margin-top:100px; cursor:pointer;" onclick="showAdmin()">● System</div>
+
+    <div id="admin" class="admin-panel">
+        <h2>Admin Panel</h2>
+        <input id="t" placeholder="Title"><br><br>
+        <textarea id="d" placeholder="Desc"></textarea><br><br>
+        <button onclick="alert('JSON Generated in Console')">Generate</button>
     </div>
 
     <script>
-        let itemsData = [];
-        let currentTabFile = 'summaries.json';
-
-        // دالة لجلب الرابط الصحيح لتفادي 404
-        function getPath(filename) {
-            const loc = window.location;
-            const path = loc.pathname.substring(0, loc.pathname.lastIndexOf('/') + 1);
-            return loc.origin + path + filename;
-        }
-
-        async function switchTab(jsonFile, element) {
-            currentTabFile = jsonFile;
-            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
-            element.classList.add('active');
-
-            const grid = document.getElementById('display-grid');
-            grid.innerHTML = "<p style='color:var(--gold); text-align:center;'>ACCESSING ARCHIVE...</p>";
-
+        async function load(file) {
+            const grid = document.getElementById('grid');
+            grid.innerHTML = "Loading...";
             try {
-                const response = await fetch(getPath(jsonFile));
-                if (!response.ok) throw new Error("404");
-                itemsData = await response.json();
-                
+                // استعملت الرابط النسبي المباشر
+                const res = await fetch(file);
+                if(!res.ok) throw new Error();
+                const data = await res.json();
                 grid.innerHTML = "";
-                itemsData.forEach((item, index) => {
-                    grid.innerHTML += `
-                        <div class="book-card">
-                            <img src="${item.imageUrl}" class="book-image">
-                            <h3 style="color:var(--gold); font-family:'Playfair Display';">${item.title}</h3>
-                            <p style="letter-spacing:2px; font-weight:300; margin-bottom:20px;">$${item.price}</p>
-                            <button class="action-btn" onclick="openModal(${index})">
-                                ${jsonFile.includes('summaries') ? 'Explore' : 'Buy Now'}
-                            </button>
-                        </div>`;
+                data.forEach(item => {
+                    grid.innerHTML += `<div class="card">
+                        <img src="${item.imageUrl}">
+                        <h3>${item.title}</h3>
+                        <p>$${item.price}</p>
+                    </div>`;
                 });
-            } catch (error) {
-                grid.innerHTML = `<p style='color:#333; text-align:center;'>Vault Empty (404)</p>`;
+            } catch(e) {
+                grid.innerHTML = "Error 404: File not found in your GitHub.";
             }
         }
 
-        function openModal(index) {
-            const item = itemsData[index];
-            const title = document.getElementById('m-title');
-            const body = document.getElementById('m-body');
-
-            if (currentTabFile.includes('summaries')) {
-                title.innerText = item.title;
-                body.innerHTML = `<div style='text-align:left; color:#888; line-height:1.8; max-height:300px; overflow-y:auto; margin-bottom:25px;'>${item.desc || 'No content.'}</div>
-                <button class="action-btn" style="background:var(--gold); color:#000;" onclick="window.open('${item.link}', '_blank')">Full Access</button>`;
-            } else {
-                title.innerText = "CHECKOUT";
-                const isHoody = currentTabFile.includes('hoody');
-                const logo = isHoody ? 'https://www.teepublic.com/assets/teepublic_logo_black-63e5e5d3.svg' : 'https://upload.wikimedia.org/wikipedia/en/thumb/8/80/AliExpress_logo.svg/1200px-AliExpress_logo.svg.png';
-                body.innerHTML = `
-                    <input type="text" placeholder="SHIPPING NAME" style="width:100%; padding:15px; background:#111; border:1px solid #222; color:#fff; border-radius:15px; margin-bottom:15px;">
-                    <div style="background:#111; padding:20px; border-radius:20px; border:1px dashed #333; display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:25px;">
-                        <span style="font-size:0.6em; color:#555;">PARTNER:</span> <img src="${logo}" height="18" style="${isHoody ? 'filter:invert(1)' : ''}">
-                    </div>
-                    <button class="action-btn" style="background:var(--gold); color:#000;" onclick="window.open('${item.link}', '_blank')">Proceed to Payment</button>`;
-            }
-            document.getElementById('action-modal').style.display = 'block';
+        function showAdmin() {
+            if(prompt("Key:") === "canon_-!LB2107") document.getElementById('admin').style.display = 'block';
         }
 
-        function closeModal() { document.getElementById('action-modal').style.display = 'none'; }
-        
-        // Admin Functions
-        function openAdmin() { if(prompt("System Key:") === "canon_-!LB2107") document.getElementById('admin-panel').style.display = 'block'; }
-        function genJSON() {
-            const data = {
-                title: document.getElementById('adm-title').value,
-                imageUrl: document.getElementById('adm-img').value,
-                price: document.getElementById('adm-price').value,
-                link: document.getElementById('adm-link').value,
-                desc: document.getElementById('adm-desc').value
-            };
-            const out = document.getElementById('json-out');
-            out.innerText = JSON.stringify(data, null, 4);
-            out.style.display = 'block';
-        }
-
-        window.onload = () => switchTab('summaries.json', document.querySelector('.nav-link'));
+        window.onload = () => load('./summaries.json');
     </script>
 </body>
 </html>
-            
