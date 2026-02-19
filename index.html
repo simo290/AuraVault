@@ -7,86 +7,115 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
         :root { 
-            --bg-color: #0b0b0b;
-            --card-bg: #161616;
+            --bg: #080808;
+            --card: #121212;
             --gold: #d4af37;
-            --radius: 35px; /* الحواف الدائرية اللي بغيتي */
+            --radius: 35px; 
         }
         
-        body { font-family: 'Inter', sans-serif; background: var(--bg-color); color: #fff; margin: 0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: #fff; margin: 0; }
 
-        header { padding: 40px 20px; text-align: center; border-bottom: 2px solid var(--gold); background: #000; }
-        header h1 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 3em; margin: 0; letter-spacing: 4px; }
+        /* Header نقي وعصري */
+        header { padding: 60px 20px 20px 20px; text-align: center; background: var(--bg); }
+        header h1 { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 3.5em; margin: 0; letter-spacing: 8px; text-transform: uppercase; }
+        header p { color: #444; letter-spacing: 5px; font-size: 0.7em; margin-top: 10px; font-weight: 600; }
 
-        /* Navigation - Rectangular & Clean (المستطيلات) */
-        .main-nav { display: flex; justify-content: center; background: var(--gold); padding: 0; position: sticky; top: 0; z-index: 1000; }
-        .nav-btn { 
-            background: #000; 
+        /* المنيو الجديد: صغير وأنيق (Minimalist Nav) */
+        .main-nav { 
+            display: flex; 
+            justify-content: center; 
+            gap: 30px; 
+            padding: 20px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 1000; 
+            background: rgba(8,8,8,0.9);
+            backdrop-filter: blur(10px);
+        }
+        .nav-link { 
+            background: none; 
             border: none; 
-            color: var(--gold); 
-            padding: 18px 25px; 
-            flex-grow: 1; 
+            color: #666; 
+            padding: 10px 5px; 
             cursor: pointer; 
-            font-weight: bold; 
+            font-weight: 600; 
             text-transform: uppercase; 
             font-size: 0.8em;
-            transition: 0.3s;
-            border-right: 1px solid #222;
+            letter-spacing: 2px;
+            transition: 0.4s;
+            position: relative;
         }
-        .nav-btn.active { background: var(--gold); color: #000; }
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 2px;
+            background: var(--gold);
+            transition: 0.4s;
+            transform: translateX(-50%);
+        }
+        .nav-link.active { color: var(--gold); }
+        .nav-link.active::after { width: 100%; }
+        .nav-link:hover { color: var(--gold); }
 
         /* Grid & Cards */
-        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; padding: 40px 20px; max-width: 1200px; margin: 0 auto; }
+        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 40px; padding: 40px; max-width: 1300px; margin: 0 auto; }
         
         .book-card { 
-            background: var(--card-bg); 
-            border: 1px solid #222; 
+            background: var(--card); 
+            border: 1px solid #1a1a1a; 
             border-radius: var(--radius); 
-            padding: 25px; 
-            transition: 0.4s; 
+            padding: 30px; 
+            transition: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
             text-align: center; 
         }
-        .book-card:hover { border-color: var(--gold); transform: translateY(-8px); }
+        .book-card:hover { border-color: var(--gold); transform: translateY(-12px); box-shadow: 0 20px 40px rgba(0,0,0,0.6); }
         
         .book-image { 
             width: 100%; 
-            height: 350px; 
+            height: 380px; 
             object-fit: cover; 
-            border-radius: 20px; 
-            margin-bottom: 15px; 
-            border: 1px solid #333;
+            border-radius: 25px; 
+            margin-bottom: 25px; 
+            border: 1px solid #222;
         }
         
         .action-btn { 
             background: none; 
             color: var(--gold); 
-            padding: 15px; 
+            padding: 16px; 
             border: 1px solid var(--gold); 
             border-radius: var(--radius); 
-            font-weight: bold; 
+            font-weight: 800; 
             cursor: pointer; 
             width: 100%; 
             text-transform: uppercase; 
+            letter-spacing: 2px;
+            font-size: 0.75em;
             transition: 0.3s;
         }
         .action-btn:hover { background: var(--gold); color: #000; }
 
-        /* Modal Overlay */
-        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2000; backdrop-filter: blur(10px); }
+        /* Modal */
+        .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.96); z-index: 2000; backdrop-filter: blur(15px); }
         .modal-content { 
-            background: #111; 
-            max-width: 500px; 
-            margin: 40px auto; 
-            padding: 40px; 
-            border: 1px solid var(--gold); 
+            background: #0a0a0a; 
+            max-width: 480px; 
+            margin: 60px auto; 
+            padding: 50px; 
+            border: 1px solid #222; 
             border-radius: var(--radius); 
             text-align: center;
+            position: relative;
         }
-        
-        .shipping-badge { background: #1a1a1a; padding: 15px; border-radius: 15px; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; border: 1px dashed #444; }
-        .shipping-badge img { height: 20px; }
+        .close-btn { position: absolute; top: 20px; right: 25px; color: var(--gold); cursor: pointer; font-size: 1.5em; }
 
-        .admin-trigger { text-align: center; padding: 40px; opacity: 0.1; cursor: pointer; }
+        /* Hide Scrollbar */
+        ::-webkit-scrollbar { width: 5px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #222; border-radius: 10px; }
     </style>
 </head>
 <body>
@@ -97,38 +126,34 @@
     </header>
 
     <nav class="main-nav">
-        <button class="nav-btn active" onclick="switchTab('summaries.json', this)">Summaries</button>
-        <button class="nav-btn" onclick="switchTab('books.json', this)">Books</button>
-        <button class="nav-btn" onclick="switchTab('hoody.json', this)">Hoodies</button>
+        <button class="nav-link active" onclick="switchTab('./summaries.json', this)">Summaries</button>
+        <button class="nav-link" onclick="switchTab('./books.json', this)">Books</button>
+        <button class="nav-link" onclick="switchTab('./hoody.json', this)">Hoodies</button>
     </nav>
 
     <main id="display-grid" class="book-grid"></main>
 
     <div id="action-modal" class="overlay">
         <div class="modal-content">
-            <h2 id="m-title" style="color:var(--gold)"></h2>
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <h2 id="m-title" style="color:var(--gold); font-family:'Playfair Display'; margin-bottom:25px;"></h2>
             <div id="m-body"></div>
-            <p onclick="closeModal()" style="color:#555; cursor:pointer; margin-top:20px;">Close</p>
         </div>
     </div>
 
-    <div class="admin-trigger" onclick="if(prompt('Key:')==='canon_-!LB2107') alert('Admin Mode Active')">● System</div>
-
     <script>
         let itemsData = [];
-        let currentTab = 'summaries.json';
+        let currentTabFile = './summaries.json';
 
         async function switchTab(jsonFile, element) {
-            currentTab = jsonFile;
-            // Update buttons
-            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            currentTabFile = jsonFile;
+            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
             element.classList.add('active');
 
             const grid = document.getElementById('display-grid');
-            grid.innerHTML = "<p style='color:var(--gold)'>Loading Archive...</p>";
+            grid.innerHTML = "<p style='color:var(--gold); text-align:center; letter-spacing:3px;'>SYNCING...</p>";
 
             try {
-                // جلب البيانات
                 const response = await fetch(jsonFile);
                 if (!response.ok) throw new Error("404");
                 itemsData = await response.json();
@@ -138,15 +163,15 @@
                     grid.innerHTML += `
                         <div class="book-card">
                             <img src="${item.imageUrl}" class="book-image">
-                            <h3>${item.title}</h3>
-                            <p>$${item.price}</p>
+                            <h3 style="color:var(--gold); font-family:'Playfair Display'; margin-bottom:10px;">${item.title}</h3>
+                            <p style="letter-spacing:2px; font-weight:300; margin-bottom:20px;">$${item.price}</p>
                             <button class="action-btn" onclick="openModal(${index})">
-                                ${jsonFile.includes('summaries') ? 'Read Summary' : 'Order Now'}
+                                ${jsonFile.includes('summaries') ? 'Explore' : 'Buy Now'}
                             </button>
                         </div>`;
                 });
             } catch (error) {
-                grid.innerHTML = `<p style='color:red'>Error: Could not load ${jsonFile}. Check file names on GitHub!</p>`;
+                grid.innerHTML = `<p style='color:#333; text-align:center;'>Section Empty</p>`;
             }
         }
 
@@ -155,38 +180,30 @@
             const title = document.getElementById('m-title');
             const body = document.getElementById('m-body');
 
-            if (currentTab.includes('summaries')) {
+            if (currentTabFile.includes('summaries')) {
                 title.innerText = item.title;
-                body.innerHTML = `<p style='text-align:left; color:#ccc; line-height:1.8;'>${item.desc || 'No description available.'}</p>
-                <button class="action-btn" style="background:var(--gold); color:#000;" onclick="window.open('${item.link}')">Get Full Access</button>`;
+                body.innerHTML = `<div style='text-align:left; color:#888; line-height:1.8; max-height:300px; overflow-y:auto; margin-bottom:25px;'>${item.desc || 'No content.'}</div>
+                <button class="action-btn" style="background:var(--gold); color:#000;" onclick="window.open('${item.link}', '_blank')">Full Access</button>`;
             } else {
-                title.innerText = "SECURE CHECKOUT";
-                const isHoody = currentTab.includes('hoody');
-                const carrierLogo = isHoody ? 
-                    'https://www.teepublic.com/assets/teepublic_logo_black-63e5e5d3.svg' : 
-                    'https://upload.wikimedia.org/wikipedia/en/thumb/8/80/AliExpress_logo.svg/1200px-AliExpress_logo.svg.png';
+                title.innerText = "CHECKOUT";
+                const isHoody = currentTabFile.includes('hoody');
+                const logo = isHoody ? 'https://www.teepublic.com/assets/teepublic_logo_black-63e5e5d3.svg' : 'https://upload.wikimedia.org/wikipedia/en/thumb/8/80/AliExpress_logo.svg/1200px-AliExpress_logo.svg.png';
                 
                 body.innerHTML = `
-                    <div style="text-align:left; margin-bottom:15px;">
-                        <label style="color:var(--gold); font-size:0.7em;">SHIPPING ADDRESS</label>
-                        <input type="text" placeholder="Your Address..." style="width:100%; padding:12px; background:#000; border:1px solid #333; color:#fff; border-radius:10px; margin-top:5px;">
+                    <input type="text" placeholder="SHIPPING NAME" style="width:100%; padding:15px; background:#111; border:1px solid #222; color:#fff; border-radius:15px; margin-bottom:15px; text-transform:uppercase; font-size:0.7em;">
+                    <div style="background:#111; padding:20px; border-radius:20px; border:1px dashed #333; display:flex; align-items:center; justify-content:center; gap:12px; margin-bottom:25px;">
+                        <span style="font-size:0.6em; color:#555;">VERIFIED PARTNER:</span> <img src="${logo}" height="18" style="${isHoody ? 'filter:invert(1)' : ''}">
                     </div>
-                    <div class="shipping-badge">
-                        <span>Partner:</span> <img src="${carrierLogo}" style="${isHoody ? 'filter:invert(1)' : ''}">
-                    </div>
-                    <button class="action-btn" style="background:var(--gold); color:#000; margin-top:15px;" onclick="window.open('${item.link}')">Proceed to Payment</button>`;
+                    <button class="action-btn" style="background:var(--gold); color:#000;" onclick="window.open('${item.link}', '_blank')">Process Order</button>`;
             }
             document.getElementById('action-modal').style.display = 'block';
         }
 
-        function closeModal() {
-            document.getElementById('action-modal').style.display = 'none';
-        }
+        function closeModal() { document.getElementById('action-modal').style.display = 'none'; }
 
-        // البداية بملف الملخصات
         window.onload = () => {
-            const summariesBtn = document.querySelector('.nav-btn');
-            switchTab('summaries.json', summariesBtn);
+            const btn = document.querySelector('.nav-link');
+            switchTab('./summaries.json', btn);
         }
     </script>
 </body>
