@@ -27,45 +27,19 @@
         .action-btn:hover { background: var(--gold); color: black; }
 
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; }
-        .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 30px; border: 1px solid var(--gold); width: 95%; max-width: 650px; max-height: 85vh; overflow-y: auto; }
+        .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 30px; border: 1px solid var(--gold); width: 95%; max-width: 550px; max-height: 90vh; overflow-y: auto; }
         
-        /* Modal Products Side-by-Side */
-        .modal-products { 
-            display: flex; 
-            flex-direction: row; 
-            flex-wrap: nowrap; 
-            gap: 20px; 
-            margin-bottom: 25px; 
-            justify-content: center; 
-            align-items: flex-start;
-        }
+        .checkout-form { margin-top: 20px; padding-top: 10px; }
+        .checkout-form input, .checkout-form textarea { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 2px; }
+        .checkout-form input:focus { border-color: var(--gold); outline: none; }
 
-        .mini-card { 
-            background: var(--dark-grey); 
-            border: 1px solid #333; 
-            padding: 10px; 
-            width: 180px; 
-            text-align: center; 
-            flex-shrink: 0; 
-        }
-
-        .mini-card img { width: 100%; height: 220px; object-fit: cover; border-radius: 2px; }
-        .mini-card h4 { font-size: 0.75rem; margin: 10px 0; font-family: 'Playfair Display'; color: var(--gold); }
-        
-        .mini-buy-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); font-size: 0.65rem; padding: 8px; width: 100%; cursor: pointer; transition: 0.3s; }
-        .mini-buy-btn:hover { background: var(--gold); color: black; }
-
-        /* Email Section Styling */
-        #email-unlock-section { 
-            margin-bottom: 20px; 
-            text-align: center; 
-            padding: 15px; 
-            border: 1px solid var(--gold); 
-            background: #000;
-        }
+        .modal-products { display: flex; flex-direction: row; flex-wrap: nowrap; gap: 15px; margin-bottom: 20px; justify-content: center; }
+        .mini-card { background: var(--dark-grey); border: 1px solid #333; padding: 8px; width: 140px; text-align: center; flex-shrink: 0; }
+        .mini-card img { width: 100%; height: 180px; object-fit: cover; }
+        .mini-card h4 { font-size: 0.7rem; margin-top: 8px; color: var(--gold); font-family: 'Playfair Display'; }
 
         #admin-panel { display: none; margin-top: 50px; padding: 30px; border: 1px dashed var(--gold); background: #050505; }
-        .admin-form input, .admin-form textarea { width: 100%; padding: 10px; margin-bottom: 10px; background: #1a1a1a; border: 1px solid #333; color: white; }
+        .admin-form input { width: 100%; padding: 10px; margin-bottom: 10px; background: #1a1a1a; border: 1px solid #333; color: white; }
         #json-out { background: #000; color: #0f0; padding: 15px; margin-top: 15px; white-space: pre-wrap; font-size: 11px; display: none; border: 1px solid #0f0; }
     </style>
 </head>
@@ -88,15 +62,13 @@
         <div class="admin-form">
             <input type="text" id="adm-title" placeholder="Title">
             <input type="text" id="adm-img" placeholder="Main Image URL">
-            <input type="text" id="adm-price" placeholder="Price (for Books/Hoodies)">
-            <input type="text" id="adm-link" placeholder="Main Link">
-            <hr style="border: 0.5px solid #333; margin: 10px 0;">
-            <p style="font-size: 0.8rem; color: var(--gold);">For Summaries only:</p>
+            <input type="text" id="adm-price" placeholder="Price">
+            <input type="text" id="adm-link" placeholder="AliExpress Link">
             <input type="text" id="adm-book-img" placeholder="Related Book Image URL">
-            <input type="text" id="adm-book-link" placeholder="Related Book Purchase Link">
+            <input type="text" id="adm-book-link" placeholder="Related Book Link">
             <input type="text" id="adm-hoody-img" placeholder="Related Hoody Image URL">
-            <input type="text" id="adm-hoody-link" placeholder="Related Hoody Purchase Link">
-            <textarea id="adm-desc" rows="5" placeholder="Summary Description"></textarea>
+            <input type="text" id="adm-hoody-link" placeholder="Related Hoody Link">
+            <textarea id="adm-desc" rows="5" placeholder="Description" style="width:100%; background:#1a1a1a; color:white; border:1px solid #333; padding:10px;"></textarea>
             <button class="action-btn" onclick="genJSON()">GENERATE JSON</button>
         </div>
         <pre id="json-out"></pre>
@@ -105,17 +77,16 @@
 
 <div id="action-modal" class="overlay">
     <div class="modal">
-        <h2 id="m-title" style="color:var(--gold); font-family:'Playfair Display'; margin-bottom: 20px; text-align: center;"></h2>
+        <h2 id="m-title" style="color:var(--gold); font-family:'Playfair Display'; margin-bottom: 15px; text-align: center;"></h2>
         <div id="m-body"></div>
-        <button onclick="closeModal()" class="action-btn" style="border:none; text-decoration:underline; font-size: 0.8rem;">CLOSE</button>
+        <button onclick="closeModal()" class="action-btn" style="border:none; text-decoration:underline; font-size: 0.8rem; margin-top: 10px;">CLOSE</button>
     </div>
 </div>
 
 <script>
     let currentTab = 'summaries.json';
     let allData = [];
-    // الرابط ديالك في Formspree
-    const FORMSPREE_URL = "https://formspree.io/f/mreaapkg"; 
+    const MY_PHONE = "212717948663"; 
 
     async function switchTab(file, btn) {
         currentTab = file;
@@ -141,7 +112,7 @@
                 <h3 class="book-title">${item.title}</h3>
                 ${item.price ? `<p style="color:var(--gold); font-weight:bold;">$${item.price}</p>` : ''}
                 <button class="action-btn" onclick="handleAction(${index})">
-                    ${currentTab === 'summaries.json' ? 'LEARN MORE' : 'BUY NOW'}
+                    ${currentTab === 'summaries.json' ? 'LEARN MORE' : 'ORDER NOW'}
                 </button>
             `;
             grid.appendChild(div);
@@ -149,74 +120,60 @@
     }
 
     function handleAction(index) {
-        const item = allData[index]; 
+        const item = allData[index];
         const modal = document.getElementById('action-modal');
         document.getElementById('m-title').innerText = item.title;
         const body = document.getElementById('m-body');
         modal.style.display = 'block';
 
+        let formHTML = `
+            <div class="checkout-form">
+                <p style="text-align:center; margin-bottom:12px; font-size:0.75rem; color:var(--gold); letter-spacing:1px;">SHIPPING INFORMATION</p>
+                <input type="text" id="u-name" placeholder="Full Name" required>
+                <input type="text" id="u-city" placeholder="City" required>
+                <textarea id="u-address" placeholder="Full Address (Street, House No.)" rows="2" required></textarea>
+                <input type="text" id="u-zip" placeholder="Zip Code" required>
+                <button class="action-btn" onclick="checkoutViaWA('${item.title}', '${item.price || 'N/A'}')">SEND ORDER TO WHATSAPP</button>
+            </div>
+        `;
+
         if(currentTab === 'summaries.json') {
             body.innerHTML = `
                 <div class="modal-products">
-                    ${item.bookLink ? `<div class="mini-card"><img src="${item.bookImg}"><h4>The Masterpiece</h4><button class="mini-buy-btn" onclick="showEmailSection('${item.bookLink}')">GET BOOK</button></div>` : ''}
-                    ${item.hoodyLink ? `<div class="mini-card"><img src="${item.hoodyImg}"><h4>The Apparel</h4><button class="mini-buy-btn" onclick="showEmailSection('${item.hoodyLink}')">GET HOODY</button></div>` : ''}
+                    ${item.bookLink ? `<div class="mini-card"><img src="${item.bookImg}"><h4>The Masterpiece</h4></div>` : ''}
+                    ${item.hoodyLink ? `<div class="mini-card"><img src="${item.hoodyImg}"><h4>The Apparel</h4></div>` : ''}
                 </div>
-                <div id="email-unlock-section" style="display:none;">
-                    <p style="font-size:0.8rem; margin-bottom:10px;">Enter email to unlock secure link:</p>
-                    <input type="email" id="modal-u-email" placeholder="your@email.com" style="width:100%; padding:10px; background:#000; border:1px solid var(--gold); color:#fff; margin-bottom:10px;">
-                    <button id="proceed-link-btn" class="action-btn" style="margin-top:0;">UNLOCK NOW</button>
+                <div style="max-height:150px; overflow-y:auto; margin-bottom:15px; border-top: 1px solid #222; padding-top:10px;">
+                    <p style="font-size:0.85rem; line-height:1.5; color:#888;">${item.desc || ''}</p>
                 </div>
-                <div style="border-top: 1px solid #333; padding-top:15px; max-height:250px; overflow-y:auto;">
-                    <p style="font-size:0.9rem; line-height:1.6; color:#bbb; white-space: pre-line;">${item.desc || item.description || ''}</p>
-                </div>
+                ${formHTML}
             `;
         } else {
-            const mainLink = item.link || item.affiliateLink || '#';
-            body.innerHTML = `
-                <p style="text-align:center; margin-bottom:15px;">Enter email to unlock secure link:</p>
-                <input type="email" id="u-email" placeholder="your@email.com" style="width:100%; padding:12px; background:#000; border:1px solid var(--gold); color:#fff; margin-bottom:15px;">
-                <button class="action-btn" onclick="goLink('${mainLink}')">UNLOCK & PROCEED</button>
-            `;
+            body.innerHTML = formHTML;
         }
     }
 
-    async function sendToFormspree(email, product, link) {
-        try {
-            await fetch(FORMSPREE_URL, {
-                method: 'POST',
-                headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email, product_name: product, target_url: link })
-            });
-        } catch (e) { console.log("Error sending data"); }
-    }
+    function checkoutViaWA(productTitle, price) {
+        const name = document.getElementById('u-name').value;
+        const city = document.getElementById('u-city').value;
+        const address = document.getElementById('u-address').value;
+        const zip = document.getElementById('u-zip').value;
 
-    function showEmailSection(link) {
-        const section = document.getElementById('email-unlock-section');
-        const btn = document.getElementById('proceed-link-btn');
-        section.style.display = 'block';
-        section.scrollIntoView({ behavior: 'smooth' });
+        if(!name || !city || !address || !zip) {
+            alert("Please complete all fields.");
+            return;
+        }
 
-        btn.onclick = async function() {
-            const email = document.getElementById('modal-u-email').value;
-            if(email.includes('@')) {
-                btn.innerText = "SENDING...";
-                await sendToFormspree(email, document.getElementById('m-title').innerText, link);
-                window.open(link, '_blank');
-                section.style.display = 'none';
-                btn.innerText = "UNLOCK NOW";
-            } else { alert("Please enter a valid email address."); }
-        };
-    }
+        const message = `*NEW ORDER - AURAVAULT*%0A%0A` +
+                        `*Product:* ${productTitle}%0A` +
+                        `*Price:* $${price}%0A%0A` +
+                        `*Customer:* ${name}%0A` +
+                        `*City:* ${city}%0A` +
+                        `*Address:* ${address}%0A` +
+                        `*Zip Code:* ${zip}`;
 
-    async function goLink(l) {
-        const mail = document.getElementById('u-email').value;
-        if(mail.includes('@')) {
-            const btn = document.querySelector('.modal .action-btn');
-            btn.innerText = "SENDING...";
-            await sendToFormspree(mail, document.getElementById('m-title').innerText, l);
-            window.open(l, '_blank');
-            closeModal();
-        } else { alert("Valid email required"); }
+        window.open(`https://api.whatsapp.com/send?phone=${MY_PHONE}&text=${message}`, '_blank');
+        closeModal();
     }
 
     function closeModal() { document.getElementById('action-modal').style.display='none'; }
