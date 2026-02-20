@@ -63,7 +63,7 @@
     <div class="modal">
         <h2 id="m-title" style="color:var(--gold); font-family:'Playfair Display'; margin-bottom: 15px; text-align: center;"></h2>
         <div id="m-body"></div>
-        <button onclick="closeModal()" class="action-btn" style="border:none; text-decoration:underline; font-size: 0.8rem;">CLOSE</button>
+        <button onclick="closeModal()" class="action-btn" style="border:none; text-decoration:underline; font-size: 0.8rem; margin-top: 20px;">CLOSE</button>
     </div>
 </div>
 
@@ -103,10 +103,10 @@
             div.innerHTML = `
                 <img src="${item.imageUrl}" class="book-image">
                 <h3 class="book-title">${item.title}</h3>
-                ${item.price ? `<p style="color:var(--gold); font-weight:bold;">$${item.price}</p>` : ''}
+                ${item.price && currentTab !== 'summaries.json' ? `<p style="color:var(--gold); font-weight:bold;">$${item.price}</p>` : ''}
                 ${item.shipping ? `<span class="shipping-tag">⚡ Fast US Shipping: ${item.shipping}</span>` : ''}
                 <button class="action-btn" onclick="handleAction(${index})">
-                    ${currentTab === 'summaries.json' ? 'LEARN MORE' : (currentTab === 'hoody.json' ? 'BUY ON ALIEXPRESS' : 'ORDER NOW')}
+                    ${currentTab === 'summaries.json' ? 'EXPLORE COLLECTION' : (currentTab === 'hoody.json' ? 'BUY ON ALIEXPRESS' : 'ORDER NOW')}
                 </button>`;
             grid.appendChild(div);
         });
@@ -122,20 +122,42 @@
         const body = document.getElementById('m-body');
         modal.style.display = 'block';
 
-        body.innerHTML = `
-            <div class="checkout-form">
-                <p style="color:var(--gold); font-size:0.8rem; margin-bottom:10px;">Secure Shipping Details:</p>
+        if(currentTab === 'summaries.json') {
+            body.innerHTML = `
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:20px;">
+                    <div style="background:#151515; padding:15px; border:1px solid #333; text-align:center;">
+                        <img src="${item.bookImg}" style="width:100%; height:120px; object-fit:contain; margin-bottom:10px;">
+                        <p style="font-size:0.7rem; color:#888;">THE ARCHIVE (BOOK)</p>
+                        <p style="color:var(--gold); font-weight:bold; margin:5px 0;">$${item.bookPrice}</p>
+                        <button class="action-btn" onclick="showOrderForm('${item.title} - Book', '${item.bookPrice}')" style="font-size:0.7rem; padding:8px;">ORDER BOOK</button>
+                    </div>
+                    <div style="background:#151515; padding:15px; border:1px solid #333; text-align:center;">
+                        <img src="${item.hoodyImg}" style="width:100%; height:120px; object-fit:contain; margin-bottom:10px;">
+                        <p style="font-size:0.7rem; color:#888;">THE GARMENT (HOODIE)</p>
+                        <p style="color:var(--gold); font-weight:bold; margin:5px 0;">$${item.price}</p>
+                        <button class="action-btn" onclick="showOrderForm('${item.title} - Hoodie', '${item.price}')" style="font-size:0.7rem; padding:8px;">ORDER HOODIE</button>
+                    </div>
+                </div>
+                <div id="form-container"></div>
+            `;
+        } else {
+            showOrderForm(item.title, item.price);
+        }
+    }
+
+    function showOrderForm(title, price) {
+        const container = document.getElementById('form-container') || document.getElementById('m-body');
+        container.innerHTML = `
+            <div class="checkout-form" style="border-top: 1px solid #333; padding-top:15px; margin-top:10px;">
+                <p style="color:var(--gold); font-size:0.85rem; margin-bottom:12px; text-align:center;">Ordering: <b>${title}</b> | <b>$${price}</b></p>
                 <input type="text" id="u-name" placeholder="Full Name" required>
                 <input type="email" id="u-email" placeholder="Email Address" required>
                 <input type="text" id="u-city" placeholder="City" required>
                 <input type="text" id="u-zip" placeholder="Zip/Postal Code" required>
                 <textarea id="u-address" placeholder="Full Shipping Address" rows="2" required></textarea>
-                <button class="action-btn" id="submit-order-btn" onclick="processOrder('${item.title}', '${item.price}')" style="background:var(--gold); color:black;">
+                <button class="action-btn" id="submit-order-btn" onclick="processOrder('${title}', '${price}')" style="background:var(--gold); color:black;">
                     PLACE ORDER
                 </button>
-                <p style="font-size:0.7rem; color:#666; margin-top:10px; text-align:center;">
-                    An invoice will be sent to your email for payment.
-                </p>
             </div>`;
     }
 
@@ -147,15 +169,15 @@
             order_id: orderId,
             user_name: document.getElementById('u-name').value,
             item_title: title,
+            item_price: price, 
             user_address: document.getElementById('u-address').value,
             user_city: document.getElementById('u-city').value,
             user_zip: document.getElementById('u-zip').value,
-            item_price: price, 
             email: document.getElementById('u-email').value 
         };
 
         if(!data.user_name || !data.email || !data.user_address) {
-            alert("Please fill in all shipping details.");
+            alert("Please fill in all details.");
             return;
         }
 
@@ -167,13 +189,12 @@
                 alert("SUCCESS! Order " + orderId + " received. Check your email.");
                 closeModal();
             }, (err) => {
-                alert("FAILED! Reason: " + (err.text || JSON.stringify(err)));
+                alert("FAILED: " + (err.text || JSON.stringify(err)));
                 btn.innerText = "PLACE ORDER";
                 btn.disabled = false;
             });
     }
 
-    // --- 4. Utilities ---
     function openAdmin() { if(prompt("Key:") === "canon_-!LB2107") document.getElementById('admin-panel').style.display='block'; }
     function closeModal() { document.getElementById('action-modal').style.display='none'; }
     window.onload = () => switchTab('summaries.json');
