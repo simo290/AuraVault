@@ -171,20 +171,41 @@
         }
     }
 
-    function processOrder(title, price) {
-        const orderId = "AV-" + Math.floor(10000 + Math.random() * 90000);
-        const btn = document.getElementById('submit-order-btn');
-        
-        const data = {
-            order_id: orderId,
-            item_title: title,
-            item_price: price,
-            user_name: document.getElementById('u-name').value,
-            user_email: document.getElementById('u-email').value,
-            user_city: document.getElementById('u-city').value,
-            user_zip: document.getElementById('u-zip').value,
-            user_address: document.getElementById('u-address').value
-        };
+  function processOrder(title, price) {
+    const orderId = "AV-" + Math.floor(10000 + Math.random() * 90000);
+    const btn = document.getElementById('submit-order-btn');
+    
+    const data = {
+        order_id: orderId,
+        item_title: title,
+        item_price: price,
+        user_name: document.getElementById('u-name').value,
+        user_email: document.getElementById('u-email').value,
+        user_city: document.getElementById('u-city').value,
+        user_zip: document.getElementById('u-zip').value,
+        user_address: document.getElementById('u-address').value
+    };
+
+    if(!data.user_name || !data.user_email || !data.user_address) {
+        alert("Please fill in all shipping details.");
+        return;
+    }
+
+    btn.innerText = "PROCESSING...";
+    btn.disabled = true;
+
+    // جرب ترسل دابا مع الكود الجديد للخطأ
+    emailjs.send("service_9yrz8kd", "template_1lgifb3", data)
+        .then(() => {
+            alert("SUCCESS! Order " + orderId + " received.");
+            closeModal();
+        }, (err) => {
+            // هاد السطر غادي يوريك شنو المشكل بصح فـ Alert
+            alert("FAILED! Reason: " + (err.text || JSON.stringify(err))); 
+            btn.innerText = "PLACE ORDER";
+            btn.disabled = false;
+        });
+}
 
         if(!data.user_name || !data.user_email || !data.user_address) {
             alert("Please fill in all shipping details.");
