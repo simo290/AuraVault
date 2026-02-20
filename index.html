@@ -8,7 +8,7 @@
     <style>
         :root { --gold: #d4af37; --black: #0a0a0a; --dark-grey: #1a1a1a; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--black); color: white; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--black); color: white; font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
         header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #333; }
         .logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--gold); letter-spacing: 2px; cursor: pointer; }
@@ -26,21 +26,16 @@
         .action-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 25px; cursor: pointer; width: 100%; margin-top: 15px; font-weight: 600; transition: 0.3s; }
         .action-btn:hover { background: var(--gold); color: black; }
 
+        /* Modal & Forms */
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; }
         .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 30px; border: 1px solid var(--gold); width: 95%; max-width: 550px; max-height: 90vh; overflow-y: auto; }
-        
-        .checkout-form { margin-top: 20px; padding-top: 10px; }
         .checkout-form input, .checkout-form textarea { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 2px; }
-        .checkout-form input:focus { border-color: var(--gold); outline: none; }
 
-        .modal-products { display: flex; flex-direction: row; flex-wrap: nowrap; gap: 15px; margin-bottom: 20px; justify-content: center; }
-        .mini-card { background: var(--dark-grey); border: 1px solid #333; padding: 8px; width: 140px; text-align: center; flex-shrink: 0; }
-        .mini-card img { width: 100%; height: 180px; object-fit: cover; }
-        .mini-card h4 { font-size: 0.7rem; margin-top: 8px; color: var(--gold); font-family: 'Playfair Display'; }
-
+        /* Admin Terminal */
         #admin-panel { display: none; margin-top: 50px; padding: 30px; border: 1px dashed var(--gold); background: #050505; }
-        .admin-form input { width: 100%; padding: 10px; margin-bottom: 10px; background: #1a1a1a; border: 1px solid #333; color: white; }
-        #json-out { background: #000; color: #0f0; padding: 15px; margin-top: 15px; white-space: pre-wrap; font-size: 11px; display: none; border: 1px solid #0f0; }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 12px; margin-bottom: 10px; background: #1a1a1a; border: 1px solid #333; color: white; }
+        .json-box { background: #000; color: #0f0; padding: 15px; border: 1px solid #222; font-size: 11px; height: 250px; overflow-y: auto; white-space: pre-wrap; }
     </style>
 </head>
 <body>
@@ -58,20 +53,36 @@
     <div id="display-grid" class="grid"></div>
 
     <div id="admin-panel" class="container">
-        <h2 style="color:var(--gold); margin-bottom: 15px;">Admin Terminal</h2>
+        <h2 style="color:var(--gold); margin-bottom: 20px;">Vault Data Management</h2>
         <div class="admin-form">
-            <input type="text" id="adm-title" placeholder="Title">
-            <input type="text" id="adm-img" placeholder="Main Image URL">
-            <input type="text" id="adm-price" placeholder="Price">
-            <input type="text" id="adm-link" placeholder="AliExpress Link">
-            <input type="text" id="adm-book-img" placeholder="Related Book Image URL">
-            <input type="text" id="adm-book-link" placeholder="Related Book Link">
-            <input type="text" id="adm-hoody-img" placeholder="Related Hoody Image URL">
-            <input type="text" id="adm-hoody-link" placeholder="Related Hoody Link">
-            <textarea id="adm-desc" rows="5" placeholder="Description" style="width:100%; background:#1a1a1a; color:white; border:1px solid #333; padding:10px;"></textarea>
-            <button class="action-btn" onclick="genJSON()">GENERATE JSON</button>
+            <select id="adm-type" onchange="toggleFields()">
+                <option value="product">Book / Hoodie (Dropshipping)</option>
+                <option value="summary">Summary Edition</option>
+            </select>
+            <input type="text" id="adm-title" placeholder="Product Title">
+            <input type="text" id="adm-img" placeholder="Image URL">
+            <input type="text" id="adm-price" placeholder="Selling Price ($)">
+            <input type="text" id="adm-source" placeholder="SOURCE LINK (Private link for sources.json)">
+            
+            <div id="extra-fields" style="display:none;">
+                <input type="text" id="adm-book-img" placeholder="Related Book Image URL">
+                <input type="text" id="adm-hoody-img" placeholder="Related Hoodie Image URL">
+                <textarea id="adm-desc" rows="4" placeholder="Summary Content"></textarea>
+            </div>
+            
+            <button class="action-btn" onclick="genAllData()" style="width:100%; background:var(--gold); color:black;">GENERATE SYSTEM DATA</button>
         </div>
-        <pre id="json-out"></pre>
+
+        <div class="admin-grid">
+            <div>
+                <label style="color:#0f0; font-size: 0.8rem;">1. FOR SITE (Public JSON)</label>
+                <div id="public-out" class="json-box"></div>
+            </div>
+            <div>
+                <label style="color:#ff4444; font-size: 0.8rem;">2. FOR GITHUB (sources.json)</label>
+                <div id="private-out" class="json-box"></div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -79,7 +90,7 @@
     <div class="modal">
         <h2 id="m-title" style="color:var(--gold); font-family:'Playfair Display'; margin-bottom: 15px; text-align: center;"></h2>
         <div id="m-body"></div>
-        <button onclick="closeModal()" class="action-btn" style="border:none; text-decoration:underline; font-size: 0.8rem; margin-top: 10px;">CLOSE</button>
+        <button onclick="closeModal()" class="action-btn" style="border:none; text-decoration:underline; font-size: 0.8rem;">CLOSE</button>
     </div>
 </div>
 
@@ -87,6 +98,10 @@
     let currentTab = 'summaries.json';
     let allData = [];
     const MY_PHONE = "212717948663"; 
+
+    function toggleFields() {
+        document.getElementById('extra-fields').style.display = (document.getElementById('adm-type').value === 'summary') ? 'block' : 'none';
+    }
 
     async function switchTab(file, btn) {
         currentTab = file;
@@ -98,7 +113,7 @@
             const res = await fetch(file);
             allData = await res.json();
             render(allData);
-        } catch(e) { grid.innerHTML = '<p style="color:red; text-align:center; width:100%;">Error loading data.</p>'; }
+        } catch(e) { grid.innerHTML = '<p style="color:red; text-align:center; width:100%;">Vault update pending.</p>'; }
     }
 
     function render(data) {
@@ -108,7 +123,7 @@
             const div = document.createElement('div');
             div.className = 'book-card';
             div.innerHTML = `
-                <img src="${item.imageUrl}" class="book-image" onerror="this.src='https://via.placeholder.com/400x600?text=AuraVault'">
+                <img src="${item.imageUrl}" class="book-image">
                 <h3 class="book-title">${item.title}</h3>
                 ${item.price ? `<p style="color:var(--gold); font-weight:bold;">$${item.price}</p>` : ''}
                 <button class="action-btn" onclick="handleAction(${index})">
@@ -128,66 +143,55 @@
 
         let formHTML = `
             <div class="checkout-form">
-                <p style="text-align:center; margin-bottom:12px; font-size:0.75rem; color:var(--gold); letter-spacing:1px;">SHIPPING INFORMATION</p>
                 <input type="text" id="u-name" placeholder="Full Name" required>
                 <input type="text" id="u-city" placeholder="City" required>
-                <textarea id="u-address" placeholder="Full Address (Street, House No.)" rows="2" required></textarea>
+                <textarea id="u-address" placeholder="Shipping Address" rows="2" required></textarea>
                 <input type="text" id="u-zip" placeholder="Zip Code" required>
-                <button class="action-btn" onclick="checkoutViaWA('${item.title}', '${item.price || 'N/A'}')">SEND ORDER TO WHATSAPP</button>
-            </div>
-        `;
+                <button class="action-btn" onclick="checkoutWA('${item.title}', '${item.price || 'N/A'}')">ORDER VIA WHATSAPP</button>
+            </div>`;
 
         if(currentTab === 'summaries.json') {
             body.innerHTML = `
-                <div class="modal-products">
-                    ${item.bookLink ? `<div class="mini-card"><img src="${item.bookImg}"><h4>The Masterpiece</h4></div>` : ''}
-                    ${item.hoodyLink ? `<div class="mini-card"><img src="${item.hoodyImg}"><h4>The Apparel</h4></div>` : ''}
+                <div style="display:flex; gap:10px; justify-content:center; margin-bottom:15px;">
+                    ${item.bookImg ? `<img src="${item.bookImg}" style="height:100px; border:1px solid #333;">` : ''}
+                    ${item.hoodyImg ? `<img src="${item.hoodyImg}" style="height:100px; border:1px solid #333;">` : ''}
                 </div>
-                <div style="max-height:150px; overflow-y:auto; margin-bottom:15px; border-top: 1px solid #222; padding-top:10px;">
-                    <p style="font-size:0.85rem; line-height:1.5; color:#888;">${item.desc || ''}</p>
-                </div>
-                ${formHTML}
-            `;
-        } else {
-            body.innerHTML = formHTML;
-        }
+                <p style="font-size:0.85rem; color:#888; margin-bottom:15px; white-space:pre-line;">${item.desc || ''}</p>
+                ${formHTML}`;
+        } else { body.innerHTML = formHTML; }
     }
 
-    function checkoutViaWA(productTitle, price) {
+    function checkoutWA(title, price) {
         const name = document.getElementById('u-name').value;
-        const city = document.getElementById('u-city').value;
-        const address = document.getElementById('u-address').value;
-        const zip = document.getElementById('u-zip').value;
-
-        if(!name || !city || !address || !zip) {
-            alert("Please complete all fields.");
-            return;
-        }
-
-        const message = `*NEW ORDER - AURAVAULT*%0A%0A` +
-                        `*Product:* ${productTitle}%0A` +
-                        `*Price:* $${price}%0A%0A` +
-                        `*Customer:* ${name}%0A` +
-                        `*City:* ${city}%0A` +
-                        `*Address:* ${address}%0A` +
-                        `*Zip Code:* ${zip}`;
-
-        window.open(`https://api.whatsapp.com/send?phone=${MY_PHONE}&text=${message}`, '_blank');
+        const addr = document.getElementById('u-address').value;
+        if(!name || !addr) return alert("Please fill shipping details");
+        const msg = `*NEW ORDER*%0A*Product:* ${title}%0A*Price:* $${price}%0A*Name:* ${name}%0A*City:* ${document.getElementById('u-city').value}%0A*Address:* ${addr}%0A*Zip:* ${document.getElementById('u-zip').value}`;
+        window.open(`https://api.whatsapp.com/send?phone=${MY_PHONE}&text=${msg}`, '_blank');
         closeModal();
     }
 
-    function closeModal() { document.getElementById('action-modal').style.display='none'; }
-    function openAdmin() { if(prompt("Key:") === "canon_-!LB2107") { document.getElementById('admin-panel').style.display='block'; window.scrollTo(0,document.body.scrollHeight); } }
+    function genAllData() {
+        const type = document.getElementById('adm-type').value;
+        const title = document.getElementById('adm-title').value;
+        const source = document.getElementById('adm-source').value;
 
-    function genJSON() {
-        const obj = { title: document.getElementById('adm-title').value, imageUrl: document.getElementById('adm-img').value, price: document.getElementById('adm-price').value, link: document.getElementById('adm-link').value, bookImg: document.getElementById('adm-book-img').value, bookLink: document.getElementById('adm-book-link').value, hoodyImg: document.getElementById('adm-hoody-img').value, hoodyLink: document.getElementById('adm-hoody-link').value, desc: document.getElementById('adm-desc').value };
-        const out = document.getElementById('json-out');
-        out.innerText = JSON.stringify(obj, null, 4) + ",";
-        out.style.display = 'block';
+        // Public JSON
+        let publicObj = { title: title, imageUrl: document.getElementById('adm-img').value, price: document.getElementById('adm-price').value };
+        if(type === 'summary') {
+            publicObj.bookImg = document.getElementById('adm-book-img').value;
+            publicObj.hoodyImg = document.getElementById('adm-hoody-img').value;
+            publicObj.desc = document.getElementById('adm-desc').value;
+        }
+        document.getElementById('public-out').innerText = JSON.stringify(publicObj, null, 4) + ",";
+
+        // Private JSON (Sources)
+        const privateObj = { title: title, source_link: source, timestamp: new Date().toLocaleDateString() };
+        document.getElementById('private-out').innerText = JSON.stringify(privateObj, null, 4) + ",";
     }
 
+    function openAdmin() { if(prompt("Key:") === "canon_-!LB2107") document.getElementById('admin-panel').style.display='block'; }
+    function closeModal() { document.getElementById('action-modal').style.display='none'; }
     window.onload = () => switchTab('summaries.json');
-    window.onclick = (e) => { if(e.target.className === 'overlay') closeModal(); }
 </script>
 </body>
 </html>
