@@ -36,7 +36,7 @@
         .admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 12px; margin-bottom: 10px; background: #1a1a1a; border: 1px solid #333; color: white; }
         .json-box-wrapper { position: relative; }
         .json-box { background: #000; color: #0f0; padding: 15px; border: 1px solid #222; font-size: 11px; height: 250px; overflow-y: auto; white-space: pre-wrap; }
-        .copy-tag { position: absolute; top: 5px; right: 5px; background: #333; color: #fff; font-size: 10px; padding: 2px 5px; cursor: pointer; border-radius: 3px; }
+        .copy-tag { position: absolute; top: 5px; right: 5px; background: #333; color: #fff; font-size: 10px; padding: 2px 5px; cursor: pointer; border-radius: 3px; border: 1px solid var(--gold); }
     </style>
 </head>
 <body>
@@ -57,9 +57,9 @@
         <h2 style="color:var(--gold); margin-bottom: 20px;">Vault Data Management</h2>
         <div class="admin-form">
             <select id="adm-type" onchange="toggleFields()">
+                <option value="summary">Summary Edition</option>
                 <option value="book">Book (Dropshipping)</option>
                 <option value="hoody">Hoodie (Affiliate)</option>
-                <option value="summary">Summary Edition</option>
             </select>
             <input type="text" id="adm-title" placeholder="Title">
             <input type="text" id="adm-img" placeholder="Image URL">
@@ -67,24 +67,24 @@
             <input type="text" id="adm-link" placeholder="AliExpress Link (For Hoodies)">
             <input type="text" id="adm-source" placeholder="SOURCE LINK (Private for GitHub)">
             
-            <div id="summary-fields" style="display:none;">
-                <input type="text" id="adm-book-img" placeholder="Related Book Image URL">
-                <input type="text" id="adm-hoody-img" placeholder="Related Hoodie Image URL">
-                <textarea id="adm-desc" rows="4" placeholder="Summary Content"></textarea>
+            <div id="summary-fields">
+                <input type="text" id="adm-book-img" placeholder="Related Book Image URL (For Bundle)">
+                <input type="text" id="adm-hoody-img" placeholder="Related Hoodie Image URL (For Bundle)">
+                <textarea id="adm-desc" rows="5" placeholder="Summary Content Text..."></textarea>
             </div>
             
-            <button class="action-btn" onclick="genAllData()" style="width:100%; background:var(--gold); color:black;">GENERATE & CLEAR</button>
+            <button class="action-btn" onclick="genAllData()" style="width:100%; background:var(--gold); color:black;">GENERATE & CLEAR ALL FIELDS</button>
         </div>
 
         <div class="admin-grid">
             <div class="json-box-wrapper">
                 <label style="color:#0f0; font-size: 0.8rem;">1. FOR SITE (Public JSON)</label>
-                <span class="copy-tag" onclick="copyToClipboard('public-out')">Copy</span>
+                <span class="copy-tag" onclick="copyToClipboard('public-out')">Copy Code</span>
                 <div id="public-out" class="json-box"></div>
             </div>
             <div class="json-box-wrapper">
                 <label style="color:#ff4444; font-size: 0.8rem;">2. FOR GITHUB (sources.json)</label>
-                <span class="copy-tag" onclick="copyToClipboard('private-out')">Copy</span>
+                <span class="copy-tag" onclick="copyToClipboard('private-out')">Copy Code</span>
                 <div id="private-out" class="json-box"></div>
             </div>
         </div>
@@ -119,7 +119,7 @@
             const res = await fetch(file);
             allData = await res.json();
             render(allData);
-        } catch(e) { grid.innerHTML = '<p style="color:red; text-align:center; width:100%;">Empty.</p>'; }
+        } catch(e) { grid.innerHTML = '<p style="color:red; text-align:center; width:100%;">Vault empty.</p>'; }
     }
 
     function render(data) {
@@ -131,7 +131,7 @@
             div.innerHTML = `
                 <img src="${item.imageUrl}" class="book-image">
                 <h3 class="book-title">${item.title}</h3>
-                ${item.price ? `<p style="color:var(--gold);">$${item.price}</p>` : ''}
+                ${item.price ? `<p style="color:var(--gold); font-weight:bold;">$${item.price}</p>` : ''}
                 <button class="action-btn" onclick="handleAction(${index})">
                     ${currentTab === 'summaries.json' ? 'LEARN MORE' : (currentTab === 'hoody.json' ? 'BUY ON ALIEXPRESS' : 'ORDER NOW')}
                 </button>`;
@@ -155,8 +155,17 @@
             <button class="action-btn" onclick="checkoutWA('${item.title}', '${item.price}')">CONFIRM WHATSAPP</button>
         </div>`;
 
-        body.innerHTML = (currentTab === 'summaries.json') ? 
-            `<p style="font-size:0.85rem; color:#888; margin-bottom:15px; white-space:pre-line;">${item.desc || ''}</p>${formHTML}` : formHTML;
+        if(currentTab === 'summaries.json') {
+            body.innerHTML = `
+                <div style="display:flex; gap:10px; justify-content:center; margin-bottom:15px;">
+                    ${item.bookImg ? `<img src="${item.bookImg}" style="height:100px; border:1px solid #333;">` : ''}
+                    ${item.hoodyImg ? `<img src="${item.hoodyImg}" style="height:100px; border:1px solid #333;">` : ''}
+                </div>
+                <p style="font-size:0.85rem; color:#888; margin-bottom:15px; white-space:pre-line;">${item.desc || ''}</p>
+                ${formHTML}`;
+        } else {
+            body.innerHTML = formHTML;
+        }
     }
 
     function checkoutWA(title, price) {
@@ -185,7 +194,7 @@
         const privateObj = { title, source: document.getElementById('adm-source').value, type, date: new Date().toLocaleDateString() };
         document.getElementById('private-out').innerText = JSON.stringify(privateObj, null, 4) + ",";
 
-        // Auto Clear Fields
+        // Auto Clear ALL Fields including Summaries
         document.getElementById('adm-title').value = "";
         document.getElementById('adm-img').value = "";
         document.getElementById('adm-price').value = "";
@@ -194,12 +203,17 @@
         document.getElementById('adm-book-img').value = "";
         document.getElementById('adm-hoody-img').value = "";
         document.getElementById('adm-desc').value = "";
+        
         document.getElementById('adm-title').focus();
     }
 
     function copyToClipboard(id) {
         const text = document.getElementById(id).innerText;
-        navigator.clipboard.writeText(text).then(() => alert("Copied to clipboard!"));
+        navigator.clipboard.writeText(text).then(() => {
+            const btn = event.target;
+            btn.innerText = "COPIED!";
+            setTimeout(() => btn.innerText = "Copy Code", 2000);
+        });
     }
 
     function openAdmin() { if(prompt("Key:") === "canon_-!LB2107") document.getElementById('admin-panel').style.display='block'; }
