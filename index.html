@@ -19,16 +19,18 @@
         .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
         .card { background: var(--dark-grey); padding: 20px; border-radius: 5px; text-align: center; border: 1px solid #222; position: relative; }
-        .card img { width: 100%; height: 400px; object-fit: cover; border-radius: 3px; }
+        .img-container { width: 100%; height: 400px; overflow: hidden; border-radius: 3px; }
+        .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s ease; cursor: crosshair; }
         .old-price { text-decoration: line-through; color: #666; font-size: 0.9rem; margin-right: 8px; }
-        .discount-badge { background: var(--gold); color: black; font-size: 0.7rem; padding: 2px 6px; border-radius: 2px; position: absolute; top: 10px; right: 10px; font-weight: bold; }
-        .action-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 25px; cursor: pointer; width: 100%; margin-top: 15px; font-weight: 600; }
+        .discount-badge { background: var(--gold); color: black; font-size: 0.7rem; padding: 2px 6px; border-radius: 2px; position: absolute; top: 10px; right: 10px; font-weight: bold; z-index: 10; }
+        .action-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 25px; cursor: pointer; width: 100%; margin-top: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
         .action-btn:hover { background: var(--gold); color: black; }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; }
-        .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 25px; border: 1px solid var(--gold); width: 95%; max-width: 550px; max-height: 90vh; overflow-y: auto; }
-        .checkout-form input, .checkout-form select, .checkout-form textarea { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; }
-        .admin-sec { background:#050505; border:1px solid var(--gold); padding:15px; margin-bottom: 20px; }
-        .admin-sec h3 { color: var(--gold); margin-bottom: 10px; font-size: 1rem; }
+        .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 25px; border: 1px solid var(--gold); width: 95%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .checkout-form input, .checkout-form select, .checkout-form textarea { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; font-family: inherit; }
+        .admin-sec { background:#050505; border:1px solid #333; padding:15px; margin-bottom: 20px; }
+        .admin-sec h3 { color: var(--gold); margin-bottom: 10px; font-size: 0.9rem; text-transform: uppercase; }
+        .json-box { background:#000; padding:15px; font-family:monospace; white-space:pre; border:1px solid #333; height:150px; overflow:auto; font-size: 0.8rem; }
     </style>
 </head>
 <body>
@@ -46,14 +48,14 @@
 <div class="container">
     <div id="display-grid" class="grid"></div>
 
-    <div id="admin-panel" style="display:none; margin-top:50px;">
+    <div id="admin-panel" style="display:none; margin-top:50px; border-top: 1px solid var(--gold); padding-top: 30px;">
         <h2 style="color:var(--gold); text-align:center; margin-bottom:20px;">VAULT ARCHITECT PANEL</h2>
         
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
             <div class="admin-sec">
                 <h3>1. Summary Entry</h3>
                 <input type="text" id="as-title" placeholder="Title">
-                <textarea id="as-desc" placeholder="Summary Content / Description"></textarea>
+                <textarea id="as-desc" placeholder="Summary Content"></textarea>
                 <input type="text" id="as-bimg" placeholder="Book Image URL">
                 <input type="text" id="as-himg" placeholder="Hoodie Image URL">
                 <input type="text" id="as-bprice" placeholder="Book Price">
@@ -66,10 +68,11 @@
                 <input type="text" id="ap-title" placeholder="Title">
                 <input type="text" id="ap-price" placeholder="Current Price">
                 <input type="text" id="ap-old" placeholder="Old Price (Optional)">
-                <input type="text" id="ap-ship" placeholder="Shipping Time (e.g. 3-5 Days)">
-                <input type="text" id="ap-img" placeholder="Image URL">
+                <input type="text" id="ap-img" placeholder="Front Image URL">
+                <input type="text" id="ap-img-back" placeholder="Back Image URL (Hover)">
+                <input type="text" id="ap-cost" placeholder="Internal Cost (e.g. 33.37)">
                 <p style="font-size: 0.7rem; color: #888; margin: 5px 0;">For Hoodies Only:</p>
-                <input type="text" id="ap-colors" placeholder="Colors (Red, Black, Blue)">
+                <input type="text" id="ap-colors" placeholder="Colors (e.g. Black, White)">
                 <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:5px;">
                     <input type="text" id="p-s" placeholder="Price S">
                     <input type="text" id="p-m" placeholder="Price M">
@@ -81,18 +84,25 @@
                 <button class="action-btn" onclick="genJSON('p')">GENERATE PRODUCT</button>
             </div>
         </div>
-        <div style="margin-top:20px;">
-            <p style="color:var(--gold);">JSON OUTPUT (Copy this):</p>
-            <div id="admin-out" style="background:#000; color:#0f0; padding:15px; font-family:monospace; white-space:pre; border:1px solid #333; height:150px; overflow:auto;"></div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top:20px;">
+            <div>
+                <p style="color:var(--gold); margin-bottom:5px;">SITE JSON (For .json files):</p>
+                <div id="out-site" class="json-box" style="color:#0f0;"></div>
+            </div>
+            <div>
+                <p style="color:var(--green); margin-bottom:5px;">INTERNAL JSON (For sources.json):</p>
+                <div id="out-sources" class="json-box" style="color:#2ecc71;"></div>
+            </div>
         </div>
     </div>
 </div>
 
 <div id="action-modal" class="overlay">
     <div class="modal">
-        <h2 id="m-title" style="color:var(--gold); text-align:center; margin-bottom:15px;"></h2>
+        <h2 id="m-title" style="color:var(--gold); text-align:center; margin-bottom:15px; font-family:'Playfair Display';"></h2>
         <div id="m-body"></div>
-        <button onclick="closeModal()" class="action-btn" style="border:none; text-decoration:underline;">CLOSE</button>
+        <button onclick="closeModal()" class="action-btn" style="border:none; text-decoration:underline; font-size:0.8rem;">BACK TO ARCHIVE</button>
     </div>
 </div>
 
@@ -105,27 +115,36 @@
         currentFile = file;
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         btn.classList.add('active');
-        const res = await fetch(file);
-        currentData = await res.json();
-        render();
+        try {
+            const res = await fetch(file);
+            currentData = await res.json();
+            render();
+        } catch(e) { console.error("File not found"); }
     }
 
     function render() {
         const grid = document.getElementById('display-grid');
         grid.innerHTML = '';
         currentData.forEach((item, i) => {
+            const mainImg = item.imageUrl || item.bookImg;
+            const backImg = item.backImageUrl || mainImg;
+
             grid.innerHTML += `
                 <div class="card">
                     ${item.oldPrice ? `<span class="discount-badge">OFFER</span>` : ''}
-                    <img src="${item.imageUrl || item.bookImg}">
-                    <h3 style="margin-top:15px;">${item.title}</h3>
+                    <div class="img-container">
+                        <img src="${mainImg}" 
+                             onmouseover="this.src='${backImg}'" 
+                             onmouseout="this.src='${mainImg}'"
+                             loading="lazy">
+                    </div>
+                    <h3 style="margin-top:15px; font-size:1.1rem; letter-spacing:1px;">${item.title}</h3>
                     <p style="margin:10px 0;">
                         ${item.oldPrice ? `<span class="old-price">$${item.oldPrice}</span>` : ''}
-                        <span style="color:var(--gold); font-weight:bold;">$${item.price}</span>
+                        <span style="color:var(--gold); font-weight:bold; font-size:1.2rem;">$${item.price || item.bookPrice}</span>
                     </p>
-                    ${item.shipping ? `<p style="color:var(--green); font-size:0.8rem;">🚚 ${item.shipping}</p>` : ''}
                     <button class="action-btn" onclick="openAction(${i})">
-                        ${currentFile==='summaries.json'?'VIEW SUMMARY':'ORDER NOW'}
+                        ${currentFile === 'summaries.json' ? 'READ SUMMARY' : 'ORDER NOW'}
                     </button>
                 </div>`;
         });
@@ -140,17 +159,17 @@
 
         if(currentFile === 'summaries.json') {
             body.innerHTML = `
-                <p style="color:#ccc; line-height:1.6; margin-bottom:20px; font-size:0.9rem;">${item.summaryText}</p>
+                <p style="color:#ccc; line-height:1.8; margin-bottom:25px; font-size:0.95rem; text-align:justify;">${item.summaryText}</p>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                    <div style="text-align:center; background:#000; padding:10px;">
-                        <img src="${item.bookImg}" style="height:100px; object-fit:contain;">
-                        <p style="color:var(--gold); margin:5px 0;">$${item.bookPrice}</p>
-                        <button class="action-btn" onclick="showCheckout('${item.title} - Book', '${item.bookPrice}', false)">ORDER BOOK</button>
+                    <div style="text-align:center; background:#000; padding:15px; border:1px solid #222;">
+                        <img src="${item.bookImg}" style="height:120px; object-fit:contain; margin-bottom:10px;">
+                        <p style="color:var(--gold); margin-bottom:10px;">$${item.bookPrice}</p>
+                        <button class="action-btn" style="font-size:0.7rem; padding:8px;" onclick="showCheckout('${item.title} - Book', '${item.bookPrice}', false)">ORDER BOOK</button>
                     </div>
-                    <div style="text-align:center; background:#000; padding:10px;">
-                        <img src="${item.hoodyImg}" style="height:100px; object-fit:contain;">
-                        <p style="color:var(--gold); margin:5px 0;">$${item.price}</p>
-                        <button class="action-btn" onclick="showCheckout('${item.title} - Hoodie', '${item.price}', true, ${JSON.stringify(item.prices || {}).replace(/"/g, '&quot;')}, '${item.colors || ''}')">ORDER HOODIE</button>
+                    <div style="text-align:center; background:#000; padding:15px; border:1px solid #222;">
+                        <img src="${item.hoodyImg}" style="height:120px; object-fit:contain; margin-bottom:10px;">
+                        <p style="color:var(--gold); margin-bottom:10px;">$${item.price}</p>
+                        <button class="action-btn" style="font-size:0.7rem; padding:8px;" onclick="showCheckout('${item.title} - Hoodie', '${item.price}', true, ${JSON.stringify(item.prices || {}).replace(/"/g, '&quot;')}, '${item.colors || ''}')">ORDER HOODIE</button>
                     </div>
                 </div>`;
         } else {
@@ -160,15 +179,18 @@
 
     function showCheckout(title, price, isHoodie, priceList = {}, colorsRaw = "") {
         const body = document.getElementById('m-body');
+        const sTime = isHoodie ? "7-10 Business Days" : "12-18 Business Days";
+        const sType = isHoodie ? "Standard US Shipping" : "International Archive Shipping";
+
         let options = '';
         if(isHoodie) {
-            const colors = colorsRaw.split(',').map(c => c.trim());
+            const colors = colorsRaw ? colorsRaw.split(',').map(c => c.trim()) : ["Black"];
             options = `
-                <select id="f-size" onchange="updatePrice(this.value, ${JSON.stringify(priceList).replace(/"/g, '&quot;')})">
+                <select id="f-size" onchange="updatePrice(this.value, ${JSON.stringify(priceList).replace(/"/g, '&quot;')})" required>
                     <option value="">SELECT SIZE</option>
                     ${Object.keys(priceList).map(s => `<option value="${s}">${s} - $${priceList[s]}</option>`).join('')}
                 </select>
-                <select id="f-color">
+                <select id="f-color" required>
                     <option value="">SELECT COLOR</option>
                     ${colors.map(c => `<option>${c}</option>`).join('')}
                 </select>`;
@@ -176,14 +198,19 @@
 
         body.innerHTML = `
             <div class="checkout-form">
-                <h3 id="display-p" style="text-align:center; color:var(--gold); margin-bottom:15px;">$${price}</h3>
+                <div style="background: #000; padding: 10px; border-radius: 2px; margin-bottom: 15px; text-align: center; border: 1px dashed var(--gold);">
+                    <p style="color:var(--green); font-size:0.75rem; font-weight:bold; margin-bottom:4px;">🚚 ${sType}</p>
+                    <p style="color:#888; font-size:0.65rem;">Delivery: ${sTime}</p>
+                </div>
+                <h3 id="display-p" style="text-align:center; color:var(--gold); margin-bottom:15px; font-size:1.6rem;">$${price}</h3>
                 ${options}
-                <input type="text" id="f-name" placeholder="Full Name">
-                <input type="email" id="f-email" placeholder="Email Address">
-                <input type="text" id="f-city" placeholder="City">
-                <input type="text" id="f-zip" placeholder="Zip Code">
-                <textarea id="f-addr" placeholder="Shipping Address"></textarea>
-                <button class="action-btn" id="s-btn" onclick="sendFinal('${title}')" style="background:var(--gold); color:black;">CONFIRM ORDER</button>
+                <input type="text" id="f-name" placeholder="Full Name" required>
+                <input type="email" id="f-email" placeholder="Email Address" required>
+                <input type="text" id="f-city" placeholder="City" required>
+                <input type="text" id="f-zip" placeholder="Zip Code" required>
+                <textarea id="f-addr" placeholder="Street Address, Apt, Suite" rows="3" required></textarea>
+                <button class="action-btn" id="s-btn" onclick="sendFinal('${title}')" style="background:var(--gold); color:black; border:none;">PROCEED TO INVOICE</button>
+                <p style="text-align:center; color:#444; font-size:0.6rem; margin-top:10px;">SECURE ARCHIVE TRANSACTION</p>
             </div>`;
     }
 
@@ -193,7 +220,6 @@
 
     function sendFinal(title) {
         const btn = document.getElementById('s-btn');
-        const price = document.getElementById('display-p').innerText;
         const data = {
             user_name: document.getElementById('f-name').value,
             user_email: document.getElementById('f-email').value,
@@ -201,21 +227,24 @@
             user_city: document.getElementById('f-city').value,
             user_zip: document.getElementById('f-zip').value,
             item_title: title,
-            item_price: price,
+            item_price: document.getElementById('display-p').innerText,
             item_size: document.getElementById('f-size')?.value || 'N/A',
             item_color: document.getElementById('f-color')?.value || 'N/A',
             order_id: "AV-" + Math.floor(Math.random()*99999)
         };
-        btn.innerText = "SENDING..."; btn.disabled = true;
+        if(!data.user_name || !data.user_email) return alert("Fill all fields");
+        btn.innerText = "PROCESSING..."; btn.disabled = true;
         emailjs.send("service_9yrz8kd", "template_1lgifb3", data).then(() => {
-            alert("Order Sent!"); closeModal();
+            alert("Order Sent to Archive!"); closeModal();
         }, () => { alert("Error"); btn.disabled = false; });
     }
 
     function genJSON(type) {
-        let entry = {};
+        let siteEntry = {};
+        let sourceEntry = {};
+
         if(type==='s') {
-            entry = { 
+            siteEntry = { 
                 title: document.getElementById('as-title').value,
                 summaryText: document.getElementById('as-desc').value,
                 bookImg: document.getElementById('as-bimg').value,
@@ -224,21 +253,29 @@
                 price: document.getElementById('as-hprice').value
             };
         } else {
-            entry = {
+            const p = document.getElementById('ap-price').value;
+            siteEntry = {
                 title: document.getElementById('ap-title').value,
-                price: document.getElementById('ap-price').value,
+                price: p,
                 oldPrice: document.getElementById('ap-old').value,
-                shipping: document.getElementById('ap-ship').value,
                 imageUrl: document.getElementById('ap-img').value,
+                backImageUrl: document.getElementById('ap-img-back').value,
+                shipping: "FREE EXPRESS SHIPPING",
                 colors: document.getElementById('ap-colors').value,
                 prices: {
-                    S: document.getElementById('p-s').value, M: document.getElementById('p-m').value,
-                    L: document.getElementById('p-l').value, XL: document.getElementById('p-xl').value,
-                    "2XL": document.getElementById('p-2xl').value, "3XL": document.getElementById('p-3xl').value
+                    S: document.getElementById('p-s').value || p, M: document.getElementById('p-m').value || p,
+                    L: document.getElementById('p-l').value || p, XL: document.getElementById('p-xl').value || p,
+                    "2XL": document.getElementById('p-2xl').value || p, "3XL": document.getElementById('p-3xl').value || p
                 }
             };
+            sourceEntry = {
+                title: siteEntry.title,
+                cost: document.getElementById('ap-cost').value,
+                profit: (parseFloat(p) - parseFloat(document.getElementById('ap-cost').value || 0)).toFixed(2)
+            };
         }
-        document.getElementById('admin-out').innerText = JSON.stringify(entry, null, 2) + ",";
+        document.getElementById('out-site').innerText = JSON.stringify(siteEntry, null, 2) + ",";
+        document.getElementById('out-sources').innerText = JSON.stringify(sourceEntry, null, 2) + ",";
     }
 
     function openAdmin() { if(prompt("Pass:") === "canon_-!LB2107") document.getElementById('admin-panel').style.display='block'; }
