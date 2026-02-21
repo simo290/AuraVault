@@ -47,20 +47,21 @@
 
     <div id="admin-panel" style="display:none; margin-top:50px; border-top: 2px solid var(--gold);">
         <h2 style="color:var(--gold); text-align:center; padding: 20px 0;">VAULT ARCHITECT ADMIN</h2>
-        <div style="display:flex; gap:10px; margin-bottom: 20px;">
+        <div style="display:flex; flex-wrap:wrap; gap:10px; margin-bottom: 20px;">
             <button class="action-btn" onclick="showForm('s')">ADD SUMMARY</button>
-            <button class="action-btn" onclick="showForm('p')">ADD PRODUCT</button>
+            <button class="action-btn" onclick="showForm('b')">ADD BOOK ONLY</button>
+            <button class="action-btn" onclick="showForm('p')">ADD HOODIE ONLY</button>
         </div>
 
         <div id="f-s" class="admin-sec">
-            <input type="text" id="as-title" placeholder="Summary Title">
-            <textarea id="as-text" placeholder="Content Text (The Quote/Summary)"></textarea>
+            <h4 style="color:var(--gold); margin-bottom:10px;">New Summary Entry</h4>
+            <input type="text" id="as-title" placeholder="Title">
+            <textarea id="as-text" placeholder="Summary Content"></textarea>
             <input type="text" id="as-bimg" placeholder="Book Image URL">
+            <input type="text" id="as-bprice" placeholder="Book Price">
             <input type="text" id="as-himg" placeholder="Hoodie Image URL">
-            <input type="text" id="as-bprice" placeholder="Book Price (Standard)">
-            <p style="color:var(--gold); margin: 10px 0; font-size: 0.8rem;">HOODIE PRICING PER SIZE ($):</p>
             <div class="admin-grid">
-                <input type="text" id="sh-s" placeholder="Price S/M/L">
+                <input type="text" id="sh-s" placeholder="Hoodie Price S/M/L">
                 <input type="text" id="sh-xl" placeholder="Price XL">
                 <input type="text" id="sh-2xl" placeholder="Price 2XL">
                 <input type="text" id="sh-3xl" placeholder="Price 3XL">
@@ -68,26 +69,30 @@
             <button class="action-btn" onclick="generate('s')">GENERATE SUMMARY</button>
         </div>
 
+        <div id="f-b" class="admin-sec" style="display:none;">
+            <h4 style="color:var(--gold); margin-bottom:10px;">New Book (Books Tab)</h4>
+            <input type="text" id="ab-title" placeholder="Book Title">
+            <input type="text" id="ab-price" placeholder="Price">
+            <input type="text" id="ab-img" placeholder="Image URL">
+            <button class="action-btn" onclick="generate('b')">GENERATE BOOK</button>
+        </div>
+
         <div id="f-p" class="admin-sec" style="display:none;">
+            <h4 style="color:var(--gold); margin-bottom:10px;">New Hoodie (Hoodies Tab)</h4>
             <input type="text" id="ap-title" placeholder="Product Title">
-            <input type="text" id="ap-cost" placeholder="Internal Cost (For Profit Tracking)">
             <input type="text" id="ap-img-f" placeholder="Front Image URL">
             <input type="text" id="ap-img-b" placeholder="Back Image URL">
             <input type="text" id="ap-colors" placeholder="Colors (e.g. Black, White)">
-            <p style="color:var(--gold); margin: 10px 0; font-size: 0.8rem;">PRICING PER SIZE ($):</p>
             <div class="admin-grid">
                 <input type="text" id="p-s" placeholder="Price S/M/L">
                 <input type="text" id="p-xl" placeholder="Price XL">
                 <input type="text" id="p-2xl" placeholder="Price 2XL">
                 <input type="text" id="p-3xl" placeholder="Price 3XL">
             </div>
-            <button class="action-btn" onclick="generate('p')">GENERATE PRODUCT</button>
+            <button class="action-btn" onclick="generate('p')">GENERATE HOODIE</button>
         </div>
 
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-top:20px;">
-            <div id="out-site" class="json-box"></div>
-            <div id="out-sources" class="json-box" style="color:#2ecc71;"></div>
-        </div>
+        <div id="out-site" class="json-box"></div>
     </div>
 </div>
 
@@ -158,7 +163,8 @@
                     </button>
                 </div>`;
         } else {
-            showCheckout(item.title, item.price, currentFile === 'hoody.json', item.colors, item.prices);
+            // If it's a book only (no prices object), we pass null
+            showCheckout(item.title, item.price || item.bookPrice, currentFile === 'hoody.json', item.colors, item.prices);
         }
     }
 
@@ -220,44 +226,43 @@
     }
 
     function generate(type) {
+        let data = {};
         if(type === 's') {
             const hPrice = document.getElementById('sh-s').value;
-            const data = { 
+            data = { 
                 title: document.getElementById('as-title').value, 
                 summaryText: document.getElementById('as-text').value, 
                 bookImg: document.getElementById('as-bimg').value, 
+                bookPrice: document.getElementById('as-bprice').value,
                 imageUrl: document.getElementById('as-himg').value,
-                bookPrice: document.getElementById('as-bprice').value, 
                 price: hPrice,
-                prices: { 
-                    "S": hPrice, "M": hPrice, "L": hPrice, 
-                    "XL": document.getElementById('sh-xl').value, 
-                    "2XL": document.getElementById('sh-2xl').value, 
-                    "3XL": document.getElementById('sh-3xl').value 
-                }
+                prices: { "S": hPrice, "M": hPrice, "L": hPrice, "XL": document.getElementById('sh-xl').value, "2XL": document.getElementById('sh-2xl').value, "3XL": document.getElementById('sh-3xl').value }
             };
-            document.getElementById('out-site').innerText = JSON.stringify(data, null, 2) + ",";
-        } else {
+        } else if(type === 'b') {
+            data = {
+                title: document.getElementById('ab-title').value,
+                bookPrice: document.getElementById('ab-price').value,
+                bookImg: document.getElementById('ab-img').value
+            };
+        } else if(type === 'p') {
             const sPrice = document.getElementById('p-s').value;
-            const data = { 
+            data = { 
                 title: document.getElementById('ap-title').value, 
                 price: sPrice, 
                 imageUrl: document.getElementById('ap-img-f').value, 
                 backImageUrl: document.getElementById('ap-img-b').value, 
                 colors: document.getElementById('ap-colors').value,
-                prices: { 
-                    "S": sPrice, "M": sPrice, "L": sPrice, 
-                    "XL": document.getElementById('p-xl').value, 
-                    "2XL": document.getElementById('p-2xl').value, 
-                    "3XL": document.getElementById('p-3xl').value 
-                }
+                prices: { "S": sPrice, "M": sPrice, "L": sPrice, "XL": document.getElementById('p-xl').value, "2XL": document.getElementById('p-2xl').value, "3XL": document.getElementById('p-3xl').value }
             };
-            document.getElementById('out-site').innerText = JSON.stringify(data, null, 2) + ",";
-            document.getElementById('out-sources').innerText = JSON.stringify({ title: data.title, cost: document.getElementById('ap-cost').value }, null, 2) + ",";
         }
+        document.getElementById('out-site').innerText = JSON.stringify(data, null, 2) + ",";
     }
 
-    function showForm(t) { document.getElementById('f-s').style.display = t==='s'?'block':'none'; document.getElementById('f-p').style.display = t==='p'?'block':'none'; }
+    function showForm(t) { 
+        document.getElementById('f-s').style.display = t==='s'?'block':'none'; 
+        document.getElementById('f-b').style.display = t==='b'?'block':'none'; 
+        document.getElementById('f-p').style.display = t==='p'?'block':'none'; 
+    }
     function openAdmin() { if(prompt("Key:") === "canon_-!LB2107") document.getElementById('admin-panel').style.display='block'; }
     function closeModal() { document.getElementById('action-modal').style.display='none'; }
     window.onload = () => switchTab('summaries.json', document.querySelectorAll('.nav-link')[0]);
