@@ -13,6 +13,8 @@
         
         header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #333; }
         .logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--gold); letter-spacing: 2px; cursor: pointer; }
+        .usa-notice { font-size: 0.75rem; color: #666; margin-top: 5px; letter-spacing: 1px; }
+        
         nav { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
         .nav-link { color: #888; text-decoration: none; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding-bottom: 5px; }
         .nav-link.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
@@ -25,7 +27,11 @@
         .book-image { width: 100%; height: 400px; object-fit: cover; border-radius: 3px; }
         .book-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin: 15px 0 5px; }
         
+        .old-price { text-decoration: line-through; color: #666; font-size: 0.9rem; margin-right: 8px; }
+        .discount-badge { background: var(--gold); color: black; font-size: 0.7rem; padding: 2px 6px; border-radius: 2px; font-weight: bold; position: absolute; top: 10px; right: 10px; }
         .shipping-tag { color: var(--green); font-size: 0.85rem; font-weight: 600; margin-top: 8px; display: block; }
+        
+        .size-selector { width: 100%; padding: 12px; background: #000; color: var(--gold); border: 1px solid #333; margin: 15px 0; border-radius: 4px; font-family: 'Inter', sans-serif; }
 
         .action-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 25px; cursor: pointer; width: 100%; margin-top: 15px; font-weight: 600; transition: 0.3s; }
         .action-btn:hover { background: var(--gold); color: black; }
@@ -35,14 +41,16 @@
         .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 30px; border: 1px solid var(--gold); width: 95%; max-width: 550px; max-height: 90vh; overflow-y: auto; }
         .checkout-form input, .checkout-form textarea { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 2px; font-family: 'Inter', sans-serif; }
 
-        #admin-panel { display: none; margin-top: 50px; padding: 30px; border: 1px dashed var(--gold); background: #050505; }
-        .json-box { background: #000; color: #0f0; padding: 15px; border: 1px solid #222; font-size: 11px; height: 250px; overflow-y: auto; white-space: pre-wrap; }
+        /* Admin Panel Styles */
+        #admin-panel { display: none; margin-top: 50px; padding: 30px; border: 2px solid var(--gold); background: #050505; }
+        .json-box { background: #000; color: #0f0; padding: 15px; border: 1px solid #222; font-size: 11px; height: 200px; overflow-y: auto; white-space: pre-wrap; font-family: monospace; }
     </style>
 </head>
 <body>
 
 <header>
     <div class="logo" onclick="openAdmin()">AURAVAULT</div>
+    <p class="usa-notice">EXCLUSIVE ARCHIVE | SHIPPING ONLY TO THE UNITED STATES</p>
     <nav>
         <span class="nav-link active" onclick="switchTab('summaries.json', this)">SUMMARIES</span>
         <span class="nav-link" onclick="switchTab('books.json', this)">BOOKS</span>
@@ -54,8 +62,18 @@
     <div id="display-grid" class="grid"></div>
 
     <div id="admin-panel" class="container">
-        <h2 style="color:var(--gold); margin-bottom: 20px;">Vault Data Management</h2>
-        <div class="json-box" id="public-out">Admin active. Use console to generate data.</div>
+        <h2 style="color:var(--gold); margin-bottom: 20px;">Vault Management System</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="checkout-form">
+                <input type="text" id="adm-title" placeholder="Product Title">
+                <input type="text" id="adm-price" placeholder="Price (e.g. 60.00)">
+                <input type="text" id="adm-oldPrice" placeholder="Old Price (Optional)">
+                <input type="text" id="adm-img" placeholder="Image URL">
+                <input type="text" id="adm-shipping" placeholder="Shipping (e.g. 5-7 Business Days)">
+                <button class="action-btn" onclick="generateJSON()" style="background:var(--gold); color:black;">GENERATE ENTRY</button>
+            </div>
+            <div class="json-box" id="public-out">// Generated JSON will appear here...</div>
+        </div>
     </div>
 </div>
 
@@ -68,30 +86,22 @@
 </div>
 
 <script>
-    // --- 1. EmailJS Configuration ---
-    (function(){
-        emailjs.init("QWKaC8MCGOF9GwKvN"); 
-    })();
+    (function(){ emailjs.init("QWKaC8MCGOF9GwKvN"); })();
 
     let currentTab = 'summaries.json';
     let allData = [];
 
-    // --- 2. Navigation & Data Loading ---
     async function switchTab(file, btn) {
         currentTab = file;
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         if(btn) btn.classList.add('active');
-        
         const grid = document.getElementById('display-grid');
         grid.innerHTML = '<p style="text-align:center; width:100%;">Accessing Vault...</p>';
-        
         try {
             const res = await fetch(file);
             allData = await res.json();
             render(allData);
-        } catch(e) { 
-            grid.innerHTML = '<p style="color:red; text-align:center; width:100%;">Vault empty or File not found.</p>'; 
-        }
+        } catch(e) { grid.innerHTML = '<p style="color:red; text-align:center; width:100%;">Vault empty.</p>'; }
     }
 
     function render(data) {
@@ -100,99 +110,124 @@
         data.forEach((item, index) => {
             const div = document.createElement('div');
             div.className = 'book-card';
+            const priceHTML = item.oldPrice 
+                ? `<p><span class="old-price">$${item.oldPrice}</span><span style="color:var(--gold); font-weight:bold;">$${item.price}</span></p>`
+                : `<p style="color:var(--gold); font-weight:bold;">$${item.price}</p>`;
             div.innerHTML = `
+                ${item.oldPrice ? `<span class="discount-badge">OFFER</span>` : ''}
                 <img src="${item.imageUrl}" class="book-image">
                 <h3 class="book-title">${item.title}</h3>
-                ${item.price && currentTab !== 'summaries.json' ? `<p style="color:var(--gold); font-weight:bold;">$${item.price}</p>` : ''}
-                ${item.shipping ? `<span class="shipping-tag">⚡ Fast US Shipping: ${item.shipping}</span>` : ''}
+                ${priceHTML}
+                ${item.shipping ? `<span class="shipping-tag">🚚 Delivery: ${item.shipping}</span>` : ''}
                 <button class="action-btn" onclick="handleAction(${index})">
-                    ${currentTab === 'summaries.json' ? 'EXPLORE COLLECTION' : (currentTab === 'hoody.json' ? 'BUY ON ALIEXPRESS' : 'ORDER NOW')}
+                    ${currentTab === 'summaries.json' ? 'EXPLORE COLLECTION' : 'ORDER NOW'}
                 </button>`;
             grid.appendChild(div);
         });
     }
 
-    // --- 3. Order Handling ---
     function handleAction(index) {
         const item = allData[index];
-        if(currentTab === 'hoody.json') { window.open(item.link, '_blank'); return; }
-        
         const modal = document.getElementById('action-modal');
         document.getElementById('m-title').innerText = item.title;
         const body = document.getElementById('m-body');
         modal.style.display = 'block';
 
-        if(currentTab === 'summaries.json') {
+        if(currentTab === 'hoody.json') {
+            const base = parseFloat(item.price);
+            const sizes = { "S": base, "M": base, "L": base + 2, "XL": base + 2, "2XL": base + 5, "3XL": base + 7 };
+            body.innerHTML = `
+                <div style="text-align:center; margin-bottom:20px;">
+                    <p style="font-size:0.8rem; color:#888; margin-bottom:10px;">SELECT SIZE (USA FIT):</p>
+                    <select id="size-picker" class="size-selector" onchange="updateLivePrice(${index}, this.value)">
+                        <option value="S">Small - $${sizes.S}</option>
+                        <option value="M">Medium - $${sizes.M}</option>
+                        <option value="L">Large - $${sizes.L}</option>
+                        <option value="XL">XL - $${sizes.XL}</option>
+                        <option value="2XL">2XL - $${sizes.2XL}</option>
+                        <option value="3XL">3XL - $${sizes.3XL}</option>
+                    </select>
+                    <h2 id="live-price" style="color:var(--gold);">$${base}</h2>
+                </div>
+                <div id="form-container"></div>
+            `;
+            showOrderForm(item.title, base, 'S');
+        } else if(currentTab === 'summaries.json') {
             body.innerHTML = `
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:20px;">
                     <div style="background:#151515; padding:15px; border:1px solid #333; text-align:center;">
                         <img src="${item.bookImg}" style="width:100%; height:120px; object-fit:contain; margin-bottom:10px;">
-                        <p style="font-size:0.7rem; color:#888;">THE ARCHIVE (BOOK)</p>
-                        <p style="color:var(--gold); font-weight:bold; margin:5px 0;">$${item.bookPrice}</p>
-                        <button class="action-btn" onclick="showOrderForm('${item.title} - Book', '${item.bookPrice}')" style="font-size:0.7rem; padding:8px;">ORDER BOOK</button>
+                        <p style="color:var(--gold); font-weight:bold;">$${item.bookPrice}</p>
+                        <button class="action-btn" onclick="showOrderForm('${item.title} - Book', '${item.bookPrice}', 'N/A')" style="font-size:0.7rem;">ORDER BOOK</button>
                     </div>
                     <div style="background:#151515; padding:15px; border:1px solid #333; text-align:center;">
                         <img src="${item.hoodyImg}" style="width:100%; height:120px; object-fit:contain; margin-bottom:10px;">
-                        <p style="font-size:0.7rem; color:#888;">THE GARMENT (HOODIE)</p>
-                        <p style="color:var(--gold); font-weight:bold; margin:5px 0;">$${item.price}</p>
-                        <button class="action-btn" onclick="showOrderForm('${item.title} - Hoodie', '${item.price}')" style="font-size:0.7rem; padding:8px;">ORDER HOODIE</button>
+                        <p style="color:var(--gold); font-weight:bold;">$${item.price}</p>
+                        <button class="action-btn" onclick="handleAction(${index})" style="font-size:0.7rem;">ORDER HOODIE</button>
                     </div>
                 </div>
                 <div id="form-container"></div>
             `;
         } else {
-            showOrderForm(item.title, item.price);
+            showOrderForm(item.title, item.price, 'N/A');
         }
     }
 
-    function showOrderForm(title, price) {
+    function updateLivePrice(index, size) {
+        const item = allData[index];
+        const base = parseFloat(item.price);
+        const sizes = { "S": base, "M": base, "L": base+2, "XL": base+2, "2XL": base+5, "3XL": base+7 };
+        const newPrice = sizes[size];
+        document.getElementById('live-price').innerText = "$" + newPrice;
+        showOrderForm(item.title, newPrice, size);
+    }
+
+    function showOrderForm(title, price, size) {
         const container = document.getElementById('form-container') || document.getElementById('m-body');
         container.innerHTML = `
-            <div class="checkout-form" style="border-top: 1px solid #333; padding-top:15px; margin-top:10px;">
-                <p style="color:var(--gold); font-size:0.85rem; margin-bottom:12px; text-align:center;">Ordering: <b>${title}</b> | <b>$${price}</b></p>
-                <input type="text" id="u-name" placeholder="Full Name" required>
-                <input type="email" id="u-email" placeholder="Email Address" required>
-                <input type="text" id="u-city" placeholder="City" required>
-                <input type="text" id="u-zip" placeholder="Zip/Postal Code" required>
-                <textarea id="u-address" placeholder="Full Shipping Address" rows="2" required></textarea>
-                <button class="action-btn" id="submit-order-btn" onclick="processOrder('${title}', '${price}')" style="background:var(--gold); color:black;">
-                    PLACE ORDER
-                </button>
+            <div class="checkout-form" style="border-top:1px solid #333; padding-top:15px;">
+                <p style="color:var(--gold); font-size:0.85rem; margin-bottom:12px; text-align:center;">
+                    Invoice: <b>${title}</b> ${size !== 'N/A' ? '['+size+']' : ''} | <b>$${price}</b>
+                </p>
+                <input type="text" id="u-name" placeholder="Full Name">
+                <input type="email" id="u-email" placeholder="Email Address">
+                <input type="text" id="u-city" placeholder="City">
+                <input type="text" id="u-zip" placeholder="Zip Code">
+                <textarea id="u-address" placeholder="Full Shipping Address" rows="2"></textarea>
+                <button class="action-btn" id="submit-order-btn" onclick="processOrder('${title}', '${price}', '${size}')" style="background:var(--gold); color:black;">SEND INVOICE REQUEST</button>
             </div>`;
     }
 
-    function processOrder(title, price) {
+    function processOrder(title, price, size) {
         const btn = document.getElementById('submit-order-btn');
-        const orderId = "AV-" + Math.floor(10000 + Math.random() * 90000);
-        
         const data = {
-            order_id: orderId,
+            order_id: "AV-" + Math.floor(10000 + Math.random() * 90000),
             user_name: document.getElementById('u-name').value,
-            item_title: title,
+            item_title: title + (size !== 'N/A' ? " (Size: "+size+")" : ""),
             item_price: price, 
             user_address: document.getElementById('u-address').value,
             user_city: document.getElementById('u-city').value,
             user_zip: document.getElementById('u-zip').value,
             email: document.getElementById('u-email').value 
         };
-
-        if(!data.user_name || !data.email || !data.user_address) {
-            alert("Please fill in all details.");
-            return;
-        }
-
+        if(!data.user_name || !data.email || !data.user_address) { alert("Fill all fields"); return; }
         btn.innerText = "PROCESSING...";
         btn.disabled = true;
+        emailjs.send("service_9yrz8kd", "template_1lgifb3", data).then(() => {
+            alert("Order " + data.order_id + " Sent! Check your email for the PayPal invoice.");
+            closeModal();
+        }, () => { alert("Error sending."); btn.disabled = false; });
+    }
 
-        emailjs.send("service_9yrz8kd", "template_1lgifb3", data)
-            .then(() => {
-                alert("SUCCESS! Order " + orderId + " received. Check your email.");
-                closeModal();
-            }, (err) => {
-                alert("FAILED: " + (err.text || JSON.stringify(err)));
-                btn.innerText = "PLACE ORDER";
-                btn.disabled = false;
-            });
+    function generateJSON() {
+        const entry = {
+            title: document.getElementById('adm-title').value,
+            price: document.getElementById('adm-price').value,
+            oldPrice: document.getElementById('adm-oldPrice').value || null,
+            imageUrl: document.getElementById('adm-img').value,
+            shipping: document.getElementById('adm-shipping').value
+        };
+        document.getElementById('public-out').innerText = JSON.stringify(entry, null, 2) + ",";
     }
 
     function openAdmin() { if(prompt("Key:") === "canon_-!LB2107") document.getElementById('admin-panel').style.display='block'; }
