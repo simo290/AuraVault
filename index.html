@@ -129,24 +129,34 @@
         });
     }
 
-    function openAction(item) {
-        const modal = document.getElementById('action-modal');
-        const body = document.getElementById('m-body');
-        document.getElementById('m-title').innerText = item.title;
-        globalPrices = item.prices || {}; 
-        modal.style.display = 'block';
+   function openAction(item) {
+    const modal = document.getElementById('action-modal');
+    const body = document.getElementById('m-body');
+    document.getElementById('m-title').innerText = item.title;
+    modal.style.display = 'block';
 
-        if(currentFile === 'summaries.json') {
-            body.innerHTML = `
-                <p style="color:#ccc; line-height:1.6; margin-bottom:20px; text-align:justify;">${item.summaryText}</p>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <button class="action-btn" onclick="showCheckout('${item.title} (Book)', '${item.bookPrice}', false)">BOOK ($${item.bookPrice})</button>
-                    <button class="action-btn" onclick="showCheckout('${item.title} (Hoodie)', '${item.price}', true, '${item.colors || 'Black'}', ${JSON.stringify(item.prices).replace(/"/g, '&quot;')})">HOODIE ($${item.price})</button>
-                </div>`;
-        } else {
-            showCheckout(item.title, item.price, currentFile === 'hoody.json', item.colors, item.prices);
-        }
+    // إلا كنا في قسم Summaries أو كانت الداتا فيها SummaryText
+    if (currentFile === 'summaries.json' || item.summaryText) {
+        body.innerHTML = `
+            <div style="text-align:center; margin-bottom:20px;">
+                <img src="${item.bookImg || item.imageUrl}" style="width:150px; border-radius:5px; border:1px solid var(--gold);">
+            </div>
+            <p style="color:#ccc; line-height:1.6; margin-bottom:20px; text-align:justify; font-style: italic;">
+                "${item.summaryText || 'No summary available.'}"
+            </p>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                <button class="action-btn" onclick="showCheckout('${item.title} (Book)', '${item.bookPrice}', false)">
+                    ORDER BOOK ($${item.bookPrice})
+                </button>
+                <button class="action-btn" onclick="showCheckout('${item.title} (Hoodie)', '${item.price}', true, '${item.colors || 'Black'}', ${JSON.stringify(item.prices).replace(/"/g, '&quot;')})">
+                    ORDER HOODIE ($${item.price})
+                </button>
+            </div>`;
+    } else {
+        // إلا كان مجرد منتج عادي (Book أو Hoodie) كيدوز نيشان لـ Checkout
+        showCheckout(item.title, item.price, currentFile === 'hoody.json', item.colors, item.prices);
     }
+}
 
     function updatePrice(sizeSelect) {
         const selectedSize = sizeSelect.value;
