@@ -128,8 +128,8 @@
                     </div>
                     <h3 style="margin-top:15px;">${item.title}</h3>
                     <p style="color:var(--gold); margin:10px 0; font-weight:bold;">$${item.price || item.bookPrice}</p>
-                    <button class="action-btn" onclick="openAction(${JSON.stringify(item).replace(/"/g, '&quot;')})">
-                        ${currentFile === 'summaries.json' ? 'READ SUMMARY' : 'ORDER NOW'}
+                    <button class="action-btn" onclick='openAction(${JSON.stringify(item)})'>
+                        ${item.summaryText ? 'READ SUMMARY' : 'ORDER NOW'}
                     </button>
                 </div>`;
         });
@@ -141,19 +141,19 @@
         document.getElementById('m-title').innerText = item.title;
         modal.style.display = 'block';
 
-        if (currentFile === 'summaries.json' || item.summaryText) {
+        if (item.summaryText) {
             body.innerHTML = `
                 <div style="text-align:center; margin-bottom:20px;">
-                    <img src="${item.bookImg || item.imageUrl}" style="width:150px; border-radius:5px; border:1px solid var(--gold);">
+                    <img src="${item.bookImg}" style="width:150px; border-radius:5px; border:1px solid var(--gold);">
                 </div>
                 <p style="color:#ccc; line-height:1.6; margin-bottom:20px; text-align:justify; font-style: italic;">
-                    "${item.summaryText || 'No summary available.'}"
+                    "${item.summaryText}"
                 </p>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <button class="action-btn" onclick="showCheckout('${item.title} (Book)', '${item.bookPrice}', false)">
+                    <button class="action-btn" onclick="showCheckout('${item.title} (Book)', '${item.bookPrice}', false, '', null)">
                         ORDER BOOK ($${item.bookPrice})
                     </button>
-                    <button class="action-btn" onclick="showCheckout('${item.title} (Hoodie)', '${item.price}', true, '${item.colors || 'Black'}', ${JSON.stringify(item.prices).replace(/"/g, '&quot;')})">
+                    <button class="action-btn" onclick='showCheckout("${item.title} (Hoodie)", "${item.price}", true, "${item.colors || 'Black'}", ${JSON.stringify(item.prices)})'>
                         ORDER HOODIE ($${item.price})
                     </button>
                 </div>`;
