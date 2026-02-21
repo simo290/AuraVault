@@ -27,7 +27,8 @@
         .modal { position: relative; margin: 50px auto; background: #111; padding: 30px; border: 1px solid var(--gold); width: 95%; max-width: 550px; }
         .checkout-form input, .checkout-form select, .checkout-form textarea { width: 100%; padding: 12px; margin-bottom: 12px; background: #000; border: 1px solid #333; color: white; font-family: inherit; }
         .admin-sec { background:#111; border:1px solid #333; padding:20px; margin-top: 20px; }
-        .json-box { background:#000; padding:15px; font-family:monospace; white-space:pre; border:1px solid #333; height:200px; overflow:auto; color: #0f0; margin-top: 10px; font-size: 12px; }
+        .json-box { background:#000; padding:15px; font-family:monospace; white-space:pre; border:1px solid #333; height:200px; overflow:auto; color: #0f0; margin-top: 10px; font-size: 11px; }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -45,29 +46,35 @@
     <div id="display-grid" class="grid"></div>
 
     <div id="admin-panel" style="display:none; margin-top:50px; border-top: 2px solid var(--gold);">
-        <h2 style="color:var(--gold); text-align:center; padding: 20px 0;">ADMIN STRATEGIST</h2>
+        <h2 style="color:var(--gold); text-align:center; padding: 20px 0;">VAULT ARCHITECT ADMIN</h2>
         <div style="display:flex; gap:10px; margin-bottom: 20px;">
             <button class="action-btn" onclick="showForm('s')">ADD SUMMARY</button>
-            <button class="action-btn" onclick="showForm('p')">ADD PRODUCT (BOOK/HOODIE)</button>
+            <button class="action-btn" onclick="showForm('p')">ADD PRODUCT</button>
         </div>
 
         <div id="f-s" class="admin-sec">
             <input type="text" id="as-title" placeholder="Summary Title">
-            <textarea id="as-text" placeholder="Content"></textarea>
+            <textarea id="as-text" placeholder="Content Text"></textarea>
             <input type="text" id="as-bimg" placeholder="Book Image URL">
             <input type="text" id="as-himg" placeholder="Hoodie Image URL">
             <input type="text" id="as-bprice" placeholder="Book Price">
-            <input type="text" id="as-hprice" placeholder="Hoodie Price">
+            <input type="text" id="as-hprice" placeholder="Hoodie Base Price">
             <button class="action-btn" onclick="generate('s')">GENERATE SUMMARY</button>
         </div>
 
         <div id="f-p" class="admin-sec" style="display:none;">
             <input type="text" id="ap-title" placeholder="Product Title">
-            <input type="text" id="ap-price" placeholder="Selling Price">
-            <input type="text" id="ap-cost" placeholder="Internal Cost">
-            <input type="text" id="ap-img-f" placeholder="Front Image (Main)">
-            <input type="text" id="ap-img-b" placeholder="Back Image (Hover)">
-            <input type="text" id="ap-colors" placeholder="Colors (Black, White...)">
+            <input type="text" id="ap-cost" placeholder="Internal Cost (Total)">
+            <input type="text" id="ap-img-f" placeholder="Front Image URL">
+            <input type="text" id="ap-img-b" placeholder="Back Image URL">
+            <input type="text" id="ap-colors" placeholder="Colors (e.g. Black, White)">
+            <p style="color:var(--gold); margin: 10px 0; font-size: 0.8rem;">PRICING PER SIZE ($):</p>
+            <div class="admin-grid">
+                <input type="text" id="p-s" placeholder="Price S/M/L">
+                <input type="text" id="p-xl" placeholder="Price XL">
+                <input type="text" id="p-2xl" placeholder="Price 2XL">
+                <input type="text" id="p-3xl" placeholder="Price 3XL">
+            </div>
             <button class="action-btn" onclick="generate('p')">GENERATE PRODUCT</button>
         </div>
 
@@ -89,6 +96,7 @@
 <script>
     (function(){ emailjs.init("QWKaC8MCGOF9GwKvN"); })();
     let currentFile = 'summaries.json';
+    let globalPrices = {}; 
 
     async function switchTab(file, btn) {
         currentFile = file;
@@ -104,7 +112,7 @@
     function render(data) {
         const grid = document.getElementById('display-grid');
         grid.innerHTML = '';
-        data.forEach((item, i) => {
+        data.forEach(item => {
             const img = item.imageUrl || item.bookImg;
             const back = item.backImageUrl || img;
             grid.innerHTML += `
@@ -112,7 +120,7 @@
                     <div class="img-container">
                         <img src="${img}" onmouseover="this.src='${back}'" onmouseout="this.src='${img}'" loading="lazy">
                     </div>
-                    <h3 style="margin-top:15px; font-size:1.1rem;">${item.title}</h3>
+                    <h3 style="margin-top:15px;">${item.title}</h3>
                     <p style="color:var(--gold); margin:10px 0; font-weight:bold;">$${item.price || item.bookPrice}</p>
                     <button class="action-btn" onclick="openAction(${JSON.stringify(item).replace(/"/g, '&quot;')})">
                         ${currentFile === 'summaries.json' ? 'READ SUMMARY' : 'ORDER NOW'}
@@ -125,6 +133,7 @@
         const modal = document.getElementById('action-modal');
         const body = document.getElementById('m-body');
         document.getElementById('m-title').innerText = item.title;
+        globalPrices = item.prices || {}; 
         modal.style.display = 'block';
 
         if(currentFile === 'summaries.json') {
@@ -132,69 +141,87 @@
                 <p style="color:#ccc; line-height:1.6; margin-bottom:20px; text-align:justify;">${item.summaryText}</p>
                 <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                     <button class="action-btn" onclick="showCheckout('${item.title} (Book)', '${item.bookPrice}', false)">BOOK ($${item.bookPrice})</button>
-                    <button class="action-btn" onclick="showCheckout('${item.title} (Hoodie)', '${item.price}', true, '${item.colors || 'Black'}')">HOODIE ($${item.price})</button>
+                    <button class="action-btn" onclick="showCheckout('${item.title} (Hoodie)', '${item.price}', true, '${item.colors || 'Black'}', ${JSON.stringify(item.prices).replace(/"/g, '&quot;')})">HOODIE ($${item.price})</button>
                 </div>`;
         } else {
-            showCheckout(item.title, item.price, currentFile === 'hoody.json', item.colors);
+            showCheckout(item.title, item.price, currentFile === 'hoody.json', item.colors, item.prices);
         }
     }
 
-    function showCheckout(title, price, isHoodie, colors = "Black") {
+    function updatePrice(sizeSelect) {
+        const selectedSize = sizeSelect.value;
+        const newPrice = globalPrices[selectedSize] || globalPrices["S"]; 
+        document.getElementById('checkout-price-tag').innerText = "$" + newPrice;
+        window.currentItemPrice = newPrice;
+    }
+
+    function showCheckout(title, price, isHoodie, colors, prices) {
+        window.currentItemPrice = price;
+        if(prices) globalPrices = prices;
         const body = document.getElementById('m-body');
-        const sTime = isHoodie ? "7-10 Days (Express)" : "12-18 Days (Standard)";
-        let extraFields = '';
+        let variantHtml = '';
 
         if(isHoodie) {
-            const colorList = colors.split(',').map(c => `<option>${c.trim()}</option>`).join('');
-            extraFields = `
-                <select id="f-size" required><option value="">SELECT SIZE</option><option>S</option><option>M</option><option>L</option><option>XL</option><option>2XL</option></select>
-                <select id="f-color" required><option value="">SELECT COLOR</option>${colorList}</select>`;
+            const colorOptions = colors.split(',').map(c => `<option>${c.trim()}</option>`).join('');
+            variantHtml = `
+                <select id="f-size" onchange="updatePrice(this)" required>
+                    <option value="">CHOOSE SIZE</option>
+                    <option value="S">S</option><option value="M">M</option><option value="L">L</option>
+                    <option value="XL">XL</option><option value="2XL">2XL</option><option value="3XL">3XL</option>
+                </select>
+                <select id="f-color" required><option value="">CHOOSE COLOR</option>${colorOptions}</select>`;
         }
 
         body.innerHTML = `
             <div class="checkout-form">
-                <p style="color:var(--green); font-size:0.8rem; text-align:center; margin-bottom:15px;">🚚 Shipping: ${sTime}</p>
-                <h3 style="text-align:center; color:var(--gold); margin-bottom:15px; font-size:1.5rem;">$${price}</h3>
+                <h3 id="checkout-price-tag" style="text-align:center; color:var(--gold); margin-bottom:20px; font-size:1.8rem;">$${price}</h3>
                 <input type="text" id="f-name" placeholder="Full Name" required>
                 <input type="email" id="f-email" placeholder="Email Address" required>
-                ${extraFields}
-                <textarea id="f-addr" placeholder="Full Address (Street, City, Zip Code, USA)" rows="3" required></textarea>
-                <button class="action-btn" id="s-btn" onclick="sendEmail('${title}', '${price}')" style="background:var(--gold); color:black; border:none;">CONFIRM ORDER</button>
+                ${variantHtml}
+                <textarea id="f-addr" placeholder="Full Shipping Address (USA Only)" rows="3" required></textarea>
+                <button class="action-btn" id="s-btn" onclick="sendOrder('${title}')" style="background:var(--gold); color:black; border:none;">CONFIRM ORDER</button>
             </div>`;
     }
 
-    function sendEmail(title, price) {
+    function sendOrder(title) {
         const btn = document.getElementById('s-btn');
-        const data = {
+        const payload = {
             user_name: document.getElementById('f-name').value,
             user_email: document.getElementById('f-email').value,
             user_address: document.getElementById('f-addr').value,
             item_title: title,
-            item_price: price,
+            item_price: window.currentItemPrice,
             item_size: document.getElementById('f-size')?.value || 'N/A',
-            item_color: document.getElementById('f-color')?.value || 'N/A',
-            order_id: "AV-" + Math.floor(Math.random()*100000)
+            item_color: document.getElementById('f-color')?.value || 'N/A'
         };
-
-        if(!data.user_name || !data.user_email || !data.user_address) return alert("Fill all fields!");
-        btn.innerText = "SENDING..."; btn.disabled = true;
-
-        emailjs.send("service_9yrz8kd", "template_1lgifb3", data).then(() => {
-            alert("Order Success! Check your email."); closeModal();
-        }, (err) => { alert("Error: " + err.text); btn.disabled = false; btn.innerText = "RETRY"; });
+        if(!payload.user_name || !payload.user_email || !payload.user_address) return alert("Fill all details!");
+        btn.innerText = "PROCESSING..."; btn.disabled = true;
+        emailjs.send("service_9yrz8kd", "template_1lgifb3", payload).then(() => {
+            alert("Order Success!"); closeModal();
+        }, (err) => { alert("Error: " + err.text); btn.disabled = false; });
     }
 
     function generate(type) {
         if(type === 's') {
-            const site = { title: document.getElementById('as-title').value, summaryText: document.getElementById('as-text').value, bookImg: document.getElementById('as-bimg').value, hoodyImg: document.getElementById('as-himg').value, bookPrice: document.getElementById('as-bprice').value, price: document.getElementById('as-hprice').value };
-            document.getElementById('out-site').innerText = JSON.stringify(site, null, 2) + ",";
+            const data = { title: document.getElementById('as-title').value, summaryText: document.getElementById('as-text').value, bookImg: document.getElementById('as-bimg').value, bookPrice: document.getElementById('as-bprice').value, price: document.getElementById('as-hprice').value };
+            document.getElementById('out-site').innerText = JSON.stringify(data, null, 2) + ",";
         } else {
-            const p = document.getElementById('ap-price').value;
-            const c = document.getElementById('ap-cost').value;
-            const site = { title: document.getElementById('ap-title').value, price: p, imageUrl: document.getElementById('ap-img-f').value, backImageUrl: document.getElementById('ap-img-b').value, colors: document.getElementById('ap-colors').value };
-            const internal = { title: site.title, cost: c, profit: (parseFloat(p)-parseFloat(c)).toFixed(2) };
-            document.getElementById('out-site').innerText = JSON.stringify(site, null, 2) + ",";
-            document.getElementById('out-sources').innerText = JSON.stringify(internal, null, 2) + ",";
+            const sPrice = document.getElementById('p-s').value;
+            const data = { 
+                title: document.getElementById('ap-title').value, 
+                price: sPrice, 
+                imageUrl: document.getElementById('ap-img-f').value, 
+                backImageUrl: document.getElementById('ap-img-b').value, 
+                colors: document.getElementById('ap-colors').value,
+                prices: { 
+                    "S": sPrice, "M": sPrice, "L": sPrice, 
+                    "XL": document.getElementById('p-xl').value, 
+                    "2XL": document.getElementById('p-2xl').value, 
+                    "3XL": document.getElementById('p-3xl').value 
+                }
+            };
+            document.getElementById('out-site').innerText = JSON.stringify(data, null, 2) + ",";
+            document.getElementById('out-sources').innerText = JSON.stringify({ title: data.title, cost: document.getElementById('ap-cost').value }, null, 2) + ",";
         }
     }
 
