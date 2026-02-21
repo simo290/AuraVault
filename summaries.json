@@ -1,9 +1,19 @@
 [
- {
+{
   "title": "The Concise 48 Laws Of Power",
   "summaryText": "In the world of power, there are no friends, only players. Robert Greene’s masterpiece distilled into a tactical guide. Never outshine the master. Conceal your intentions. Master the art of timing. This archive entry is for those who refuse to be sheep in a world of wolves. Understand the laws, or be ruled by them.",
   "bookImg": "https://ae-pic-a1.aliexpress-media.com/kf/S0babc3f38bfa483080e5b275c8153659X.jpg?has_lang=1&ver=2_220x220q75.jpg_.avif",
   "bookPrice": "34.5",
-  "price": "64.95"
+  "imageUrl": "https://files.cdn.printful.com/files/319/3192e455b54fcfb388be3fadc0be60cc_preview.png",
+  "price": "64.95",
+  "colors": "black",
+  "prices": {
+    "S": "64.95",
+    "M": "64.95",
+    "L": "64.95",
+    "XL": "66.95",
+    "2XL": "68.99",
+    "3XL": "70.00"
+  }
 }
 ]
