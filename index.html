@@ -13,35 +13,35 @@
         
         header { padding: 40px 20px; text-align: center; border-bottom: 1px solid #333; }
         .logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--gold); letter-spacing: 2px; cursor: pointer; }
-        .usa-notice { font-size: 0.75rem; color: #666; margin-top: 5px; letter-spacing: 1px; }
+        .usa-notice { font-size: 0.75rem; color: #666; margin-top: 5px; text-transform: uppercase; letter-spacing: 1px; }
         
         nav { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
-        .nav-link { color: #888; text-decoration: none; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding-bottom: 5px; }
+        .nav-link { color: #888; text-decoration: none; font-size: 0.9rem; font-weight: 600; cursor: pointer; padding-bottom: 5px; border-bottom: 2px solid transparent; }
         .nav-link.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
 
         .container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
         
-        .book-card { background: var(--dark-grey); padding: 20px; border-radius: 5px; text-align: center; border: 1px solid #222; transition: 0.3s; position: relative; }
-        .book-card:hover { border-color: var(--gold); transform: translateY(-5px); }
-        .book-image { width: 100%; height: 400px; object-fit: cover; border-radius: 3px; }
-        .book-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin: 15px 0 5px; }
+        .product-card { background: var(--dark-grey); padding: 20px; border-radius: 5px; text-align: center; border: 1px solid #222; transition: 0.3s; position: relative; }
+        .product-card:hover { border-color: var(--gold); transform: translateY(-5px); }
+        .product-image { width: 100%; height: 400px; object-fit: cover; border-radius: 3px; background: #000; }
+        .product-title { font-family: 'Playfair Display', serif; font-size: 1.2rem; margin: 15px 0 5px; }
+        .price-tag { color: var(--gold); font-weight: bold; font-size: 1.1rem; margin-bottom: 10px; }
+        .shipping-tag { color: var(--green); font-size: 0.8rem; font-weight: 600; display: block; margin-bottom: 10px; }
         
-        /* New Styles for Pricing & Shipping */
-        .old-price { text-decoration: line-through; color: #666; font-size: 0.9rem; margin-right: 8px; }
-        .discount-badge { background: var(--gold); color: black; font-size: 0.7rem; padding: 2px 6px; border-radius: 2px; font-weight: bold; position: absolute; top: 10px; right: 10px; }
-        .shipping-tag { color: var(--green); font-size: 0.85rem; font-weight: 600; margin-top: 8px; display: block; }
-        
-        .action-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 25px; cursor: pointer; width: 100%; margin-top: 15px; font-weight: 600; transition: 0.3s; }
+        .action-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 25px; cursor: pointer; width: 100%; margin-top: 10px; font-weight: 600; transition: 0.3s; }
         .action-btn:hover { background: var(--gold); color: black; }
 
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; }
-        .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 30px; border: 1px solid var(--gold); width: 95%; max-width: 550px; max-height: 90vh; overflow-y: auto; }
-        .checkout-form input, .checkout-form textarea { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 2px; }
+        .modal { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; padding: 25px; border: 1px solid var(--gold); width: 95%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        
+        .checkout-form input, .checkout-form select, .checkout-form textarea { width: 100%; padding: 12px; margin-bottom: 10px; background: #000; border: 1px solid #333; color: white; border-radius: 2px; font-family: inherit; }
+        .checkout-form select { color: var(--gold); }
 
-        /* Admin Layout */
-        #admin-panel { display: none; background: #050505; border: 2px solid var(--gold); padding: 25px; margin-top: 40px; }
-        .json-out { background: #000; color: #0f0; padding: 15px; font-family: monospace; font-size: 12px; height: 200px; overflow-y: auto; border: 1px solid #333; white-space: pre-wrap; }
+        #admin-panel { display: none; margin-top: 50px; padding: 30px; border-top: 2px solid var(--gold); background: #050505; }
+        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+        .admin-box { background: #111; padding: 20px; border: 1px solid #333; border-radius: 5px; }
+        .json-box { background: #000; color: #0f0; padding: 10px; font-size: 11px; height: 120px; overflow-y: auto; border: 1px solid #222; margin-top: 10px; white-space: pre-wrap; font-family: monospace; }
     </style>
 </head>
 <body>
@@ -59,20 +59,33 @@
 <div class="container">
     <div id="display-grid" class="grid"></div>
 
-    <div id="admin-panel" class="container">
-        <h2 style="color:var(--gold); margin-bottom: 15px;">Vault Admin Tool</h2>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-            <div class="checkout-form">
-                <input type="text" id="adm-title" placeholder="Product Title">
-                <input type="text" id="adm-price" placeholder="Current Price (e.g. 60.00)">
-                <input type="text" id="adm-oldPrice" placeholder="Old Price (Optional)">
-                <input type="text" id="adm-img" placeholder="Image URL">
-                <input type="text" id="adm-shipping" placeholder="Shipping (e.g. 5-7 Business Days)">
-                <button class="action-btn" onclick="buildJSON()" style="background:var(--gold); color:black;">GENERATE JSON</button>
+    <div id="admin-panel">
+        <h2 style="color:var(--gold); text-align: center;">VAULT DATA MANAGEMENT</h2>
+        <div class="admin-grid">
+            <div class="admin-box">
+                <h3 style="color:var(--gold); margin-bottom:10px;">Summary Entry</h3>
+                <input type="text" id="s-title" placeholder="Title">
+                <input type="text" id="s-hprice" placeholder="Hoodie Price">
+                <input type="text" id="s-bprice" placeholder="Book Price">
+                <input type="text" id="s-img" placeholder="Main Image URL">
+                <button class="action-btn" onclick="genJSON('s')">GENERATE JSON</button>
+                <div class="json-box" id="out-s"></div>
             </div>
-            <div>
-                <p style="font-size: 0.7rem; color: #888; margin-bottom: 5px;">COPY TO YOUR JSON FILE:</p>
-                <div class="json-out" id="json-output">// Data will appear here...</div>
+            <div class="admin-box">
+                <h3 style="color:var(--gold); margin-bottom:10px;">Book Entry</h3>
+                <input type="text" id="b-title" placeholder="Book Title">
+                <input type="text" id="b-price" placeholder="Price">
+                <input type="text" id="b-img" placeholder="Image URL">
+                <button class="action-btn" onclick="genJSON('b')">GENERATE JSON</button>
+                <div class="json-box" id="out-b"></div>
+            </div>
+            <div class="admin-box">
+                <h3 style="color:var(--gold); margin-bottom:10px;">Hoodie Entry</h3>
+                <input type="text" id="h-title" placeholder="Hoodie Title">
+                <input type="text" id="h-price" placeholder="Price">
+                <input type="text" id="h-img" placeholder="Image URL">
+                <button class="action-btn" onclick="genJSON('h')">GENERATE JSON</button>
+                <div class="json-box" id="out-h"></div>
             </div>
         </div>
     </div>
@@ -80,107 +93,164 @@
 
 <div id="action-modal" class="overlay">
     <div class="modal">
-        <h2 id="m-title" style="color:var(--gold); font-family:'Playfair Display'; margin-bottom: 15px; text-align: center;"></h2>
+        <h2 id="m-title" style="color:var(--gold); text-align: center; margin-bottom: 15px; font-family: 'Playfair Display';"></h2>
         <div id="m-body"></div>
-        <button onclick="closeModal()" class="action-btn" style="border:none; text-decoration:underline; font-size: 0.8rem; margin-top: 20px;">CLOSE</button>
+        <button onclick="closeModal()" class="action-btn" style="border:none; text-decoration:underline; font-size: 0.8rem; margin-top: 15px;">CLOSE</button>
     </div>
 </div>
 
 <script>
+    // --- Config ---
     (function(){ emailjs.init("QWKaC8MCGOF9GwKvN"); })();
 
-    let currentTab = 'summaries.json';
-    let allData = [];
+    let currentFile = 'summaries.json';
+    let currentData = [];
 
+    // --- Navigation ---
     async function switchTab(file, btn) {
-        currentTab = file;
+        currentFile = file;
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
         if(btn) btn.classList.add('active');
+        
         const grid = document.getElementById('display-grid');
         grid.innerHTML = '<p style="text-align:center; width:100%;">Accessing Vault...</p>';
+        
         try {
             const res = await fetch(file);
-            allData = await res.json();
-            render(allData);
-        } catch(e) { grid.innerHTML = '<p style="color:red; text-align:center; width:100%;">Vault Link Broken.</p>'; }
+            currentData = await res.json();
+            render();
+        } catch(e) { 
+            grid.innerHTML = `<p style="color:red; text-align:center; width:100%;">Error loading ${file}</p>`; 
+        }
     }
 
-    function render(data) {
+    // --- UI Render ---
+    function render() {
         const grid = document.getElementById('display-grid');
         grid.innerHTML = '';
-        data.forEach((item, index) => {
+        currentData.forEach((item, index) => {
             const div = document.createElement('div');
-            div.className = 'book-card';
-            const priceHTML = item.oldPrice 
-                ? `<p><span class="old-price">$${item.oldPrice}</span><span style="color:var(--gold); font-weight:bold;">$${item.price}</span></p>`
-                : `<p style="color:var(--gold); font-weight:bold;">$${item.price}</p>`;
-            
+            div.className = 'product-card';
             div.innerHTML = `
-                ${item.oldPrice ? `<span class="discount-badge">OFFER</span>` : ''}
-                <img src="${item.imageUrl}" class="book-image">
-                <h3 class="book-title">${item.title}</h3>
-                ${priceHTML}
-                ${item.shipping ? `<span class="shipping-tag">🚚 ${item.shipping}</span>` : ''}
-                <button class="action-btn" onclick="handleAction(${index})">
-                    ${currentTab === 'summaries.json' ? 'EXPLORE' : 'ORDER NOW'}
+                <img src="${item.imageUrl}" class="product-image" onerror="this.src='https://via.placeholder.com/400x600'">
+                <h3 class="product-title">${item.title}</h3>
+                <p class="price-tag">$${item.price}</p>
+                <span class="shipping-tag">🚚 FREE USA SHIPPING</span>
+                <button class="action-btn" onclick="openCheckout(${index})">
+                    ${currentFile === 'summaries.json' ? 'EXPLORE ARCHIVE' : 'ORDER NOW'}
                 </button>`;
             grid.appendChild(div);
         });
     }
 
-    function handleAction(index) {
-        const item = allData[index];
+    // --- Checkout Logic ---
+    function openCheckout(index) {
+        const item = currentData[index];
         const modal = document.getElementById('action-modal');
+        const body = document.getElementById('m-body');
         document.getElementById('m-title').innerText = item.title;
-        const body = document.getElementById('m-body');
         modal.style.display = 'block';
-        showForm(item.title, item.price);
-    }
 
-    function showForm(title, price) {
-        const body = document.getElementById('m-body');
+        let hoodieOptions = '';
+        // Show Size/Color only if it's a hoodie or summary
+        if (currentFile === 'hoody.json' || currentFile === 'summaries.json') {
+            hoodieOptions = `
+                <div style="display: flex; gap: 10px;">
+                    <select id="f-size" required>
+                        <option value="">SELECT SIZE</option>
+                        <option>S</option><option>M</option><option>L</option>
+                        <option>XL</option><option>2XL</option><option>3XL</option>
+                    </select>
+                    <select id="f-color" required>
+                        <option value="">SELECT COLOR</option>
+                        <option>Pure Black</option><option>Archive White</option><option>Deep Grey</option>
+                    </select>
+                </div>`;
+        }
+
         body.innerHTML = `
             <div class="checkout-form">
-                <p style="text-align:center; margin-bottom:15px; color:var(--gold);">Invoice for: ${title} - $${price}</p>
-                <input type="text" id="u-name" placeholder="Full Name">
-                <input type="email" id="u-email" placeholder="Email Address">
-                <textarea id="u-address" placeholder="Shipping Address in USA" rows="3"></textarea>
-                <button class="action-btn" id="s-btn" onclick="processOrder('${title}', '${price}')" style="background:var(--gold); color:black;">REQUEST PAYPAL INVOICE</button>
+                <p style="text-align:center; color:#888; font-size:0.8rem; margin-bottom:15px;">Product Invoice: $${item.price}</p>
+                ${hoodieOptions}
+                <input type="text" id="f-name" placeholder="Full Name" required>
+                <input type="email" id="f-email" placeholder="Email Address" required>
+                <input type="text" id="f-city" placeholder="City" required>
+                <input type="text" id="f-zip" placeholder="ZIP / Postal Code" required>
+                <textarea id="f-addr" placeholder="Full Shipping Address" rows="3" required></textarea>
+                <button class="action-btn" id="sub-btn" onclick="submitOrder('${item.title}', '${item.price}')" style="background:var(--gold); color:black;">REQUEST INVOICE</button>
             </div>`;
     }
 
-    function processOrder(title, price) {
-        const btn = document.getElementById('s-btn');
+    function submitOrder(title, price) {
+        const btn = document.getElementById('sub-btn');
+        const sizeElem = document.getElementById('f-size');
+        const colorElem = document.getElementById('f-color');
+        
+        const selectedSize = sizeElem ? sizeElem.value : "N/A (Book)";
+        const selectedColor = colorElem ? colorElem.value : "N/A (Book)";
+
         const data = {
             order_id: "AV-" + Math.floor(10000 + Math.random() * 90000),
-            user_name: document.getElementById('u-name').value,
+            user_name: document.getElementById('f-name').value,
+            user_email: document.getElementById('f-email').value,
+            user_city: document.getElementById('f-city').value,
+            user_zip: document.getElementById('f-zip').value,
+            user_address: document.getElementById('f-addr').value,
             item_title: title,
-            item_price: price, 
-            user_address: document.getElementById('u-address').value,
-            email: document.getElementById('u-email').value 
+            item_price: price,
+            item_size: selectedSize,
+            item_color: selectedColor
         };
-        if(!data.user_name || !data.email) { alert("Please complete the form."); return; }
+
+        // Basic validation
+        if(!data.user_name || !data.user_email || !data.user_address || !data.user_zip) {
+            alert("Please fill all shipping fields."); return;
+        }
+        if(sizeElem && selectedSize === "") { alert("Please select a size."); return; }
+
         btn.innerText = "SENDING..."; btn.disabled = true;
-        emailjs.send("service_9yrz8kd", "template_1lgifb3", data).then(() => {
-            alert("Order Request Sent!"); closeModal();
-        }, () => { alert("Error."); btn.disabled = false; });
+
+        emailjs.send("service_9yrz8kd", "template_1lgifb3", data)
+            .then(() => {
+                alert("Order Successful! Your ID: " + data.order_id);
+                closeModal();
+            }, (err) => {
+                alert("Error sending request.");
+                btn.disabled = false;
+                btn.innerText = "REQUEST INVOICE";
+            });
     }
 
-    // --- Admin Functions ---
-    function buildJSON() {
-        const entry = {
-            title: document.getElementById('adm-title').value,
-            price: document.getElementById('adm-price').value,
-            oldPrice: document.getElementById('adm-oldPrice').value || null,
-            imageUrl: document.getElementById('adm-img').value,
-            shipping: document.getElementById('adm-shipping').value
-        };
-        document.getElementById('json-output').innerText = JSON.stringify(entry, null, 2) + ",";
+    // --- Admin Tools ---
+    function genJSON(type) {
+        let entry = {};
+        if(type === 's') {
+            entry = { 
+                title: document.getElementById('s-title').value,
+                price: document.getElementById('s-hprice').value,
+                bookPrice: document.getElementById('s-bprice').value,
+                imageUrl: document.getElementById('s-img').value
+            };
+        } else if(type === 'b') {
+            entry = { 
+                title: document.getElementById('b-title').value,
+                price: document.getElementById('b-price').value,
+                imageUrl: document.getElementById('b-img').value
+            };
+        } else if(type === 'h') {
+            entry = { 
+                title: document.getElementById('h-title').value,
+                price: document.getElementById('h-price').value,
+                imageUrl: document.getElementById('h-img').value
+            };
+        }
+        document.getElementById('out-'+type).innerText = JSON.stringify(entry, null, 2) + ",";
     }
 
-    function openAdmin() { if(prompt("Key:") === "canon_-!LB2107") document.getElementById('admin-panel').style.display='block'; }
+    function openAdmin() { if(prompt("Access Key:") === "canon_-!LB2107") document.getElementById('admin-panel').style.display='block'; }
     function closeModal() { document.getElementById('action-modal').style.display = 'none'; }
-    window.onload = () => switchTab('summaries.json');
+
+    window.onload = () => switchTab('summaries.json', document.querySelector('.nav-link'));
 </script>
 </body>
 </html>
