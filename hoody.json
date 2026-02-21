@@ -1,3 +1,20 @@
 [
-  
+  {
+  "title": "The 48 Laws Archive Hoodie",
+  "price": "64.95",
+  "oldPrice": "89.00",
+  "imageUrl": "Crafted upon order. Expected delivery: 7-10 business days",
+  "backImageUrl": "https://files.cdn.printful.com/upload/product-templates/64/644217e3c51a73da87a0cf63fc06ca2a_l",
+  "shipping": "FREE EXPRESS SHIPPING",
+  "colors": "black",
+  "prices": {
+    "S": "64.95",
+    "M": "64.95",
+    "L": "64.95",
+    "XL": "66.95",
+    "2XL": "68.99",
+    "3XL": "70.00"
+  }
+}
+
 ]
