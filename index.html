@@ -54,17 +54,23 @@
 
         <div id="f-s" class="admin-sec">
             <input type="text" id="as-title" placeholder="Summary Title">
-            <textarea id="as-text" placeholder="Content Text"></textarea>
+            <textarea id="as-text" placeholder="Content Text (The Quote/Summary)"></textarea>
             <input type="text" id="as-bimg" placeholder="Book Image URL">
             <input type="text" id="as-himg" placeholder="Hoodie Image URL">
-            <input type="text" id="as-bprice" placeholder="Book Price">
-            <input type="text" id="as-hprice" placeholder="Hoodie Base Price">
+            <input type="text" id="as-bprice" placeholder="Book Price (Standard)">
+            <p style="color:var(--gold); margin: 10px 0; font-size: 0.8rem;">HOODIE PRICING PER SIZE ($):</p>
+            <div class="admin-grid">
+                <input type="text" id="sh-s" placeholder="Price S/M/L">
+                <input type="text" id="sh-xl" placeholder="Price XL">
+                <input type="text" id="sh-2xl" placeholder="Price 2XL">
+                <input type="text" id="sh-3xl" placeholder="Price 3XL">
+            </div>
             <button class="action-btn" onclick="generate('s')">GENERATE SUMMARY</button>
         </div>
 
         <div id="f-p" class="admin-sec" style="display:none;">
             <input type="text" id="ap-title" placeholder="Product Title">
-            <input type="text" id="ap-cost" placeholder="Internal Cost (Total)">
+            <input type="text" id="ap-cost" placeholder="Internal Cost (For Profit Tracking)">
             <input type="text" id="ap-img-f" placeholder="Front Image URL">
             <input type="text" id="ap-img-b" placeholder="Back Image URL">
             <input type="text" id="ap-colors" placeholder="Colors (e.g. Black, White)">
@@ -129,34 +135,32 @@
         });
     }
 
-   function openAction(item) {
-    const modal = document.getElementById('action-modal');
-    const body = document.getElementById('m-body');
-    document.getElementById('m-title').innerText = item.title;
-    modal.style.display = 'block';
+    function openAction(item) {
+        const modal = document.getElementById('action-modal');
+        const body = document.getElementById('m-body');
+        document.getElementById('m-title').innerText = item.title;
+        modal.style.display = 'block';
 
-    // إلا كنا في قسم Summaries أو كانت الداتا فيها SummaryText
-    if (currentFile === 'summaries.json' || item.summaryText) {
-        body.innerHTML = `
-            <div style="text-align:center; margin-bottom:20px;">
-                <img src="${item.bookImg || item.imageUrl}" style="width:150px; border-radius:5px; border:1px solid var(--gold);">
-            </div>
-            <p style="color:#ccc; line-height:1.6; margin-bottom:20px; text-align:justify; font-style: italic;">
-                "${item.summaryText || 'No summary available.'}"
-            </p>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <button class="action-btn" onclick="showCheckout('${item.title} (Book)', '${item.bookPrice}', false)">
-                    ORDER BOOK ($${item.bookPrice})
-                </button>
-                <button class="action-btn" onclick="showCheckout('${item.title} (Hoodie)', '${item.price}', true, '${item.colors || 'Black'}', ${JSON.stringify(item.prices).replace(/"/g, '&quot;')})">
-                    ORDER HOODIE ($${item.price})
-                </button>
-            </div>`;
-    } else {
-        // إلا كان مجرد منتج عادي (Book أو Hoodie) كيدوز نيشان لـ Checkout
-        showCheckout(item.title, item.price, currentFile === 'hoody.json', item.colors, item.prices);
+        if (currentFile === 'summaries.json' || item.summaryText) {
+            body.innerHTML = `
+                <div style="text-align:center; margin-bottom:20px;">
+                    <img src="${item.bookImg || item.imageUrl}" style="width:150px; border-radius:5px; border:1px solid var(--gold);">
+                </div>
+                <p style="color:#ccc; line-height:1.6; margin-bottom:20px; text-align:justify; font-style: italic;">
+                    "${item.summaryText || 'No summary available.'}"
+                </p>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+                    <button class="action-btn" onclick="showCheckout('${item.title} (Book)', '${item.bookPrice}', false)">
+                        ORDER BOOK ($${item.bookPrice})
+                    </button>
+                    <button class="action-btn" onclick="showCheckout('${item.title} (Hoodie)', '${item.price}', true, '${item.colors || 'Black'}', ${JSON.stringify(item.prices).replace(/"/g, '&quot;')})">
+                        ORDER HOODIE ($${item.price})
+                    </button>
+                </div>`;
+        } else {
+            showCheckout(item.title, item.price, currentFile === 'hoody.json', item.colors, item.prices);
+        }
     }
-}
 
     function updatePrice(sizeSelect) {
         const selectedSize = sizeSelect.value;
@@ -167,12 +171,12 @@
 
     function showCheckout(title, price, isHoodie, colors, prices) {
         window.currentItemPrice = price;
-        if(prices) globalPrices = prices;
+        globalPrices = prices || { "S": price, "M": price, "L": price, "XL": price, "2XL": price, "3XL": price };
         const body = document.getElementById('m-body');
         let variantHtml = '';
 
         if(isHoodie) {
-            const colorOptions = colors.split(',').map(c => `<option>${c.trim()}</option>`).join('');
+            const colorOptions = (colors || "Black").split(',').map(c => `<option>${c.trim()}</option>`).join('');
             variantHtml = `
                 <select id="f-size" onchange="updatePrice(this)" required>
                     <option value="">CHOOSE SIZE</option>
@@ -213,7 +217,21 @@
 
     function generate(type) {
         if(type === 's') {
-            const data = { title: document.getElementById('as-title').value, summaryText: document.getElementById('as-text').value, bookImg: document.getElementById('as-bimg').value, bookPrice: document.getElementById('as-bprice').value, price: document.getElementById('as-hprice').value };
+            const hPrice = document.getElementById('sh-s').value;
+            const data = { 
+                title: document.getElementById('as-title').value, 
+                summaryText: document.getElementById('as-text').value, 
+                bookImg: document.getElementById('as-bimg').value, 
+                imageUrl: document.getElementById('as-himg').value,
+                bookPrice: document.getElementById('as-bprice').value, 
+                price: hPrice,
+                prices: { 
+                    "S": hPrice, "M": hPrice, "L": hPrice, 
+                    "XL": document.getElementById('sh-xl').value, 
+                    "2XL": document.getElementById('sh-2xl').value, 
+                    "3XL": document.getElementById('sh-3xl').value 
+                }
+            };
             document.getElementById('out-site').innerText = JSON.stringify(data, null, 2) + ",";
         } else {
             const sPrice = document.getElementById('p-s').value;
