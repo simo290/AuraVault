@@ -169,9 +169,11 @@
         window.currentItemPrice = newPrice;
     }
 
-    function showCheckout(title, price, isHoodie, colors, prices) {
+  function showCheckout(title, price, isHoodie, colors, prices) {
         window.currentItemPrice = price;
+        // هنا كنعطيو للسيستيم الأثمنة كاملة اللي جاية من الـ JSON
         globalPrices = prices || { "S": price, "M": price, "L": price, "XL": price, "2XL": price, "3XL": price };
+        
         const body = document.getElementById('m-body');
         let variantHtml = '';
 
@@ -180,11 +182,26 @@
             variantHtml = `
                 <select id="f-size" onchange="updatePrice(this)" required>
                     <option value="">CHOOSE SIZE</option>
-                    <option value="S">S</option><option value="M">M</option><option value="L">L</option>
-                    <option value="XL">XL</option><option value="2XL">2XL</option><option value="3XL">3XL</option>
+                    <option value="S">S ($${globalPrices['S']})</option>
+                    <option value="M">M ($${globalPrices['M']})</option>
+                    <option value="L">L ($${globalPrices['L']})</option>
+                    <option value="XL">XL ($${globalPrices['XL']})</option>
+                    <option value="2XL">2XL ($${globalPrices['2XL']})</option>
+                    <option value="3XL">3XL ($${globalPrices['3XL']})</option>
                 </select>
                 <select id="f-color" required><option value="">CHOOSE COLOR</option>${colorOptions}</select>`;
         }
+
+        body.innerHTML = `
+            <div class="checkout-form">
+                <h3 id="checkout-price-tag" style="text-align:center; color:var(--gold); margin-bottom:20px; font-size:1.8rem;">$${price}</h3>
+                <input type="text" id="f-name" placeholder="Full Name" required>
+                <input type="email" id="f-email" placeholder="Email Address" required>
+                ${variantHtml}
+                <textarea id="f-addr" placeholder="Full Shipping Address (USA Only)" rows="3" required></textarea>
+                <button class="action-btn" id="s-btn" onclick="sendOrder('${title}')" style="background:var(--gold); color:black; border:none;">CONFIRM ORDER</button>
+            </div>`;
+    }
 
         body.innerHTML = `
             <div class="checkout-form">
