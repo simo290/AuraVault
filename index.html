@@ -175,7 +175,7 @@
             font-size: 1.5rem; 
             line-height: 1.9; 
             font-weight: 300;
-            margin-bottom: 60px; /* Changed from margin-top */
+            margin-bottom: 60px; 
             padding: 80px 60px; 
             background: #080808; 
             border-radius: var(--radius-sm); 
@@ -258,8 +258,7 @@
     </header>
 
     <div class="container">
-        <div id="product-grid" class="grid">
-            </div>
+        <div id="product-grid" class="grid"></div>
 
         <div id="admin-panel" style="display:none; margin-top: 150px; border-top: 1px solid #222; padding-top: 80px;">
             <h2 style="color:var(--gold); text-align:center; letter-spacing: 12px; margin-bottom: 60px; text-transform: uppercase; font-family: 'Playfair Display';">Vault Architect</h2>
@@ -277,6 +276,7 @@
                     <input type="text" id="as-book-img" placeholder="Book Surface URL">
                     <input type="text" id="as-book-price" placeholder="Book Unit Price">
                 </div>
+                <input type="text" id="as-source" placeholder="Supplier Source URL (Private Reference)" style="width:100%; margin-bottom:25px; padding:22px; background:#000; border:1px solid #222; color:var(--gold); border-radius:8px;">
                 <div class="admin-grid">
                     <input type="text" id="as-h-front" placeholder="Hoodie Front URL">
                     <input type="text" id="as-h-back" placeholder="Hoodie Back URL">
@@ -297,6 +297,7 @@
                 <div class="admin-grid"><input type="text" id="ah-front" placeholder="Front View"><input type="text" id="ah-back" placeholder="Back View"></div>
                 <div class="admin-grid"><input type="text" id="ah-sleeve" placeholder="Sleeve Detail"><input type="text" id="ah-fabric" placeholder="Fabric Details"></div>
                 <input type="text" id="ah-colors" placeholder="Color Palette (e.g., Onyx, Ghost White)">
+                <input type="text" id="ah-source" placeholder="Supplier Source URL (Private Reference)" style="width:100%; margin-bottom:25px; padding:22px; background:#000; border:1px solid #222; color:var(--gold); border-radius:8px;">
                 <div class="admin-grid">
                     <input type="text" id="ah-p-common" placeholder="Base Price (S-M-L)">
                     <input type="text" id="ah-p-xl" placeholder="XL Price">
@@ -310,6 +311,7 @@
                 <input type="text" id="ab-title" placeholder="Archive Book Title">
                 <div class="admin-grid"><input type="text" id="ab-price" placeholder="Price"><input type="text" id="ab-del" placeholder="Delivery Frame"></div>
                 <input type="text" id="ab-img" placeholder="Cover Image URL">
+                <input type="text" id="ab-source" placeholder="Supplier Source URL (Private Reference)" style="width:100%; margin-bottom:25px; padding:22px; background:#000; border:1px solid #222; color:var(--gold); border-radius:8px;">
                 <button class="action-btn" onclick="executeGeneration('book')" style="background:var(--gold); color:#000; border:none;">CONSTRUCT DATA OBJECT</button>
             </div>
             
@@ -354,7 +356,6 @@
                 grid.innerHTML = '';
                 
                 data.forEach((item, idx) => {
-                    // Logic to show BACK image by default for hoodies
                     const defaultImg = (item.backImageUrl && !item.summaryText) ? item.backImageUrl : (item.imageUrl || item.bookImg);
                     const hoverImg = (item.imageUrl && item.backImageUrl && !item.summaryText) ? item.imageUrl : (item.backImageUrl || item.imageUrl || item.bookImg);
 
@@ -390,7 +391,6 @@
             document.body.style.overflow = 'hidden';
 
             if (item.summaryText) {
-                // Narrative text is now ABOVE the images
                 content.innerHTML = `
                     <div class="narrative-text">${item.summaryText}</div>
                     <div style="display:flex; gap:50px; flex-wrap:wrap;">
@@ -554,6 +554,7 @@
                         summaryText: document.getElementById('as-narrative').value,
                         bookImg: document.getElementById('as-book-img').value,
                         bookPrice: document.getElementById('as-book-price').value,
+                        source: document.getElementById('as-source').value,
                         imageUrl: document.getElementById('as-h-front').value,
                         backImageUrl: document.getElementById('as-h-back').value,
                         sleeveImg: document.getElementById('as-h-sleeve').value,
@@ -575,10 +576,17 @@
                         sleeveImg: document.getElementById('ah-sleeve').value,
                         fabric: document.getElementById('ah-fabric').value,
                         colors: document.getElementById('ah-colors').value,
+                        source: document.getElementById('ah-source').value,
                         prices: { "S": base, "M": base, "L": base, "XL": document.getElementById('ah-p-xl').value, "2XL": document.getElementById('ah-p-2xl').value, "3XL": document.getElementById('ah-p-3xl').value }
                     };
                 } else {
-                    obj = { title: document.getElementById('ab-title').value, bookPrice: document.getElementById('ab-price').value, bookImg: document.getElementById('ab-img').value, delivery: document.getElementById('ab-del').value };
+                    obj = { 
+                        title: document.getElementById('ab-title').value, 
+                        bookPrice: document.getElementById('ab-price').value, 
+                        bookImg: document.getElementById('ab-img').value, 
+                        delivery: document.getElementById('ab-del').value,
+                        source: document.getElementById('ab-source').value
+                    };
                 }
                 document.getElementById('json-output').innerText = JSON.stringify(obj, null, 4) + ",";
             } catch (e) { alert("Archive Blueprint Failed."); }
