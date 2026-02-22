@@ -1,20 +1,20 @@
 [
-  {
-  "title": "The 48 Laws Archive Hoodie",
-  "price": "64.95",
-  "oldPrice": "89.00",
-  "imageUrl": "https://files.cdn.printful.com/files/319/3192e455b54fcfb388be3fadc0be60cc_preview.png",
-  "backImageUrl": "https://files.cdn.printful.com/upload/product-templates/64/644217e3c51a73da87a0cf63fc06ca2a_l",
-  "shipping": "FREE EXPRESS SHIPPING. Crafted upon order. Expected delivery: 7-10 business days",
-  "colors": "black",
-  "prices": {
-    "S": "64.95",
-    "M": "64.95",
-    "L": "64.95",
-    "XL": "66.95",
-    "2XL": "68.99",
-    "3XL": "70.00"
-  }
+ {
+    "title": "",
+    "price": "65.00",
+    "imageUrl": "blob:https://www.printful.com/3df35420-551b-47f2-8507-21607c5f9c9b",
+    "backImageUrl": "blob:https://www.printful.com/025d4787-394d-4aee-93d3-5fa606f69d69",
+    "sleeveImg": "blob:https://www.printful.com/075d395c-9650-4028-8e72-f33a26a9724f",
+    "fabric": "Sweat à capuche premium unisexe | Cotton Heritage M2580",
+    "colors": "black",
+    "prices": {
+        "S": "65.00",
+        "M": "65.00",
+        "L": "65.00",
+        "XL": "67.99",
+        "2XL": "70.00",
+        "3XL": "72.00"
+    }
 }
 
 ]
