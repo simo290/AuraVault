@@ -415,22 +415,65 @@
 
         /* --- CHECKOUT ENGINE --- */
         function initiateCheckout(title, basePrice, isApparel, colors, priceMap, material, imgF, imgB, imgS) {
-            window.activeOrderPrice = basePrice;
-            precisionPrices = priceMap || { "S": basePrice, "M": basePrice, "L": basePrice, "XL": basePrice, "2XL": basePrice, "3XL": basePrice };
-            const content = document.getElementById('modal-content');
+    window.activeOrderPrice = basePrice;
+    precisionPrices = priceMap || { "S": basePrice, "M": basePrice, "L": basePrice, "XL": basePrice, "2XL": basePrice, "3XL": basePrice };
+    const content = document.getElementById('modal-content');
+    
+    let visualHeader = isApparel ? `
+        <div style="text-align:center; margin-bottom:50px;">
+            <img id="chk-view" src="${imgF}" style="max-height:300px; border-radius:12px; border:1px solid #222; margin-bottom:25px;">
+            <div class="thumb-box" style="margin-top:0">
+                <img src="${imgF}" class="active" onclick="syncModalImage(this, '${imgF}')" style="width:60px; height:75px;">
+                <img src="${imgB}" onclick="syncModalImage(this, '${imgB}')" style="width:60px; height:75px;">
+                ${imgS ? `<img src="${imgS}" onclick="syncModalImage(this, '${imgS}')" style="width:60px; height:75px;">` : ''}
+            </div>
+        </div>` : `
+        <div style="text-align:center; margin-bottom:50px;">
+            <img src="${imgF}" style="max-height:300px; border-radius:12px; border:1px solid #222;">
+        </div>`;
+
+    let apparelFields = isApparel ? `
+        <div class="admin-grid">
+            <select id="size-selector" onchange="adjustPrice(this)" required>
+                <option value="">SELECT SIZE</option>
+                <option value="S">SMALL</option><option value="M">MEDIUM</option><option value="L">LARGE</option>
+                <option value="XL">XLARGE</option><option value="2XL">2XLARGE</option><option value="3XL">3XLARGE</option>
+            </select>
+            <select id="color-selector" required>
+                <option value="">SELECT COLORWAY</option>
+                ${(colors || "Original").split(',').map(c => `<option>${c.trim()}</option>`).join('')}
+            </select>
+        </div>
+        <p style="text-align:center; color:#444; font-size:0.75rem; margin-bottom:20px; text-transform:uppercase;">Material: ${material}</p>` : '';
+
+    // هنا فين زدت الخانات الجداد باش يتطابقوا مع الـ Template ديالك
+    content.innerHTML = `
+        ${visualHeader}
+        <div class="checkout-form">
+            <h3 id="live-price" style="text-align:center; color:var(--gold); font-size:3rem; margin-bottom:30px; font-weight:200;">$${basePrice}</h3>
             
-            let visualHeader = isApparel ? `
-                <div style="text-align:center; margin-bottom:50px;">
-                    <img id="chk-view" src="${imgF}" style="max-height:300px; border-radius:12px; border:1px solid #222; margin-bottom:25px;">
-                    <div class="thumb-box" style="margin-top:0">
-                        <img src="${imgF}" class="active" onclick="syncModalImage(this, '${imgF}')" style="width:60px; height:75px;">
-                        <img src="${imgB}" onclick="syncModalImage(this, '${imgB}')" style="width:60px; height:75px;">
-                        ${imgS ? `<img src="${imgS}" onclick="syncModalImage(this, '${imgS}')" style="width:60px; height:75px;">` : ''}
-                    </div>
-                </div>` : `
-                <div style="text-align:center; margin-bottom:50px;">
-                    <img src="${imgF}" style="max-height:300px; border-radius:12px; border:1px solid #222;">
-                </div>`;
+            <input id="c-name" placeholder="Full Legal Name" type="text">
+            
+            <div class="admin-grid">
+                <input id="c-phone" placeholder="Mobile Contact" type="tel">
+                <input id="c-email" placeholder="Electronic Mail" type="email">
+            </div>
+            
+            ${apparelFields}
+            
+            <input id="c-country" placeholder="Destination Country">
+            
+            <div class="admin-grid">
+                <input id="c-city" placeholder="City" type="text">
+                <input id="c-zip" placeholder="ZIP / Postal Code" type="text">
+            </div>
+            
+            <textarea id="c-address" placeholder="Full Detailed Shipping Address" rows="4"></textarea>
+            
+            <button class="action-btn" id="vault-confirm" onclick="finalizeVaultOrder('${title}')" style="background:var(--gold); color:black; border:none; padding:25px; font-weight:600; font-size:0.9rem;">CONFIRM RESERVATION</button>
+            <p style="text-align:center; font-size:0.6rem; color:#333; letter-spacing:2px; margin-top:10px;">SECURE ARCHIVE ENCRYPTION ENABLED</p>
+        </div>`;
+}
 
             let apparelFields = isApparel ? `
                 <div class="admin-grid">
@@ -489,16 +532,60 @@
         }
 
         /* --- FINAL TRANSMISSION --- */
-        function finalizeVaultOrder(itemTitle) {
-            const btn = document.getElementById('vault-confirm');
-            const inputs = ['c-name', 'c-phone', 'c-address', 'c-country'];
-            let fail = false;
-            
-            inputs.forEach(id => {
-                const el = document.getElementById(id);
-                if(!el.value) { el.style.borderColor = 'red'; fail = true; }
-                else { el.style.borderColor = '#222'; }
-            });
+       function finalizeVaultOrder(itemTitle) {
+    const btn = document.getElementById('vault-confirm');
+    
+    // لستة ديال الخانات اللي ضروري يعمرهم الكليان
+    const inputs = ['c-name', 'c-phone', 'c-address', 'c-country', 'c-email'];
+    let fail = false;
+    
+    inputs.forEach(id => {
+        const el = document.getElementById(id);
+        if(!el || !el.value) { 
+            if(el) el.style.borderColor = 'red'; 
+            fail = true; 
+        } else { 
+            el.style.borderColor = '#222'; 
+        }
+    });
+
+    if(fail) {
+        alert("Please complete all prestige fields.");
+        return;
+    }
+
+    // هاد الجزء هو المحرك اللي كيصيفط المعلومات لـ EmailJS
+    const payload = {
+        order_id: "AV-" + Math.floor(Math.random() * 900000 + 100000), // هنا كيتم صنع ID أوتوماتيكياً
+        customer_name: document.getElementById('c-name').value,
+        customer_phone: document.getElementById('c-phone').value,
+        customer_email: document.getElementById('c-email').value,
+        customer_country: document.getElementById('c-country').value,
+        customer_city: document.getElementById('c-city').value,
+        customer_zip: document.getElementById('c-zip').value,
+        customer_address: document.getElementById('c-address').value,
+        item_title: itemTitle,
+        item_price: window.activeOrderPrice,
+        item_size: document.getElementById('size-selector')?.value || 'Unique',
+        item_color: document.getElementById('color-selector')?.value || 'Default'
+    };
+
+    btn.innerText = "TRANSMITTING TO VAULT...";
+    btn.disabled = true;
+
+    // الإرسال لـ EmailJS
+    emailjs.send("service_9yrz8kd", "template_1lgifb3", payload)
+        .then(() => {
+            alert("Reservation Successful. Your ID is: " + payload.order_id);
+            closeVaultModal();
+        })
+        .catch((err) => {
+            console.error("Vault Error:", err);
+            alert("Transmission Failed. Check Connection.");
+            btn.disabled = false;
+            btn.innerText = "RETRY RESERVATION";
+        });
+}
 
             if(fail) return;
 
