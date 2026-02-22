@@ -9,18 +9,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     
     <style>
-        /* --- GLOBAL DESIGN SYSTEM --- */
+        /* --- DESIGN SYSTEM TOKENS --- */
         :root {
             --gold: #d4af37;
             --black: #0a0a0a;
-            --dark-grey: #141414;
-            --mid-grey: #1f1f1f;
-            --light-grey: #888;
+            --dark-grey: #121212;
+            --mid-grey: #1a1a1a;
+            --light-grey: #444;
             --green: #2ecc71;
-            --radius: 12px; /* Smooth corners for modern look */
-            --transition: 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --radius-lg: 12px;
+            --radius-sm: 6px;
+            --transition-smooth: 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
+        /* --- RESET & BASE STYLES --- */
         * {
             margin: 0;
             padding: 0;
@@ -36,47 +38,47 @@
             line-height: 1.6;
         }
 
-        /* --- HEADER & NAVIGATION --- */
+        /* --- HEADER & NAVIGATION (NON-STICKY) --- */
         header {
-            padding: 80px 20px 40px;
+            padding: 100px 20px 50px;
             text-align: center;
             background: var(--black);
             position: relative;
-            z-index: 10;
+            z-index: 100;
         }
 
         .logo {
             font-family: 'Playfair Display', serif;
-            font-size: 3rem;
+            font-size: 3.2rem;
             color: var(--gold);
-            letter-spacing: 8px;
+            letter-spacing: 10px;
             cursor: pointer;
             text-transform: uppercase;
-            transition: var(--transition);
+            transition: var(--transition-smooth);
         }
 
         .logo:hover {
-            opacity: 0.8;
-            letter-spacing: 10px;
+            letter-spacing: 12px;
+            opacity: 0.9;
         }
 
         nav {
             display: flex;
             justify-content: center;
-            gap: 40px;
-            margin-top: 35px;
+            gap: 45px;
+            margin-top: 40px;
         }
 
         .nav-link {
-            color: #555;
+            color: #666;
             text-decoration: none;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 600;
             letter-spacing: 3px;
             cursor: pointer;
             transition: 0.3s;
             text-transform: uppercase;
-            padding: 5px 0;
+            padding-bottom: 5px;
         }
 
         .nav-link.active, .nav-link:hover {
@@ -84,16 +86,16 @@
             border-bottom: 1px solid var(--gold);
         }
 
-        /* --- MAIN CONTAINER --- */
+        /* --- MAIN LAYOUT --- */
         .container {
             max-width: 1300px;
-            margin: 20px auto 100px;
-            padding: 0 30px;
+            margin: 0 auto 100px;
+            padding: 0 40px;
         }
 
         .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 40px;
         }
 
@@ -101,17 +103,16 @@
         .card {
             background: var(--dark-grey);
             border: 1px solid var(--mid-grey);
-            padding: 20px;
+            padding: 25px;
             text-align: center;
-            border-radius: var(--radius);
-            transition: var(--transition);
-            position: relative;
+            border-radius: var(--radius-lg);
+            transition: var(--transition-smooth);
         }
 
         .card:hover {
-            border-color: #444;
-            transform: translateY(-8px);
-            box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+            border-color: #333;
+            transform: translateY(-10px);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
         }
 
         .img-container {
@@ -120,14 +121,14 @@
             overflow: hidden;
             background: #000;
             margin-bottom: 25px;
-            border-radius: calc(var(--radius) - 4px);
+            border-radius: var(--radius-sm);
         }
 
         .card img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transition: 0.6s ease;
+            object-fit: cover; /* Fixed white gaps */
+            transition: 0.6s ease-in-out;
         }
 
         .dual-preview {
@@ -140,7 +141,7 @@
         .dual-preview div {
             flex: 1;
             overflow: hidden;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
         }
 
         .dual-preview img {
@@ -151,32 +152,31 @@
 
         .card h3 {
             font-family: 'Playfair Display', serif;
-            font-size: 1.25rem;
-            margin: 10px 0 8px;
-            letter-spacing: 1.5px;
-            color: #eee;
+            font-size: 1.3rem;
+            margin: 15px 0 10px;
+            letter-spacing: 1px;
         }
 
         .price-tag {
             color: var(--gold);
             font-size: 1.1rem;
-            font-weight: 400;
             margin-bottom: 20px;
             display: block;
+            font-weight: 300;
         }
 
-        /* --- INTERACTIVE ELEMENTS --- */
+        /* --- BUTTONS & INTERFACE --- */
         .action-btn {
             background: transparent;
             border: 1px solid #333;
             color: #fff;
-            padding: 16px;
+            padding: 18px;
             cursor: pointer;
             width: 100%;
             font-size: 0.75rem;
             letter-spacing: 2px;
             text-transform: uppercase;
-            border-radius: 6px;
+            border-radius: var(--radius-sm);
             transition: 0.3s;
             font-weight: 600;
         }
@@ -188,7 +188,7 @@
         }
 
         .delivery-tag {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: #444;
             display: block;
             margin-top: 15px;
@@ -196,108 +196,92 @@
             text-transform: uppercase;
         }
 
-        /* --- MODAL DESIGN --- */
+        /* --- MODAL SYSTEM --- */
         .overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.97);
-            z-index: 1000;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.98);
+            z-index: 2000;
             overflow-y: auto;
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(10px);
         }
 
         .modal {
             position: relative;
-            margin: 60px auto;
-            background: #0a0a0a;
-            padding: 40px;
+            margin: 50px auto;
+            background: var(--black);
+            padding: 50px;
             border: 1px solid #222;
             width: 90%;
-            max-width: 950px;
-            border-radius: var(--radius);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
+            max-width: 1000px;
+            border-radius: var(--radius-lg);
         }
 
         .close-modal {
             position: absolute;
-            top: 25px;
-            right: 25px;
-            color: #555;
-            cursor: pointer;
-            font-size: 1.8rem;
+            top: 30px; right: 30px;
+            color: #888; cursor: pointer;
+            font-size: 2rem;
             transition: 0.3s;
         }
 
-        .close-modal:hover { color: var(--gold); }
+        .close-modal:hover { color: white; }
 
-        /* --- SUMMARY TEXT STYLING --- */
+        /* --- CLEAN TYPOGRAPHY --- */
         .narrative-text {
-            color: #aaa;
-            font-size: 0.95rem;
-            line-height: 2;
+            color: #999;
+            font-size: 1rem;
+            line-height: 2.2;
             letter-spacing: 0.5px;
             font-weight: 300;
-            margin-top: 30px;
+            margin-top: 40px;
             text-align: justify;
-            padding: 30px;
+            padding: 40px;
             background: #0d0d0d;
-            border-radius: 8px;
-            border-left: 1px solid var(--gold);
+            border-radius: var(--radius-sm);
+            border-left: 2px solid var(--gold);
         }
 
         /* --- CHECKOUT FORM --- */
-        .checkout-form {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
+        .checkout-form { display: flex; flex-direction: column; gap: 15px; }
 
         .checkout-form input, .checkout-form select, .checkout-form textarea {
-            width: 100%;
-            padding: 16px;
-            background: #000;
-            border: 1px solid #222;
-            color: white;
-            border-radius: 6px;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.9rem;
-            outline: none;
+            width: 100%; padding: 18px; background: #000;
+            border: 1px solid #222; color: white;
+            border-radius: var(--radius-sm); font-family: 'Inter', sans-serif;
+            font-size: 0.9rem; outline: none;
         }
 
         .checkout-form input:focus { border-color: var(--gold); }
 
-        .thumb-box { display: flex; gap: 12px; margin-top: 20px; justify-content: center; }
+        .thumb-box { display: flex; gap: 15px; margin-top: 25px; justify-content: center; }
         .thumb-box img { 
-            width: 60px; height: 75px; object-fit: cover; 
+            width: 70px; height: 90px; object-fit: cover; 
             border: 1px solid #222; border-radius: 4px; 
-            cursor: pointer; opacity: 0.4; transition: 0.3s;
+            cursor: pointer; opacity: 0.5; transition: 0.3s;
         }
         .thumb-box img:hover { opacity: 1; border-color: var(--gold); }
 
-        /* --- ADMIN ARCHITECT PANEL --- */
+        /* --- ADMIN ARCHITECT SYSTEM --- */
         .admin-section { 
-            background: #0f0f0f; padding: 30px; 
-            margin-top: 25px; display: none; 
-            border: 1px dashed #333; border-radius: 8px;
+            background: #0f0f0f; padding: 40px; margin-top: 30px; 
+            display: none; border: 1px dashed #333; border-radius: var(--radius-lg);
         }
-        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
         .json-output { 
-            background: #000; padding: 20px; color: var(--green); 
-            font-size: 0.8rem; white-space: pre; overflow-x: auto; 
-            margin-top: 20px; border-radius: 6px; border: 1px solid #111;
+            background: #000; padding: 25px; color: var(--green); 
+            font-size: 0.85rem; white-space: pre; overflow-x: auto; 
+            margin-top: 30px; border-radius: var(--radius-sm);
         }
 
-        /* --- RESPONSIVE OPTIMIZATION --- */
+        /* --- MOBILE ADAPTATION --- */
         @media (max-width: 768px) {
-            header { padding: 50px 20px 30px; }
-            .logo { font-size: 2rem; letter-spacing: 4px; }
+            header { padding: 60px 20px 40px; }
+            .logo { font-size: 2.2rem; }
             .grid { grid-template-columns: 1fr; }
-            .modal { padding: 20px; margin: 20px auto; }
-            nav { gap: 20px; flex-wrap: wrap; }
+            .container { padding: 0 20px; }
+            .modal { padding: 30px 20px; }
         }
     </style>
 </head>
@@ -316,52 +300,63 @@
         <div id="product-grid" class="grid">
             </div>
 
-        <div id="admin-panel" style="display:none; margin-top: 80px; border-top: 1px solid #222; padding-top: 40px;">
-            <h2 style="color:var(--gold); text-align:center; letter-spacing: 6px; margin-bottom: 30px; text-transform: uppercase;">Vault Architect</h2>
-            <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 30px;">
-                <button class="action-btn" style="width:auto; padding: 12px 25px;" onclick="toggleAdminForm('summary')">ADD SUMMARY</button>
-                <button class="action-btn" style="width:auto; padding: 12px 25px;" onclick="toggleAdminForm('book')">ADD BOOK</button>
-                <button class="action-btn" style="width:auto; padding: 12px 25px;" onclick="toggleAdminForm('hoodie')">ADD HOODIE</button>
+        <div id="admin-panel" style="display:none; margin-top: 100px; border-top: 1px solid #222; padding-top: 50px;">
+            <h2 style="color:var(--gold); text-align:center; letter-spacing: 8px; margin-bottom: 40px; text-transform: uppercase;">Vault Architect Control</h2>
+            <div style="display: flex; gap: 20px; justify-content: center; margin-bottom: 40px;">
+                <button class="action-btn" style="width:auto; padding: 15px 40px;" onclick="toggleAdminForm('summary')">ADD NEW SUMMARY</button>
+                <button class="action-btn" style="width:auto; padding: 15px 40px;" onclick="toggleAdminForm('book')">ADD NEW BOOK</button>
+                <button class="action-btn" style="width:auto; padding: 15px 40px;" onclick="toggleAdminForm('hoodie')">ADD NEW HOODIE</button>
             </div>
 
             <div id="form-summary" class="admin-section">
                 <input type="text" id="as-title" placeholder="Collection Title">
-                <textarea id="as-narrative" placeholder="The Archive Narrative (Story)"></textarea>
-                <div class="admin-grid"><input type="text" id="as-book-img" placeholder="Book Cover Link"><input type="text" id="as-book-price" placeholder="Book Price"></div>
-                <div class="admin-grid"><input type="text" id="as-h-front" placeholder="Hoodie Front"><input type="text" id="as-h-back" placeholder="Hoodie Back"></div>
-                <div class="admin-grid"><input type="text" id="as-h-sleeve" placeholder="Left Sleeve Image"><input type="text" id="as-fabric" placeholder="Fabric Details"></div>
-                <div class="admin-grid"><input type="text" id="as-p-sl" placeholder="Price S-L"><input type="text" id="as-p-xl" placeholder="Price XL"></div>
-                <button class="action-btn" onclick="generateJSON('summary')">GENERATE SUMMARY CODE</button>
+                <textarea id="as-narrative" style="width:100%; height:120px; background:#000; color:#fff; padding:15px; margin-bottom:15px; border-radius:6px; border:1px solid #222;" placeholder="Narrative Story"></textarea>
+                <div class="admin-grid"><input type="text" id="as-book-img" placeholder="Book Image Link"><input type="text" id="as-book-price" placeholder="Book Price"></div>
+                <div class="admin-grid"><input type="text" id="as-h-front" placeholder="Hoodie Front URL"><input type="text" id="as-h-back" placeholder="Hoodie Back URL"></div>
+                <div class="admin-grid"><input type="text" id="as-h-sleeve" placeholder="Hoodie Sleeve URL"><input type="text" id="as-fabric" placeholder="Fabric Composition"></div>
+                <div class="admin-grid">
+                    <input type="text" id="as-p-common" placeholder="Price (S-M-L)">
+                    <input type="text" id="as-p-xl" placeholder="Price XL">
+                    <input type="text" id="as-p-2xl" placeholder="Price 2XL">
+                    <input type="text" id="as-p-3xl" placeholder="Price 3XL">
+                </div>
+                <button class="action-btn" onclick="generateJSON('summary')">GENERATE SUMMARY ARCHIVE</button>
             </div>
 
             <div id="form-book" class="admin-section">
                 <input type="text" id="ab-title" placeholder="Book Title">
-                <div class="admin-grid"><input type="text" id="ab-price" placeholder="Price"><input type="text" id="ab-del" placeholder="Delivery (e.g. 5-7 Days)"></div>
-                <input type="text" id="ab-img" placeholder="Direct Image URL (.jpg/.png)">
-                <button class="action-btn" onclick="generateJSON('book')">GENERATE BOOK CODE</button>
+                <div class="admin-grid"><input type="text" id="ab-price" placeholder="Book Price"><input type="text" id="ab-del" placeholder="Delivery Time Frame"></div>
+                <input type="text" id="ab-img" placeholder="Direct Image URL">
+                <button class="action-btn" onclick="generateJSON('book')">GENERATE BOOK ARCHIVE</button>
             </div>
 
             <div id="form-hoodie" class="admin-section">
-                <input type="text" id="ah-title" placeholder="Hoodie Title">
-                <div class="admin-grid"><input type="text" id="ah-front" placeholder="Front URL"><input type="text" id="ah-back" placeholder="Back URL"></div>
-                <div class="admin-grid"><input type="text" id="ah-sleeve" placeholder="Left Sleeve URL"><input type="text" id="ah-fabric" placeholder="Fabric Type"></div>
-                <input type="text" id="ah-colors" placeholder="Available Colors (Comma separated)">
-                <div class="admin-grid"><input type="text" id="ah-p-sl" placeholder="Price S-L"><input type="text" id="ah-p-xl" placeholder="Price XL"></div>
-                <button class="action-btn" onclick="generateJSON('hoodie')">GENERATE HOODIE CODE</button>
+                <input type="text" id="ah-title" placeholder="Hoodie Product Title">
+                <div class="admin-grid"><input type="text" id="ah-front" placeholder="Front Image"><input type="text" id="ah-back" placeholder="Back Image"></div>
+                <div class="admin-grid"><input type="text" id="ah-sleeve" placeholder="Sleeve Image"><input type="text" id="ah-fabric" placeholder="Fabric Details"></div>
+                <input type="text" id="ah-colors" placeholder="Available Colors (Comma Separated)">
+                <div class="admin-grid">
+                    <input type="text" id="ah-p-common" placeholder="Price (S-M-L)">
+                    <input type="text" id="ah-p-xl" placeholder="Price XL">
+                    <input type="text" id="ah-p-2xl" placeholder="Price 2XL">
+                    <input type="text" id="ah-p-3xl" placeholder="Price 3XL">
+                </div>
+                <button class="action-btn" onclick="generateJSON('hoodie')">GENERATE HOODIE ARCHIVE</button>
             </div>
-            <div id="json-output" class="json-output">Ready for input...</div>
+            <div id="json-output" class="json-output">Archive code output pending input...</div>
         </div>
     </div>
 
     <div id="main-modal" class="overlay">
         <div class="modal">
             <span class="close-modal" onclick="closeModal()">&times;</span>
-            <h2 id="modal-title" style="font-family:'Playfair Display'; color:var(--gold); text-align:center; margin-bottom:25px; font-size:2rem; letter-spacing:2px;"></h2>
+            <h2 id="modal-title" style="font-family:'Playfair Display'; color:var(--gold); text-align:center; margin-bottom:30px; font-size:2.2rem; letter-spacing:2px;"></h2>
             <div id="modal-content"></div>
         </div>
     </div>
 
     <script>
+        /* --- INITIALIZATION --- */
         (function(){ emailjs.init("QWKaC8MCGOF9GwKvN"); })();
         let activeFile = 'summaries.json';
         let currentPrices = {};
@@ -380,15 +375,13 @@
                 const products = await response.json();
                 grid.innerHTML = '';
                 products.forEach(item => {
-                    // Logic to fix Hover only for Hoodies/Summaries
-                    let hoverEffect = '';
-                    if(item.backImageUrl) {
-                        hoverEffect = `onmouseover="this.src='${item.backImageUrl}'" onmouseout="this.src='${item.imageUrl || item.bookImg}'"`;
-                    }
-
+                    // Hover logic only if back image exists (Fixes Book Hover issue)
+                    let hoverAttr = item.backImageUrl ? 
+                        `onmouseover="this.src='${item.backImageUrl}'" onmouseout="this.src='${item.imageUrl || item.bookImg}'"` : '';
+                    
                     let media = item.summaryText ? 
                         `<div class="dual-preview"><div><img src="${item.bookImg}"></div><div><img src="${item.imageUrl}"></div></div>` : 
-                        `<div class="img-container"><img src="${item.imageUrl || item.bookImg}" ${hoverEffect}></div>`;
+                        `<div class="img-container"><img src="${item.imageUrl || item.bookImg}" ${hoverAttr}></div>`;
                     
                     grid.innerHTML += `
                         <div class="card">
@@ -401,7 +394,7 @@
                             </button>
                         </div>`;
                 });
-            } catch (e) { grid.innerHTML = `<p style="text-align:center; color:#333; grid-column:1/-1; padding:50px;">VAULT TEMPORARILY SEALED</p>`; }
+            } catch (e) { grid.innerHTML = `<p style="text-align:center; grid-column:1/-1; padding:50px; color:#333;">ARCHIVE TEMPORARILY SEALED</p>`; }
         }
 
         function openPreview(item) {
@@ -413,18 +406,18 @@
             if (item.summaryText) {
                 content.innerHTML = `
                     <div style="display:flex; gap:30px; flex-wrap:wrap;">
-                        <div style="flex:1; min-width:280px; background:#0d0d0d; padding:20px; border-radius:8px;">
-                            <img src="${item.bookImg}" style="width:100%; border-radius:6px; margin-bottom:20px;">
+                        <div style="flex:1; min-width:280px; background:#0d0d0d; padding:25px; border-radius:10px;">
+                            <img src="${item.bookImg}" style="width:100%; border-radius:8px; margin-bottom:20px;">
                             <button class="action-btn" onclick="startOrder('${item.title} (Book)', '${item.bookPrice}', false, '', null, '')">PURCHASE BOOK ($${item.bookPrice})</button>
                         </div>
-                        <div style="flex:1; min-width:280px; background:#0d0d0d; padding:20px; border-radius:8px;">
-                            <img id="h-view" src="${item.imageUrl}" style="width:100%; border-radius:6px; margin-bottom:20px;">
+                        <div style="flex:1; min-width:280px; background:#0d0d0d; padding:25px; border-radius:10px;">
+                            <img id="h-view" src="${item.imageUrl}" style="width:100%; border-radius:8px; margin-bottom:20px;">
                             <div class="thumb-box">
                                 <img src="${item.imageUrl}" onclick="document.getElementById('h-view').src='${item.imageUrl}'">
                                 <img src="${item.backImageUrl}" onclick="document.getElementById('h-view').src='${item.backImageUrl}'">
                                 ${item.sleeveImg ? `<img src="${item.sleeveImg}" onclick="document.getElementById('h-view').src='${item.sleeveImg}'">` : ''}
                             </div>
-                            <button class="action-btn" onclick='startOrder("${item.title} (Hoodie)", "${item.price}", true, "${item.colors || 'Black'}", ${JSON.stringify(item.prices)}, "${item.fabric || 'Premium Fabric'}", "${item.imageUrl}", "${item.backImageUrl}", "${item.sleeveImg}")'>PURCHASE HOODIE ($${item.price})</button>
+                            <button class="action-btn" onclick='startOrder("${item.title} (Hoodie)", "${item.price}", true, "${item.colors || 'Black'}", ${JSON.stringify(item.prices)}, "${item.fabric || 'Cotton'}", "${item.imageUrl}", "${item.backImageUrl}", "${item.sleeveImg}")'>PURCHASE HOODIE ($${item.price})</button>
                         </div>
                     </div>
                     <div class="narrative-text">${item.summaryText}</div>`;
@@ -438,10 +431,10 @@
             currentPrices = prices || { "S": price, "M": price, "L": price, "XL": price, "2XL": price, "3XL": price };
             const content = document.getElementById('modal-content');
             
-            let visual = isH ? `<div style="text-align:center; margin-bottom:25px;"><img id="chk-view" src="${imgF}" style="max-height:220px; border-radius:8px; border:1px solid #222; margin-bottom:15px;"><div class="thumb-box" style="margin-top:0"><img src="${imgF}" onclick="document.getElementById('chk-view').src='${imgF}'" style="width:40px;height:50px;"><img src="${imgB}" onclick="document.getElementById('chk-view').src='${imgB}'" style="width:40px;height:50px;">${imgS?`<img src="${imgS}" onclick="document.getElementById('chk-view').src='${imgS}'" style="width:40px;height:50px;">`:''}</div></div>` : '';
-            let opts = isH ? `<div class="admin-grid"><select id="size" onchange="updateModalPrice(this)" required><option value="">SELECT SIZE</option><option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="2XL">2XL</option><option value="3XL">3XL</option></select><select id="color" required><option value="">COLOR</option>${(colors||"Black").split(',').map(c=>`<option>${c.trim()}</option>`).join('')}</select></div><p style="text-align:center; color:#555; font-size:0.75rem; margin-bottom:10px;">Construction: ${fabric}</p>` : '';
+            let visual = isH ? `<div style="text-align:center; margin-bottom:30px;"><img id="chk-view" src="${imgF}" style="max-height:220px; border-radius:10px; border:1px solid #222; margin-bottom:15px;"><div class="thumb-box" style="margin-top:0"><img src="${imgF}" onclick="document.getElementById('chk-view').src='${imgF}'" style="width:40px;height:55px;"><img src="${imgB}" onclick="document.getElementById('chk-view').src='${imgB}'" style="width:40px;height:55px;">${imgS?`<img src="${imgS}" onclick="document.getElementById('chk-view').src='${imgS}'" style="width:40px;height:55px;">`:''}</div></div>` : '';
+            let opts = isH ? `<div class="admin-grid"><select id="size" onchange="updateModalPrice(this)" required><option value="">SELECT SIZE</option><option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="2XL">2XL</option><option value="3XL">3XL</option></select><select id="color" required><option value="">COLOR</option>${(colors||"Black").split(',').map(c=>`<option>${c.trim()}</option>`).join('')}</select></div><p style="text-align:center; color:#555; font-size:0.75rem; margin-bottom:10px;">Fabric: ${fabric}</p>` : '';
             
-            content.innerHTML = `${visual}<div class="checkout-form"><h3 id="p-display" style="text-align:center; color:var(--gold); font-size:2rem; margin-bottom:20px;">$${price}</h3><input id="name" placeholder="Full Name"><input id="phone" placeholder="Contact Number"><input id="email" placeholder="Email Address">${opts}<input id="country" placeholder="Country"><div class="admin-grid"><input id="city" placeholder="City"><input id="zip" placeholder="Postal Code"></div><textarea id="address" placeholder="Complete Shipping Address" rows="3"></textarea><button class="action-btn" id="confirm-btn" onclick="sendVaultOrder('${title}')" style="background:var(--gold); color:black; border:none; font-size:0.9rem; padding:20px;">Complete Archive Reservation</button></div>`;
+            content.innerHTML = `${visual}<div class="checkout-form"><h3 id="p-display" style="text-align:center; color:var(--gold); font-size:2.2rem; margin-bottom:20px;">$${price}</h3><input id="name" placeholder="Full Name"><input id="phone" placeholder="Phone Number"><input id="email" placeholder="Email Address">${opts}<input id="country" placeholder="Country"><div class="admin-grid"><input id="city" placeholder="City"><input id="zip" placeholder="ZIP"></div><textarea id="address" placeholder="Shipping Address" rows="3"></textarea><button class="action-btn" id="confirm-btn" onclick="sendVaultOrder('${title}')" style="background:var(--gold); color:black; border:none; padding:20px; font-size:0.9rem;">RESERVE IN ARCHIVE</button></div>`;
         }
 
         function updateModalPrice(s) { if(s.value) { const np = currentPrices[s.value]; document.getElementById('p-display').innerText = "$" + np; window.tempPrice = np; } }
@@ -449,23 +442,35 @@
         function sendVaultOrder(t) {
             const btn = document.getElementById('confirm-btn');
             const data = { customer_name: document.getElementById('name').value, customer_phone: document.getElementById('phone').value, customer_email: document.getElementById('email').value, customer_country: document.getElementById('country').value, customer_city: document.getElementById('city').value, customer_zip: document.getElementById('zip').value, customer_address: document.getElementById('address').value, item_title: t, item_price: window.tempPrice, item_size: document.getElementById('size')?.value || 'N/A', item_color: document.getElementById('color')?.value || 'N/A' };
-            if(!data.customer_name || !data.customer_phone || !data.customer_address) return alert("All fields are mandatory for archive shipping.");
-            btn.innerText = "COMMUNICATING WITH VAULT..."; btn.disabled = true;
-            emailjs.send("service_9yrz8kd", "template_1lgifb3", data).then(() => { alert("Reservation success. Check your email for confirmation."); closeModal(); }, () => { alert("Vault Connection Error."); btn.disabled = false; });
+            if(!data.customer_name || !data.customer_phone || !data.customer_address) return alert("Archive reservation requires full details.");
+            btn.innerText = "ARCHIVING..."; btn.disabled = true;
+            emailjs.send("service_9yrz8kd", "template_1lgifb3", data).then(() => { alert("Reservation success. Archive updated."); closeModal(); }, () => { alert("Connection Error."); btn.disabled = false; });
         }
 
         function openAdmin() { if(prompt("Vault Key:") === "canon_-!LB2107") document.getElementById('admin-panel').style.display='block'; }
         function toggleAdminForm(t) { document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none'); document.getElementById('form-' + t).style.display = 'block'; }
+        
         function generateJSON(type) {
             let entry = {};
             if(type === 'summary') {
-                const sp = document.getElementById('as-p-sl').value;
-                entry = { title: document.getElementById('as-title').value, summaryText: document.getElementById('as-narrative').value, bookImg: document.getElementById('as-book-img').value, bookPrice: document.getElementById('as-book-price').value, imageUrl: document.getElementById('as-h-front').value, backImageUrl: document.getElementById('as-h-back').value, sleeveImg: document.getElementById('as-h-sleeve').value, fabric: document.getElementById('as-fabric').value, price: sp, prices: { "S": sp, "M": sp, "L": sp, "XL": document.getElementById('as-p-xl').value } };
+                const cp = document.getElementById('as-p-common').value;
+                entry = {
+                    title: document.getElementById('as-title').value, summaryText: document.getElementById('as-narrative').value,
+                    bookImg: document.getElementById('as-book-img').value, bookPrice: document.getElementById('as-book-price').value,
+                    imageUrl: document.getElementById('as-h-front').value, backImageUrl: document.getElementById('as-h-back').value,
+                    sleeveImg: document.getElementById('as-h-sleeve').value, fabric: document.getElementById('as-fabric').value,
+                    price: cp, prices: { "S": cp, "M": cp, "L": cp, "XL": document.getElementById('as-p-xl').value, "2XL": document.getElementById('as-p-2xl').value, "3XL": document.getElementById('as-p-3xl').value }
+                };
             } else if(type === 'book') {
                 entry = { title: document.getElementById('ab-title').value, bookPrice: document.getElementById('ab-price').value, bookImg: document.getElementById('ab-img').value, delivery: document.getElementById('ab-del').value };
             } else if(type === 'hoodie') {
-                const hp = document.getElementById('ah-p-sl').value;
-                entry = { title: document.getElementById('ah-title').value, price: hp, imageUrl: document.getElementById('ah-front').value, backImageUrl: document.getElementById('ah-back').value, sleeveImg: document.getElementById('ah-sleeve').value, fabric: document.getElementById('ah-fabric').value, colors: document.getElementById('ah-colors').value, prices: { "S": hp, "M": hp, "L": hp, "XL": document.getElementById('ah-p-xl').value } };
+                const cp = document.getElementById('ah-p-common').value;
+                entry = {
+                    title: document.getElementById('ah-title').value, price: cp, imageUrl: document.getElementById('ah-front').value,
+                    backImageUrl: document.getElementById('ah-back').value, sleeveImg: document.getElementById('ah-sleeve').value,
+                    fabric: document.getElementById('ah-fabric').value, colors: document.getElementById('ah-colors').value,
+                    prices: { "S": cp, "M": cp, "L": cp, "XL": document.getElementById('ah-p-xl').value, "2XL": document.getElementById('ah-p-2xl').value, "3XL": document.getElementById('ah-p-3xl').value }
+                };
             }
             document.getElementById('json-output').innerText = JSON.stringify(entry, null, 4) + ",";
         }
