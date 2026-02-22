@@ -19,12 +19,18 @@
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
         .card { background: var(--dark-grey); padding: 20px; border-radius: 5px; text-align: center; border: 1px solid #222; position: relative; transition: 0.3s; }
         .card:hover { border-color: var(--gold); }
-        .img-container { width: 100%; height: 350px; overflow: hidden; border-radius: 3px; background: #000; display: flex; align-items: center; }
-        .card img { width: 100%; height: 100%; object-fit: contain; transition: 0.5s ease; cursor: crosshair; }
+        
+        /* New Styles for Dual View and Delivery */
+        .img-container { width: 100%; height: 350px; overflow: hidden; border-radius: 3px; background: #000; display: flex; align-items: center; justify-content: center; }
+        .card img { width: 100%; height: 100%; object-fit: contain; transition: 0.5s ease; }
+        .dual-preview { display: flex; gap: 10px; justify-content: center; height: 300px; margin-bottom: 10px; }
+        .dual-preview img { width: 45%; height: 100%; object-fit: cover; border: 1px solid #333; }
+        .delivery-tag { font-size: 0.75rem; color: #888; margin-bottom: 10px; display: block; }
+        
         .action-btn { background: transparent; border: 1px solid var(--gold); color: var(--gold); padding: 12px 25px; cursor: pointer; width: 100%; margin-top: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
         .action-btn:hover { background: var(--gold); color: black; }
         .overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.98); z-index: 1000; overflow-y: auto; }
-        .modal { position: relative; margin: 50px auto; background: #111; padding: 30px; border: 1px solid var(--gold); width: 95%; max-width: 550px; }
+        .modal { position: relative; margin: 50px auto; background: #111; padding: 30px; border: 1px solid var(--gold); width: 95%; max-width: 650px; }
         .checkout-form input, .checkout-form select, .checkout-form textarea { width: 100%; padding: 12px; margin-bottom: 12px; background: #000; border: 1px solid #333; color: white; font-family: inherit; }
         .admin-sec { background:#111; border:1px solid #333; padding:20px; margin-top: 20px; }
         .json-box { background:#000; padding:15px; font-family:monospace; white-space:pre; border:1px solid #333; height:200px; overflow:auto; color: #0f0; margin-top: 10px; font-size: 11px; }
@@ -57,9 +63,12 @@
             <h4 style="color:var(--gold); margin-bottom:10px;">New Summary Entry</h4>
             <input type="text" id="as-title" placeholder="Title">
             <textarea id="as-text" placeholder="Summary Content"></textarea>
-            <input type="text" id="as-bimg" placeholder="Book Image URL">
-            <input type="text" id="as-bprice" placeholder="Book Price">
-            <input type="text" id="as-himg" placeholder="Hoodie Image URL">
+            <div class="admin-grid">
+                <input type="text" id="as-bimg" placeholder="Book Image URL">
+                <input type="text" id="as-bprice" placeholder="Book Price">
+            </div>
+            <input type="text" id="as-himg" placeholder="Hoodie Image URL (Front)">
+            <input type="text" id="as-himg-b" placeholder="Hoodie Image URL (Back)">
             <div class="admin-grid">
                 <input type="text" id="sh-s" placeholder="Hoodie Price S/M/L">
                 <input type="text" id="sh-xl" placeholder="Price XL">
@@ -70,15 +79,16 @@
         </div>
 
         <div id="f-b" class="admin-sec" style="display:none;">
-            <h4 style="color:var(--gold); margin-bottom:10px;">New Book (Books Tab)</h4>
+            <h4 style="color:var(--gold); margin-bottom:10px;">New Book</h4>
             <input type="text" id="ab-title" placeholder="Book Title">
             <input type="text" id="ab-price" placeholder="Price">
             <input type="text" id="ab-img" placeholder="Image URL">
+            <input type="text" id="ab-delivery" placeholder="Delivery Time (e.g. 24h - 48h)">
             <button class="action-btn" onclick="generate('b')">GENERATE BOOK</button>
         </div>
 
         <div id="f-p" class="admin-sec" style="display:none;">
-            <h4 style="color:var(--gold); margin-bottom:10px;">New Hoodie (Hoodies Tab)</h4>
+            <h4 style="color:var(--gold); margin-bottom:10px;">New Hoodie</h4>
             <input type="text" id="ap-title" placeholder="Product Title">
             <input type="text" id="ap-img-f" placeholder="Front Image URL">
             <input type="text" id="ap-img-b" placeholder="Back Image URL">
@@ -124,15 +134,30 @@
         const grid = document.getElementById('display-grid');
         grid.innerHTML = '';
         data.forEach(item => {
-            const img = item.imageUrl || item.bookImg;
-            const back = item.backImageUrl || img;
-            grid.innerHTML += `
-                <div class="card">
+            let mediaHtml = '';
+            
+            // Layout for Summaries (Dual Images)
+            if (item.summaryText) {
+                mediaHtml = `
+                    <div class="dual-preview">
+                        <img src="${item.bookImg}" alt="Book">
+                        <img src="${item.imageUrl}" alt="Hoodie">
+                    </div>`;
+            } else {
+                const img = item.imageUrl || item.bookImg;
+                const back = item.backImageUrl || img;
+                mediaHtml = `
                     <div class="img-container">
                         <img src="${img}" onmouseover="this.src='${back}'" onmouseout="this.src='${img}'" loading="lazy">
-                    </div>
+                    </div>`;
+            }
+
+            grid.innerHTML += `
+                <div class="card">
+                    ${mediaHtml}
                     <h3 style="margin-top:15px;">${item.title}</h3>
-                    <p style="color:var(--gold); margin:10px 0; font-weight:bold;">$${item.price || item.bookPrice}</p>
+                    <p style="color:var(--gold); margin:5px 0; font-weight:bold;">$${item.price || item.bookPrice}</p>
+                    ${item.delivery ? `<span class="delivery-tag">🚚 Shipping: ${item.delivery}</span>` : ''}
                     <button class="action-btn" onclick='openAction(${JSON.stringify(item)})'>
                         ${item.summaryText ? 'READ SUMMARY' : 'ORDER NOW'}
                     </button>
@@ -148,22 +173,27 @@
 
         if (item.summaryText) {
             body.innerHTML = `
-                <div style="text-align:center; margin-bottom:20px;">
-                    <img src="${item.bookImg}" style="width:150px; border-radius:5px; border:1px solid var(--gold);">
+                <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center; margin-bottom:30px;">
+                    <div style="flex:1; min-width:200px; text-align:center; background:#000; padding:15px; border:1px solid #222;">
+                        <img src="${item.bookImg}" style="width:120px; border:1px solid var(--gold); margin-bottom:10px;">
+                        <button class="action-btn" onclick="showCheckout('${item.title} (Book)', '${item.bookPrice}', false, '', null)">
+                            ORDER BOOK ($${item.bookPrice})
+                        </button>
+                    </div>
+                    <div style="flex:1; min-width:200px; text-align:center; background:#000; padding:15px; border:1px solid #222;">
+                        <img src="${item.imageUrl}" onmouseover="this.src='${item.backImageUrl || item.imageUrl}'" onmouseout="this.src='${item.imageUrl}'" style="width:120px; border:1px solid var(--gold); margin-bottom:10px; cursor:crosshair;">
+                        <button class="action-btn" onclick='showCheckout("${item.title} (Hoodie)", "${item.price}", true, "${item.colors || 'Black'}", ${JSON.stringify(item.prices)})'>
+                            ORDER HOODIE ($${item.price})
+                        </button>
+                    </div>
                 </div>
-                <p style="color:#ccc; line-height:1.6; margin-bottom:20px; text-align:justify; font-style: italic;">
-                    "${item.summaryText}"
-                </p>
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                    <button class="action-btn" onclick="showCheckout('${item.title} (Book)', '${item.bookPrice}', false, '', null)">
-                        ORDER BOOK ($${item.bookPrice})
-                    </button>
-                    <button class="action-btn" onclick='showCheckout("${item.title} (Hoodie)", "${item.price}", true, "${item.colors || 'Black'}", ${JSON.stringify(item.prices)})'>
-                        ORDER HOODIE ($${item.price})
-                    </button>
+                <div style="border-top:1px solid #333; padding-top:20px;">
+                    <h4 style="color:var(--gold); margin-bottom:10px; text-align:center;">THE SUMMARY</h4>
+                    <p style="color:#ccc; line-height:1.8; text-align:justify; font-style: italic;">
+                        "${item.summaryText}"
+                    </p>
                 </div>`;
         } else {
-            // If it's a book only (no prices object), we pass null
             showCheckout(item.title, item.price || item.bookPrice, currentFile === 'hoody.json', item.colors, item.prices);
         }
     }
@@ -202,7 +232,7 @@
                 <input type="text" id="f-name" placeholder="Full Name" required>
                 <input type="email" id="f-email" placeholder="Email Address" required>
                 ${variantHtml}
-                <textarea id="f-addr" placeholder="Full Shipping Address (USA Only)" rows="3" required></textarea>
+                <textarea id="f-addr" placeholder="Full Shipping Address" rows="3" required></textarea>
                 <button class="action-btn" id="s-btn" onclick="sendOrder('${title}')" style="background:var(--gold); color:black; border:none;">CONFIRM ORDER</button>
             </div>`;
     }
@@ -235,6 +265,7 @@
                 bookImg: document.getElementById('as-bimg').value, 
                 bookPrice: document.getElementById('as-bprice').value,
                 imageUrl: document.getElementById('as-himg').value,
+                backImageUrl: document.getElementById('as-himg-b').value,
                 price: hPrice,
                 prices: { "S": hPrice, "M": hPrice, "L": hPrice, "XL": document.getElementById('sh-xl').value, "2XL": document.getElementById('sh-2xl').value, "3XL": document.getElementById('sh-3xl').value }
             };
@@ -242,7 +273,8 @@
             data = {
                 title: document.getElementById('ab-title').value,
                 bookPrice: document.getElementById('ab-price').value,
-                bookImg: document.getElementById('ab-img').value
+                bookImg: document.getElementById('ab-img').value,
+                delivery: document.getElementById('ab-delivery').value
             };
         } else if(type === 'p') {
             const sPrice = document.getElementById('p-s').value;
