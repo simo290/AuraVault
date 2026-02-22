@@ -6,358 +6,254 @@
     <title>AuraVault | Luxury Archive</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Inter:wght@200;300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300&family=Inter:wght@200;300;400;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- CORE DESIGN TOKENS --- */
+        /* --- DESIGN TOKENS --- */
         :root {
             --gold: #d4af37;
-            --gold-hover: #b8962d;
+            --gold-glow: rgba(212, 175, 55, 0.2);
             --black: #0a0a0a;
             --dark-grey: #121212;
-            --mid-grey: #1a1a1a;
-            --border-color: #262626;
-            --text-main: #ffffff;
-            --text-dim: #888888;
-            --radius-main: 12px;
-            --radius-inner: 8px;
-            --transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            --border: #262626;
+            --radius-lg: 12px;
+            --radius-sm: 8px;
+            --transition-fluid: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        /* --- GLOBAL RESET --- */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
+        /* --- GLOBAL RESET & SCROLLBAR --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: var(--black); }
+        ::-webkit-scrollbar-thumb { background: var(--gold); }
+
+        body { 
+            background: var(--black); 
+            color: white; 
+            font-family: 'Inter', sans-serif; 
+            line-height: 1.7; 
+            overflow-x: hidden; 
         }
 
-        html {
-            scroll-behavior: smooth;
+        /* --- LUXURY HEADER --- */
+        header { padding: 120px 20px 60px; text-align: center; position: relative; }
+        .logo { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 3.8rem; 
+            color: var(--gold); 
+            letter-spacing: 14px; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            transition: var(--transition-fluid);
+            text-shadow: 0 0 20px var(--gold-glow);
         }
+        .logo:hover { letter-spacing: 18px; opacity: 0.8; transform: scale(1.02); }
 
-        body {
-            background-color: var(--black);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-            line-height: 1.7;
-        }
-
-        /* --- HEADER SECTION --- */
-        header {
-            padding: 120px 20px 60px;
-            text-align: center;
-            background: linear-gradient(to bottom, #000 0%, var(--black) 100%);
+        nav { display: flex; justify-content: center; gap: 55px; margin-top: 50px; }
+        .nav-link { 
+            color: #555; 
+            text-decoration: none; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            letter-spacing: 4px; 
+            cursor: pointer; 
+            transition: 0.4s; 
+            text-transform: uppercase; 
+            padding-bottom: 8px;
             position: relative;
         }
-
-        .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 3.5rem;
-            color: var(--gold);
-            letter-spacing: 12px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: var(--transition);
-            display: inline-block;
-        }
-
-        .logo:hover {
-            transform: scale(1.02);
-            letter-spacing: 14px;
-        }
-
-        nav {
-            display: flex;
-            justify-content: center;
-            gap: 50px;
-            margin-top: 45px;
-        }
-
-        .nav-link {
-            color: var(--text-dim);
-            text-decoration: none;
-            font-size: 0.75rem;
-            font-weight: 600;
-            letter-spacing: 4px;
-            cursor: pointer;
-            transition: var(--transition);
-            text-transform: uppercase;
-            padding: 8px 0;
-            position: relative;
-        }
-
         .nav-link::after {
             content: '';
             position: absolute;
             bottom: 0; left: 0;
             width: 0; height: 1px;
             background: var(--gold);
-            transition: 0.3s;
+            transition: 0.4s;
         }
+        .nav-link.active, .nav-link:hover { color: var(--gold); }
+        .nav-link.active::after { width: 100%; }
 
-        .nav-link.active, .nav-link:hover {
-            color: var(--gold);
-        }
+        /* --- PRODUCT GRID SYSTEM --- */
+        .container { max-width: 1440px; margin: 0 auto 120px; padding: 0 50px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 60px; }
 
-        .nav-link.active::after {
-            width: 100%;
-        }
-
-        /* --- CONTAINER & GRID --- */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto 120px;
-            padding: 0 40px;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-            gap: 50px;
-        }
-
-        /* --- PRODUCT CARDS --- */
-        .card {
-            background: var(--dark-grey);
-            border: 1px solid var(--border-color);
-            padding: 30px;
-            text-align: center;
-            border-radius: var(--radius-main);
-            transition: var(--transition);
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInCard 0.8s forwards;
-        }
-
-        @keyframes fadeInCard {
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .card:hover {
-            border-color: #444;
-            box-shadow: 0 30px 60px rgba(0,0,0,0.8);
-            transform: translateY(-12px);
-        }
-
-        .img-container {
-            width: 100%;
-            aspect-ratio: 4/5;
-            overflow: hidden;
-            background: #000;
-            margin-bottom: 30px;
-            border-radius: var(--radius-inner);
+        .card { 
+            background: var(--dark-grey); 
+            border: 1px solid var(--border); 
+            padding: 35px; 
+            text-align: center; 
+            border-radius: var(--radius-lg); 
+            transition: var(--transition-fluid); 
             position: relative;
         }
-
-        .card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: 0.8s ease-in-out;
+        .card:hover { 
+            border-color: #555; 
+            transform: translateY(-15px); 
+            box-shadow: 0 40px 80px rgba(0,0,0,0.9); 
         }
 
-        .dual-preview {
-            display: flex;
-            gap: 20px;
-            aspect-ratio: 4/5;
-            margin-bottom: 30px;
+        .img-container { 
+            width: 100%; 
+            aspect-ratio: 4/5; 
+            overflow: hidden; 
+            background: #000; 
+            margin-bottom: 35px; 
+            border-radius: var(--radius-sm); 
+        }
+        .card img { width: 100%; height: 100%; object-fit: cover; transition: 1s ease; }
+
+        .dual-preview { display: flex; gap: 20px; aspect-ratio: 4/5; margin-bottom: 35px; }
+        .dual-preview div { flex: 1; overflow: hidden; border-radius: var(--radius-sm); }
+        .dual-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+        .card h3 { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 1.5rem; 
+            margin: 15px 0 5px; 
+            color: #f8f8f8; 
+            letter-spacing: 1px; 
+        }
+        .price-tag { 
+            color: var(--gold); 
+            font-size: 1.3rem; 
+            margin-bottom: 30px; 
+            display: block; 
+            font-weight: 200; 
+            font-family: 'Inter'; 
         }
 
-        .dual-preview div {
-            flex: 1;
-            overflow: hidden;
-            border-radius: var(--radius-inner);
+        .action-btn { 
+            background: transparent; 
+            border: 1px solid #333; 
+            color: #fff; 
+            padding: 22px; 
+            cursor: pointer; 
+            width: 100%; 
+            font-size: 0.75rem; 
+            letter-spacing: 3px; 
+            text-transform: uppercase; 
+            border-radius: var(--radius-sm); 
+            transition: 0.4s; 
+            font-weight: 600; 
         }
+        .action-btn:hover { background: var(--gold); color: #000; border-color: var(--gold); }
 
-        .dual-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        /* --- PRESTIGE MODAL --- */
+        .overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.99); 
+            z-index: 9999; 
+            overflow-y: auto; 
+            backdrop-filter: blur(20px); 
         }
-
-        .card h3 {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.4rem;
-            margin: 10px 0 10px;
-            letter-spacing: 1px;
-            color: #f0f0f0;
+        .modal { 
+            position: relative; 
+            margin: 80px auto; 
+            background: var(--black); 
+            padding: 80px 60px; 
+            border: 1px solid var(--border); 
+            width: 95%; 
+            max-width: 1200px; 
+            border-radius: var(--radius-lg); 
         }
-
-        .price-tag {
-            color: var(--gold);
-            font-size: 1.2rem;
-            margin-bottom: 25px;
-            display: block;
-            font-weight: 200;
-        }
-
-        /* --- BUTTONS --- */
-        .action-btn {
-            background: transparent;
-            border: 1px solid #333;
-            color: #fff;
-            padding: 20px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 0.7rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            border-radius: var(--radius-inner);
-            transition: var(--transition);
-            font-weight: 600;
-        }
-
-        .action-btn:hover {
-            background: var(--gold);
-            color: #000;
-            border-color: var(--gold);
-            transform: scale(1.02);
-        }
-
-        .delivery-tag {
-            font-size: 0.65rem;
-            color: var(--text-dim);
-            display: block;
-            margin-top: 15px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        /* --- MODAL SYSTEM --- */
-        .overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.98);
-            z-index: 9999;
-            overflow-y: auto;
-            backdrop-filter: blur(15px);
-        }
-
-        .modal {
-            position: relative;
-            margin: 60px auto;
-            background: var(--black);
-            padding: 60px;
-            border: 1px solid var(--border-color);
-            width: 90%;
-            max-width: 1100px;
-            border-radius: var(--radius-main);
-            box-shadow: 0 0 100px rgba(0,0,0,0.5);
-        }
-
-        .close-modal {
-            position: absolute;
-            top: 30px; right: 30px;
-            color: var(--text-dim);
-            cursor: pointer;
-            font-size: 2.2rem;
+        .close-modal { 
+            position: absolute; 
+            top: 40px; right: 40px; 
+            color: #444; 
+            cursor: pointer; 
+            font-size: 2.5rem; 
             transition: 0.3s;
         }
-
         .close-modal:hover { color: var(--gold); }
-
-        /* --- CONTENT TYPOGRAPHY --- */
-        .narrative-text {
-            color: #b0b0b0;
-            font-size: 1.05rem;
-            line-height: 2.3;
-            letter-spacing: 0.4px;
+        
+        /* --- NARRATIVE TYPOGRAPHY --- */
+        .narrative-text { 
+            color: #e0e0e0; 
+            font-family: 'Cormorant Garamond', serif; 
+            font-size: 1.5rem; 
+            line-height: 1.9; 
             font-weight: 300;
-            margin-top: 50px;
-            text-align: justify;
-            padding: 50px;
-            background: #0d0d0d;
-            border-radius: var(--radius-inner);
-            border-left: 3px solid var(--gold);
+            margin-bottom: 60px; /* Changed from margin-top */
+            padding: 80px 60px; 
+            background: #080808; 
+            border-radius: var(--radius-sm); 
+            border: 1px solid #151515;
+            text-align: center; 
+            font-style: italic;
+            position: relative;
+        }
+        .narrative-text::before {
+            content: "“";
+            position: absolute;
+            top: 20px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 5rem;
+            color: var(--gold);
+            opacity: 0.2;
         }
 
-        /* --- FORMS & INPUTS --- */
-        .checkout-form { display: flex; flex-direction: column; gap: 20px; }
-
-        .checkout-form input, .checkout-form select, .checkout-form textarea {
-            width: 100%;
-            padding: 20px;
-            background: #000;
-            border: 1px solid #222;
-            color: white;
-            border-radius: var(--radius-inner);
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
+        /* --- CHECKOUT FORM DESIGN --- */
+        .checkout-form { display: flex; flex-direction: column; gap: 25px; }
+        .checkout-form input, .checkout-form select, .checkout-form textarea { 
+            width: 100%; 
+            padding: 22px; 
+            background: #000; 
+            border: 1px solid #222; 
+            color: white; 
+            border-radius: var(--radius-sm); 
+            font-size: 1rem; 
+            font-family: 'Inter'; 
             transition: 0.3s;
         }
-
-        .checkout-form input:focus {
-            border-color: var(--gold);
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.1);
-        }
+        .checkout-form input:focus { border-color: var(--gold); }
 
         .thumb-box { display: flex; gap: 20px; margin-top: 30px; justify-content: center; }
         .thumb-box img { 
-            width: 80px; height: 100px; object-fit: cover; 
-            border: 1px solid #222; border-radius: 6px; 
-            cursor: pointer; opacity: 0.4; transition: 0.4s;
+            width: 85px; height: 110px; 
+            object-fit: cover; 
+            border: 1px solid #222; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            opacity: 0.4; 
+            transition: 0.4s; 
         }
-        .thumb-box img:hover, .thumb-box img.active { 
-            opacity: 1; border-color: var(--gold); 
-        }
+        .thumb-box img.active, .thumb-box img:hover { opacity: 1; border-color: var(--gold); transform: scale(1.05); }
 
-        /* --- ADMIN ARCHITECT SYSTEM --- */
-        .admin-section { 
-            background: #0f0f0f; 
-            padding: 50px; 
-            margin-top: 40px; 
-            display: none; 
-            border: 1px dashed #333; 
-            border-radius: var(--radius-main);
-        }
-
-        .admin-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 25px; 
-            margin-bottom: 25px; 
-        }
-
+        /* --- ADMIN INTERFACE --- */
+        .admin-section { background: #0f0f0f; padding: 60px; margin-top: 50px; display: none; border: 1px dashed #444; border-radius: var(--radius-lg); }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px; }
         .json-output { 
-            background: #000; 
-            padding: 30px; 
-            color: var(--green); 
-            font-size: 0.9rem; 
-            white-space: pre; 
-            overflow-x: auto; 
-            margin-top: 40px; 
-            border-radius: var(--radius-inner);
-            border: 1px solid #111;
+            background: #000; padding: 40px; color: #2ecc71; 
+            font-size: 0.95rem; white-space: pre; overflow-x: auto; 
+            margin-top: 50px; border-radius: var(--radius-sm); 
+            font-family: 'Courier New', monospace; border: 1px solid #111;
         }
 
-        /* --- RESPONSIVE DESIGN --- */
-        @media (max-width: 992px) {
-            .grid { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
-            .logo { font-size: 2.8rem; }
+        /* --- ANIMATIONS --- */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+        .card { animation: slideIn 0.8s ease-out forwards; }
 
-        @media (max-width: 768px) {
-            header { padding: 80px 20px 40px; }
-            .logo { font-size: 2.2rem; letter-spacing: 6px; }
-            nav { gap: 20px; flex-wrap: wrap; }
-            .container { padding: 0 25px; }
-            .modal { padding: 40px 20px; margin: 20px auto; }
-            .admin-grid { grid-template-columns: 1fr; }
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: 1fr; }
+            .logo { font-size: 2.8rem; letter-spacing: 8px; }
+            .modal { padding: 40px 20px; }
+            .narrative-text { padding: 40px 20px; font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="logo" onclick="openAdmin()">AURAVAULT</div>
-        <nav id="main-nav">
-            <span class="nav-link active" onclick="switchTab('summaries.json', this)">SUMMARIES</span>
-            <span class="nav-link" onclick="switchTab('books.json', this)">BOOKS</span>
-            <span class="nav-link" onclick="switchTab('hoody.json', this)">HOODIES</span>
+        <div class="logo" onclick="initiateAdmin()">AURAVAULT</div>
+        <nav>
+            <span class="nav-link active" onclick="navigateVault('summaries.json', this)">SUMMARIES</span>
+            <span class="nav-link" onclick="navigateVault('books.json', this)">BOOKS</span>
+            <span class="nav-link" onclick="navigateVault('hoody.json', this)">HOODIES</span>
         </nav>
     </header>
 
@@ -365,18 +261,18 @@
         <div id="product-grid" class="grid">
             </div>
 
-        <div id="admin-panel" style="display:none; margin-top: 120px; border-top: 2px solid #1a1a1a; padding-top: 60px;">
-            <h2 style="color:var(--gold); text-align:center; letter-spacing: 10px; margin-bottom: 50px; text-transform: uppercase; font-weight: 300;">Archive Architect</h2>
+        <div id="admin-panel" style="display:none; margin-top: 150px; border-top: 1px solid #222; padding-top: 80px;">
+            <h2 style="color:var(--gold); text-align:center; letter-spacing: 12px; margin-bottom: 60px; text-transform: uppercase; font-family: 'Playfair Display';">Vault Architect</h2>
             
-            <div style="display: flex; gap: 25px; justify-content: center; margin-bottom: 50px; flex-wrap: wrap;">
-                <button class="action-btn" style="width:auto; padding: 15px 50px;" onclick="toggleAdminForm('summary')">ARCHIVE SUMMARY</button>
-                <button class="action-btn" style="width:auto; padding: 15px 50px;" onclick="toggleAdminForm('book')">ARCHIVE BOOK</button>
-                <button class="action-btn" style="width:auto; padding: 15px 50px;" onclick="toggleAdminForm('hoodie')">ARCHIVE HOODIE</button>
+            <div style="display: flex; gap: 30px; justify-content: center; margin-bottom: 60px; flex-wrap: wrap;">
+                <button class="action-btn" style="width:auto; padding: 18px 50px;" onclick="switchAdminForm('summary')">ARCHIVE SUMMARY</button>
+                <button class="action-btn" style="width:auto; padding: 18px 50px;" onclick="switchAdminForm('book')">ARCHIVE BOOK</button>
+                <button class="action-btn" style="width:auto; padding: 18px 50px;" onclick="switchAdminForm('hoodie')">ARCHIVE HOODIE</button>
             </div>
 
             <div id="form-summary" class="admin-section">
                 <input type="text" id="as-title" placeholder="Collection Archive Title">
-                <textarea id="as-narrative" style="width:100%; height:150px; background:#000; color:#fff; padding:20px; margin-bottom:20px; border-radius:8px; border:1px solid #222;" placeholder="The Vault Narrative..."></textarea>
+                <textarea id="as-narrative" style="width:100%; height:160px; background:#000; color:#fff; padding:20px; margin-bottom:25px; border-radius:8px; border:1px solid #222;" placeholder="The Narrative (Luxury Content)..."></textarea>
                 <div class="admin-grid">
                     <input type="text" id="as-book-img" placeholder="Book Surface URL">
                     <input type="text" id="as-book-price" placeholder="Book Unit Price">
@@ -385,7 +281,7 @@
                     <input type="text" id="as-h-front" placeholder="Hoodie Front URL">
                     <input type="text" id="as-h-back" placeholder="Hoodie Back URL">
                     <input type="text" id="as-h-sleeve" placeholder="Left Sleeve Detail URL">
-                    <input type="text" id="as-fabric" placeholder="Material/Fabric Info">
+                    <input type="text" id="as-fabric" placeholder="Material Composition">
                 </div>
                 <div class="admin-grid">
                     <input type="text" id="as-p-common" placeholder="Price (S, M, L)">
@@ -393,273 +289,267 @@
                     <input type="text" id="as-p-2xl" placeholder="Price 2XL">
                     <input type="text" id="as-p-3xl" placeholder="Price 3XL">
                 </div>
-                <button class="action-btn" onclick="generateJSON('summary')" style="background:var(--gold); color:#000; border:none;">CONSTRUCT SUMMARY JSON</button>
-            </div>
-
-            <div id="form-book" class="admin-section">
-                <input type="text" id="ab-title" placeholder="Internal Book Title">
-                <div class="admin-grid">
-                    <input type="text" id="ab-price" placeholder="Unit Price">
-                    <input type="text" id="ab-del" placeholder="Estimated Shipping">
-                </div>
-                <input type="text" id="ab-img" placeholder="Primary Image Link (.jpg/.png)">
-                <button class="action-btn" onclick="generateJSON('book')" style="background:var(--gold); color:#000; border:none;">CONSTRUCT BOOK JSON</button>
+                <button class="action-btn" onclick="executeGeneration('summary')" style="background:var(--gold); color:#000; border:none;">CONSTRUCT DATA OBJECT</button>
             </div>
 
             <div id="form-hoodie" class="admin-section">
-                <input type="text" id="ah-title" placeholder="Hoodie Aesthetic Title">
+                <input type="text" id="ah-title" placeholder="Aesthetic Hoodie Title">
+                <div class="admin-grid"><input type="text" id="ah-front" placeholder="Front View"><input type="text" id="ah-back" placeholder="Back View"></div>
+                <div class="admin-grid"><input type="text" id="ah-sleeve" placeholder="Sleeve Detail"><input type="text" id="ah-fabric" placeholder="Fabric Details"></div>
+                <input type="text" id="ah-colors" placeholder="Color Palette (e.g., Onyx, Ghost White)">
                 <div class="admin-grid">
-                    <input type="text" id="ah-front" placeholder="Primary View (Front)">
-                    <input type="text" id="ah-back" placeholder="Secondary View (Back)">
+                    <input type="text" id="ah-p-common" placeholder="Base Price (S-M-L)">
+                    <input type="text" id="ah-p-xl" placeholder="XL Price">
+                    <input type="text" id="ah-p-2xl" placeholder="2XL Price">
+                    <input type="text" id="ah-p-3xl" placeholder="3XL Price">
                 </div>
-                <div class="admin-grid">
-                    <input type="text" id="ah-sleeve" placeholder="Detail View (Left Sleeve)">
-                    <input type="text" id="ah-fabric" placeholder="Fabric Construction">
-                </div>
-                <input type="text" id="ah-colors" placeholder="Color Palette (Separated by comma)">
-                <div class="admin-grid">
-                    <input type="text" id="ah-p-common" placeholder="Price (S, M, L)">
-                    <input type="text" id="ah-p-xl" placeholder="Price XL">
-                    <input type="text" id="ah-p-2xl" placeholder="Price 2XL">
-                    <input type="text" id="ah-p-3xl" placeholder="Price 3XL">
-                </div>
-                <button class="action-btn" onclick="generateJSON('hoodie')" style="background:var(--gold); color:#000; border:none;">CONSTRUCT HOODIE JSON</button>
+                <button class="action-btn" onclick="executeGeneration('hoodie')" style="background:var(--gold); color:#000; border:none;">CONSTRUCT DATA OBJECT</button>
+            </div>
+
+            <div id="form-book" class="admin-section">
+                <input type="text" id="ab-title" placeholder="Archive Book Title">
+                <div class="admin-grid"><input type="text" id="ab-price" placeholder="Price"><input type="text" id="ab-del" placeholder="Delivery Frame"></div>
+                <input type="text" id="ab-img" placeholder="Cover Image URL">
+                <button class="action-btn" onclick="executeGeneration('book')" style="background:var(--gold); color:#000; border:none;">CONSTRUCT DATA OBJECT</button>
             </div>
             
-            <div id="json-output" class="json-output">// Vault Waiting for Instructions...</div>
+            <div id="json-output" class="json-output">// ARCHITECT STANDBY: DATA WILL APPEAR HERE...</div>
         </div>
     </div>
 
-    <div id="main-modal" class="overlay" onclick="handleOverlayClick(event)">
-        <div class="modal" id="modal-container">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
-            <h2 id="modal-title" style="font-family:'Playfair Display'; color:var(--gold); text-align:center; margin-bottom:40px; font-size:2.4rem; letter-spacing:2px; font-weight: 300;"></h2>
+    <div id="main-modal" class="overlay" onclick="if(event.target == this) closeVaultModal()">
+        <div class="modal">
+            <span class="close-modal" onclick="closeVaultModal()">&times;</span>
+            <h2 id="modal-title" style="font-family:'Playfair Display'; color:var(--gold); text-align:center; margin-bottom:50px; font-size:3rem; font-weight:400;"></h2>
             <div id="modal-content"></div>
         </div>
     </div>
 
     <script>
         /* --- SYSTEM INITIALIZATION --- */
-        (function(){ emailjs.init("QWKaC8MCGOF9GwKvN"); })();
+        (function() { 
+            emailjs.init("QWKaC8MCGOF9GwKvN"); 
+            console.log("Vault Security Initialized...");
+        })();
         
-        let activeFile = 'summaries.json';
-        let currentPrices = {};
-        let isProcessing = false;
+        let currentVaultFile = 'summaries.json';
+        let precisionPrices = {};
 
-        /* --- TAB NAVIGATION LOGIC --- */
-        async function switchTab(file, element) {
-            if(isProcessing) return;
-            activeFile = file;
-            document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
+        /* --- NAVIGATION CORE --- */
+        async function navigateVault(file, element) {
+            currentVaultFile = file;
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             element.classList.add('active');
-            await loadProducts();
+            await loadVaultArchive();
         }
 
-        /* --- PRODUCT LOADER ENGINE --- */
-        async function loadProducts() {
+        /* --- DATA FETCHING ENGINE --- */
+        async function loadVaultArchive() {
             const grid = document.getElementById('product-grid');
-            grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; padding:100px; color:#333; letter-spacing:5px;">SYNCHRONIZING ARCHIVE...</div>';
+            grid.style.opacity = '0.5';
             
             try {
-                const response = await fetch(activeFile);
-                if(!response.ok) throw new Error('Vault unreachable');
-                const products = await response.json();
-                
+                const response = await fetch(currentVaultFile);
+                const data = await response.json();
                 grid.innerHTML = '';
-                products.forEach((item, index) => {
-                    const hoverAction = item.backImageUrl ? 
-                        `onmouseover="this.src='${item.backImageUrl}'" onmouseout="this.src='${item.imageUrl || item.bookImg}'"` : '';
+                
+                data.forEach((item, idx) => {
+                    // Logic to show BACK image by default for hoodies
+                    const defaultImg = (item.backImageUrl && !item.summaryText) ? item.backImageUrl : (item.imageUrl || item.bookImg);
+                    const hoverImg = (item.imageUrl && item.backImageUrl && !item.summaryText) ? item.imageUrl : (item.backImageUrl || item.imageUrl || item.bookImg);
+
+                    const hoverScript = item.backImageUrl ? 
+                        `onmouseover="this.src='${hoverImg}'" onmouseout="this.src='${defaultImg}'"` : '';
                     
-                    const mediaMarkup = item.summaryText ? 
+                    const media = item.summaryText ? 
                         `<div class="dual-preview"><div><img src="${item.bookImg}"></div><div><img src="${item.imageUrl}"></div></div>` : 
-                        `<div class="img-container"><img src="${item.imageUrl || item.bookImg}" ${hoverAction}></div>`;
+                        `<div class="img-container"><img src="${defaultImg}" ${hoverScript}></div>`;
                     
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.style.animationDelay = `${index * 0.1}s`;
-                    card.innerHTML = `
-                        ${mediaMarkup}
-                        <h3>${item.title}</h3>
-                        <div class="price-tag">$${item.price || item.bookPrice}</div>
-                        ${item.delivery ? `<span class="delivery-tag">📦 ${item.delivery}</span>` : ''}
-                        <button class="action-btn" onclick='openPreview(${JSON.stringify(item)})'>
-                            ${item.summaryText ? 'Explore Archive' : 'Acquire Piece'}
-                        </button>`;
-                    grid.appendChild(card);
+                    grid.innerHTML += `
+                        <div class="card" style="animation-delay: ${idx * 0.1}s">
+                            ${media}
+                            <h3>${item.title}</h3>
+                            <div class="price-tag">$${item.price || item.bookPrice}</div>
+                            <button class="action-btn" onclick='triggerVaultPreview(${JSON.stringify(item)})'>
+                                ${item.summaryText ? 'Explore Archive' : 'Acquire Piece'}
+                            </button>
+                        </div>`;
                 });
-            } catch (err) {
-                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:100px; color:var(--gold); border:1px solid #111; border-radius:12px;">ARCHIVE ACCESS DENIED OR FILE EMPTY</div>`;
+                grid.style.opacity = '1';
+            } catch (error) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:100px; letter-spacing:3px; color:#333;">ARCHIVE TEMPORARILY OFFLINE</div>`;
             }
         }
 
-        /* --- PREVIEW SYSTEM --- */
-        function openPreview(item) {
+        /* --- PREVIEW LOGIC --- */
+        function triggerVaultPreview(item) {
             const modal = document.getElementById('main-modal');
             const content = document.getElementById('modal-content');
             document.getElementById('modal-title').innerText = item.title;
-            document.body.style.overflow = 'hidden'; // Lock Scroll
             modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
 
             if (item.summaryText) {
+                // Narrative text is now ABOVE the images
                 content.innerHTML = `
-                    <div style="display:flex; gap:40px; flex-wrap:wrap; animation: fadeInCard 0.5s;">
-                        <div style="flex:1; min-width:300px; background:#0d0d0d; padding:30px; border-radius:12px; border:1px solid #1a1a1a;">
-                            <img src="${item.bookImg}" style="width:100%; border-radius:8px; margin-bottom:25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
-                            <button class="action-btn" onclick="startOrder('${item.title} (Book)', '${item.bookPrice}', false, '', null, '')">BUY UNIT: BOOK ($${item.bookPrice})</button>
+                    <div class="narrative-text">${item.summaryText}</div>
+                    <div style="display:flex; gap:50px; flex-wrap:wrap;">
+                        <div style="flex:1; min-width:320px; background:#0d0d0d; padding:40px; border-radius:12px; border:1px solid #1a1a1a;">
+                            <img src="${item.bookImg}" style="width:100%; border-radius:8px; margin-bottom:30px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+                            <button class="action-btn" onclick="initiateCheckout('${item.title} (Book)', '${item.bookPrice}', false, '', null, '', '${item.bookImg}')">PURCHASE ARCHIVE BOOK ($${item.bookPrice})</button>
                         </div>
-                        <div style="flex:1; min-width:300px; background:#0d0d0d; padding:30px; border-radius:12px; border:1px solid #1a1a1a;">
-                            <img id="h-view" src="${item.imageUrl}" style="width:100%; border-radius:8px; margin-bottom:25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                        <div style="flex:1; min-width:320px; background:#0d0d0d; padding:40px; border-radius:12px; border:1px solid #1a1a1a;">
+                            <img id="h-view" src="${item.imageUrl}" style="width:100%; border-radius:8px; margin-bottom:30px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
                             <div class="thumb-box">
-                                <img src="${item.imageUrl}" class="active" onclick="updateView(this, '${item.imageUrl}')">
-                                <img src="${item.backImageUrl}" onclick="updateView(this, '${item.backImageUrl}')">
-                                ${item.sleeveImg ? `<img src="${item.sleeveImg}" onclick="updateView(this, '${item.sleeveImg}')">` : ''}
+                                <img src="${item.imageUrl}" class="active" onclick="syncModalImage(this, '${item.imageUrl}')">
+                                <img src="${item.backImageUrl}" onclick="syncModalImage(this, '${item.backImageUrl}')">
+                                ${item.sleeveImg ? `<img src="${item.sleeveImg}" onclick="syncModalImage(this, '${item.sleeveImg}')">` : ''}
                             </div>
-                            <button class="action-btn" onclick='startOrder("${item.title} (Hoodie)", "${item.price}", true, "${item.colors || 'Black'}", ${JSON.stringify(item.prices)}, "${item.fabric || 'Cotton'}", "${item.imageUrl}", "${item.backImageUrl}", "${item.sleeveImg}")'>BUY UNIT: HOODIE ($${item.price})</button>
+                            <button class="action-btn" onclick='initiateCheckout("${item.title} (Hoodie)", "${item.price}", true, "${item.colors}", ${JSON.stringify(item.prices)}, "${item.fabric}", "${item.imageUrl}", "${item.backImageUrl}", "${item.sleeveImg}")'>PURCHASE ARCHIVE HOODIE ($${item.price})</button>
                         </div>
-                    </div>
-                    <div class="narrative-text">${item.summaryText}</div>`;
+                    </div>`;
             } else {
-                startOrder(item.title, item.price || item.bookPrice, activeFile === 'hoody.json', item.colors, item.prices, item.fabric, item.imageUrl, item.backImageUrl, item.sleeveImg);
+                initiateCheckout(item.title, item.price || item.bookPrice, currentVaultFile === 'hoody.json', item.colors, item.prices, item.fabric, item.imageUrl, item.backImageUrl, item.sleeveImg);
             }
         }
 
         /* --- CHECKOUT ENGINE --- */
-        function startOrder(title, price, isH, colors, prices, fabric, imgF, imgB, imgS) {
-            window.tempPrice = price;
-            currentPrices = prices || { "S": price, "M": price, "L": price, "XL": price, "2XL": price, "3XL": price };
+        function initiateCheckout(title, basePrice, isApparel, colors, priceMap, material, imgF, imgB, imgS) {
+            window.activeOrderPrice = basePrice;
+            precisionPrices = priceMap || { "S": basePrice, "M": basePrice, "L": basePrice, "XL": basePrice, "2XL": basePrice, "3XL": basePrice };
             const content = document.getElementById('modal-content');
             
-            let visualMarkup = isH ? `
-                <div style="text-align:center; margin-bottom:40px;">
-                    <img id="chk-view" src="${imgF}" style="max-height:280px; border-radius:12px; border:1px solid #222; margin-bottom:20px;">
+            let visualHeader = isApparel ? `
+                <div style="text-align:center; margin-bottom:50px;">
+                    <img id="chk-view" src="${imgF}" style="max-height:300px; border-radius:12px; border:1px solid #222; margin-bottom:25px;">
                     <div class="thumb-box" style="margin-top:0">
-                        <img src="${imgF}" onclick="updateView(this, '${imgF}')" style="width:50px;height:65px;">
-                        <img src="${imgB}" onclick="updateView(this, '${imgB}')" style="width:50px;height:65px;">
-                        ${imgS ? `<img src="${imgS}" onclick="updateView(this, '${imgS}')" style="width:50px;height:65px;">` : ''}
+                        <img src="${imgF}" class="active" onclick="syncModalImage(this, '${imgF}')" style="width:60px; height:75px;">
+                        <img src="${imgB}" onclick="syncModalImage(this, '${imgB}')" style="width:60px; height:75px;">
+                        ${imgS ? `<img src="${imgS}" onclick="syncModalImage(this, '${imgS}')" style="width:60px; height:75px;">` : ''}
                     </div>
-                </div>` : '';
+                </div>` : `
+                <div style="text-align:center; margin-bottom:50px;">
+                    <img src="${imgF}" style="max-height:300px; border-radius:12px; border:1px solid #222;">
+                </div>`;
 
-            let formOptions = isH ? `
+            let apparelFields = isApparel ? `
                 <div class="admin-grid">
-                    <select id="size" onchange="updateModalPrice(this)" required>
-                        <option value="">SELECT ARCHIVE SIZE</option>
+                    <select id="size-selector" onchange="adjustPrice(this)" required>
+                        <option value="">SELECT SIZE</option>
                         <option value="S">SMALL</option><option value="M">MEDIUM</option><option value="L">LARGE</option>
                         <option value="XL">XLARGE</option><option value="2XL">2XLARGE</option><option value="3XL">3XLARGE</option>
                     </select>
-                    <select id="color" required>
+                    <select id="color-selector" required>
                         <option value="">SELECT COLORWAY</option>
-                        ${(colors || "Black").split(',').map(c => `<option>${c.trim()}</option>`).join('')}
+                        ${(colors || "Original").split(',').map(c => `<option>${c.trim()}</option>`).join('')}
                     </select>
                 </div>
-                <p style="text-align:center; color:#444; font-size:0.7rem; margin-bottom:15px; letter-spacing:1px;">CONSTRUCTION: ${fabric}</p>` : '';
-            
+                <p style="text-align:center; color:#444; font-size:0.75rem; margin-bottom:20px; text-transform:uppercase;">Material: ${material}</p>` : '';
+
             content.innerHTML = `
-                ${visualMarkup}
+                ${visualHeader}
                 <div class="checkout-form">
-                    <h3 id="p-display" style="text-align:center; color:var(--gold); font-size:2.5rem; margin-bottom:30px; font-weight:200;">$${price}</h3>
-                    <input id="name" placeholder="Legal Full Name">
+                    <h3 id="live-price" style="text-align:center; color:var(--gold); font-size:3rem; margin-bottom:30px; font-weight:200;">$${basePrice}</h3>
+                    <input id="c-name" placeholder="Full Legal Name" type="text">
                     <div class="admin-grid">
-                        <input id="phone" placeholder="Mobile Contact">
-                        <input id="email" placeholder="Electronic Mail">
+                        <input id="c-phone" placeholder="Mobile Contact" type="tel">
+                        <input id="c-email" placeholder="Electronic Mail" type="email">
                     </div>
-                    ${formOptions}
-                    <input id="country" placeholder="Destination Country">
+                    ${apparelFields}
+                    <input id="c-country" placeholder="Destination Country">
                     <div class="admin-grid">
-                        <input id="city" placeholder="City">
-                        <input id="zip" placeholder="Postal / ZIP Code">
+                        <input id="c-city" placeholder="City">
+                        <input id="c-zip" placeholder="ZIP / Postal Code">
                     </div>
-                    <textarea id="address" placeholder="Complete Tactical Shipping Address" rows="3"></textarea>
-                    <button class="action-btn" id="confirm-btn" onclick="sendVaultOrder('${title}')" style="background:var(--gold); color:#000; border:none; padding:25px; font-size:0.9rem;">CONFIRM ARCHIVE RESERVATION</button>
+                    <textarea id="c-address" placeholder="Full Detailed Shipping Address" rows="4"></textarea>
+                    <button class="action-btn" id="vault-confirm" onclick="finalizeVaultOrder('${title}')" style="background:var(--gold); color:black; border:none; padding:25px; font-weight:600; font-size:0.9rem;">CONFIRM RESERVATION</button>
+                    <p style="text-align:center; font-size:0.6rem; color:#333; letter-spacing:2px; margin-top:10px;">SECURE ARCHIVE ENCRYPTION ENABLED</p>
                 </div>`;
         }
 
-        /* --- UI HELPERS --- */
-        function updateView(el, src) {
-            const container = el.closest('.modal') || el.closest('.dual-preview');
-            const mainImg = container.querySelector('#h-view') || container.querySelector('#chk-view');
-            if(mainImg) mainImg.src = src;
+        /* --- INTERFACE HELPERS --- */
+        function syncModalImage(el, src) {
+            const mImg = document.getElementById('h-view') || document.getElementById('chk-view');
+            if(mImg) mImg.src = src;
             el.parentElement.querySelectorAll('img').forEach(i => i.classList.remove('active'));
             el.classList.add('active');
         }
 
-        function updateModalPrice(select) {
+        function adjustPrice(select) {
             if(select.value) {
-                const newPrice = currentPrices[select.value] || window.tempPrice;
-                document.getElementById('p-display').innerText = "$" + newPrice;
-                window.tempPrice = newPrice;
+                const p = precisionPrices[select.value] || window.activeOrderPrice;
+                document.getElementById('live-price').innerText = "$" + p;
+                window.activeOrderPrice = p;
             }
         }
 
-        function handleOverlayClick(e) {
-            if(e.target.id === 'main-modal') closeModal();
-        }
-
-        function closeModal() {
+        function closeVaultModal() {
             document.getElementById('main-modal').style.display = 'none';
             document.body.style.overflow = 'auto';
         }
 
-        /* --- ORDER SYSTEM --- */
-        async function sendVaultOrder(title) {
-            const btn = document.getElementById('confirm-btn');
-            const fields = ['name', 'phone', 'email', 'address', 'country', 'city'];
-            let isValid = true;
+        /* --- FINAL TRANSMISSION --- */
+        function finalizeVaultOrder(itemTitle) {
+            const btn = document.getElementById('vault-confirm');
+            const inputs = ['c-name', 'c-phone', 'c-address', 'c-country'];
+            let fail = false;
             
-            fields.forEach(f => {
-                const el = document.getElementById(f);
-                if(!el.value) { el.style.borderColor = 'red'; isValid = false; }
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                if(!el.value) { el.style.borderColor = 'red'; fail = true; }
                 else { el.style.borderColor = '#222'; }
             });
 
-            if(!isValid) return alert("Archive requires complete shipping data.");
+            if(fail) return;
 
-            const orderData = {
-                customer_name: document.getElementById('name').value,
-                customer_phone: document.getElementById('phone').value,
-                customer_email: document.getElementById('email').value,
-                customer_country: document.getElementById('country').value,
-                customer_city: document.getElementById('city').value,
-                customer_zip: document.getElementById('zip').value,
-                customer_address: document.getElementById('address').value,
-                item_title: title,
-                item_price: window.tempPrice,
-                item_size: document.getElementById('size')?.value || 'Fixed',
-                item_color: document.getElementById('color')?.value || 'Default'
+            const payload = {
+                customer_name: document.getElementById('c-name').value,
+                customer_phone: document.getElementById('c-phone').value,
+                customer_email: document.getElementById('c-email').value,
+                customer_country: document.getElementById('c-country').value,
+                customer_city: document.getElementById('c-city').value,
+                customer_zip: document.getElementById('c-zip').value,
+                customer_address: document.getElementById('c-address').value,
+                item_title: itemTitle,
+                item_price: window.activeOrderPrice,
+                item_size: document.getElementById('size-selector')?.value || 'Unique',
+                item_color: document.getElementById('color-selector')?.value || 'Default'
             };
 
-            btn.innerText = "SYNCHRONIZING WITH VAULT...";
+            btn.innerText = "TRANSMITTING TO VAULT...";
             btn.disabled = true;
 
-            try {
-                await emailjs.send("service_9yrz8kd", "template_1lgifb3", orderData);
-                alert("Reservation Logged. Your piece is archived.");
-                closeModal();
-            } catch (err) {
-                alert("Vault synchronization failed. Please retry.");
-                btn.disabled = false;
-                btn.innerText = "RETRY RESERVATION";
-            }
+            emailjs.send("service_9yrz8kd", "template_1lgifb3", payload)
+                .then(() => {
+                    alert("Order Logged in Archive.");
+                    closeVaultModal();
+                })
+                .catch(() => {
+                    alert("Vault Transmission Error.");
+                    btn.disabled = false;
+                    btn.innerText = "RETRY RESERVATION";
+                });
         }
 
-        /* --- ADMIN ARCHITECT LOGIC --- */
-        function openAdmin() {
-            if(prompt("Vault Access Key:") === "canon_-!LB2107") {
+        /* --- ARCHITECT LOGIC (ADMIN) --- */
+        function initiateAdmin() {
+            if(prompt("Vault Security Key:") === "canon_-!LB2107") {
                 document.getElementById('admin-panel').style.display = 'block';
-                window.scrollTo(0, document.getElementById('admin-panel').offsetTop);
+                window.scrollTo({top: document.getElementById('admin-panel').offsetTop, behavior: 'smooth'});
             }
         }
 
-        function toggleAdminForm(type) {
+        function switchAdminForm(t) {
             document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
-            document.getElementById('form-' + type).style.display = 'block';
+            document.getElementById('form-' + t).style.display = 'block';
         }
 
-        function generateJSON(type) {
-            let entry = {};
+        function executeGeneration(type) {
+            let obj = {};
             try {
                 if(type === 'summary') {
-                    const common = document.getElementById('as-p-common').value;
-                    entry = {
+                    const base = document.getElementById('as-p-common').value;
+                    obj = {
                         title: document.getElementById('as-title').value,
                         summaryText: document.getElementById('as-narrative').value,
                         bookImg: document.getElementById('as-book-img').value,
@@ -668,47 +558,33 @@
                         backImageUrl: document.getElementById('as-h-back').value,
                         sleeveImg: document.getElementById('as-h-sleeve').value,
                         fabric: document.getElementById('as-fabric').value,
-                        price: common,
-                        prices: {
-                            "S": common, "M": common, "L": common,
-                            "XL": document.getElementById('as-p-xl').value,
-                            "2XL": document.getElementById('as-p-2xl').value,
-                            "3XL": document.getElementById('as-p-3xl').value
+                        price: base,
+                        prices: { 
+                            "S": base, "M": base, "L": base, 
+                            "XL": document.getElementById('as-p-xl').value, 
+                            "2XL": document.getElementById('as-p-2xl').value, 
+                            "3XL": document.getElementById('as-p-3xl').value 
                         }
                     };
-                } else if(type === 'book') {
-                    entry = {
-                        title: document.getElementById('ab-title').value,
-                        bookPrice: document.getElementById('ab-price').value,
-                        bookImg: document.getElementById('ab-img').value,
-                        delivery: document.getElementById('ab-del').value
-                    };
                 } else if(type === 'hoodie') {
-                    const common = document.getElementById('ah-p-common').value;
-                    entry = {
+                    const base = document.getElementById('ah-p-common').value;
+                    obj = {
                         title: document.getElementById('ah-title').value,
-                        price: common,
-                        imageUrl: document.getElementById('ah-front').value,
+                        price: base, imageUrl: document.getElementById('ah-front').value,
                         backImageUrl: document.getElementById('ah-back').value,
                         sleeveImg: document.getElementById('ah-sleeve').value,
                         fabric: document.getElementById('ah-fabric').value,
                         colors: document.getElementById('ah-colors').value,
-                        prices: {
-                            "S": common, "M": common, "L": common,
-                            "XL": document.getElementById('ah-p-xl').value,
-                            "2XL": document.getElementById('ah-p-2xl').value,
-                            "3XL": document.getElementById('ah-p-3xl').value
-                        }
+                        prices: { "S": base, "M": base, "L": base, "XL": document.getElementById('ah-p-xl').value, "2XL": document.getElementById('ah-p-2xl').value, "3XL": document.getElementById('ah-p-3xl').value }
                     };
+                } else {
+                    obj = { title: document.getElementById('ab-title').value, bookPrice: document.getElementById('ab-price').value, bookImg: document.getElementById('ab-img').value, delivery: document.getElementById('ab-del').value };
                 }
-                document.getElementById('json-output').innerText = JSON.stringify(entry, null, 4) + ",";
-            } catch (e) {
-                alert("Logic Error: Check all Architect fields.");
-            }
+                document.getElementById('json-output').innerText = JSON.stringify(obj, null, 4) + ",";
+            } catch (e) { alert("Archive Blueprint Failed."); }
         }
 
-        /* --- BOOT SYSTEM --- */
-        window.onload = loadProducts;
+        window.onload = loadVaultArchive;
     </script>
 </body>
 </html>
