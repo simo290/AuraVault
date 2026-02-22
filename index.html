@@ -3,576 +3,588 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AURAVAULT | Content Architect Terminal</title>
+    <title>AuraVault | Luxury Archive</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;400;600&family=Playfair+Display:wght@700&family=JetBrains+Mono:wght@300&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,500;1,300&family=Inter:wght@200;300;400;600&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
+        /* --- DESIGN TOKENS --- */
         :root {
             --gold: #d4af37;
-            --gold-low: rgba(212, 175, 55, 0.15);
-            --black-pure: #000000;
-            --black-rich: #050505;
-            --black-surface: #0f0f0f;
-            --border-dim: #1a1a1a;
-            --border-glow: #333;
-            --text-main: #e0e0e0;
-            --text-muted: #555;
-            --error: #ff4d4d;
-            --success: #00ff88;
+            --gold-glow: rgba(212, 175, 55, 0.2);
+            --black: #0a0a0a;
+            --dark-grey: #121212;
+            --border: #262626;
+            --radius-lg: 12px;
+            --radius-sm: 8px;
+            --transition-fluid: 0.6s cubic-bezier(0.23, 1, 0.32, 1);
         }
 
-        /* MASTER LAYOUT */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            background-color: var(--black-pure);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            padding-bottom: 100px;
-        }
-
-        /* SCROLLBAR */
+        /* --- GLOBAL RESET & SCROLLBAR --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: var(--black-pure); }
+        ::-webkit-scrollbar-track { background: var(--black); }
         ::-webkit-scrollbar-thumb { background: var(--gold); }
 
-        /* --- HEADER SECTION --- */
-        header {
-            background: var(--black-rich);
-            padding: 40px;
-            border-bottom: 1px solid var(--border-dim);
-            text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            backdrop-filter: blur(10px);
+        body { 
+            background: var(--black); 
+            color: white; 
+            font-family: 'Inter', sans-serif; 
+            line-height: 1.7; 
+            overflow-x: hidden; 
         }
 
-        .brand-title {
-            font-family: 'Playfair Display';
-            font-size: 1.8rem;
-            color: var(--gold);
-            letter-spacing: 12px;
-            text-transform: uppercase;
+        /* --- LUXURY HEADER --- */
+        header { padding: 120px 20px 60px; text-align: center; position: relative; }
+        .logo { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 3.8rem; 
+            color: var(--gold); 
+            letter-spacing: 14px; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            transition: var(--transition-fluid);
+            text-shadow: 0 0 20px var(--gold-glow);
         }
+        .logo:hover { letter-spacing: 18px; opacity: 0.8; transform: scale(1.02); }
 
-        .terminal-status {
-            font-family: 'JetBrains Mono';
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-top: 10px;
+        nav { display: flex; justify-content: center; gap: 55px; margin-top: 50px; }
+        .nav-link { 
+            color: #555; 
+            text-decoration: none; 
+            font-size: 0.75rem; 
+            font-weight: 600; 
+            letter-spacing: 4px; 
+            cursor: pointer; 
+            transition: 0.4s; 
+            text-transform: uppercase; 
+            padding-bottom: 8px;
+            position: relative;
         }
-
-        /* --- MAIN DASHBOARD --- */
-        .dashboard-wrapper {
-            max-width: 1400px;
-            margin: 50px auto;
-            display: grid;
-            grid-template-columns: 1fr 400px;
-            gap: 40px;
-            padding: 0 40px;
-        }
-
-        .form-section {
-            background: var(--black-rich);
-            border: 1px solid var(--border-dim);
-            padding: 50px;
-            border-radius: 4px;
-        }
-
-        .section-title {
-            font-family: 'Playfair Display';
-            font-size: 1.4rem;
-            margin-bottom: 40px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .section-title::after {
+        .nav-link::after {
             content: '';
-            height: 1px;
-            flex-grow: 1;
-            background: linear-gradient(to right, var(--gold), transparent);
-        }
-
-        /* --- FORM ELEMENTS --- */
-        .input-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .full-row { grid-column: 1 / -1; }
-
-        .field-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        label {
-            font-size: 0.65rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-        }
-
-        input, select, textarea {
-            background: var(--black-pure);
-            border: 1px solid var(--border-dim);
-            padding: 15px;
-            color: #fff;
-            font-family: 'Inter';
-            font-size: 0.9rem;
-            transition: 0.4s;
-            border-radius: 2px;
-        }
-
-        input:focus, select:focus, textarea:focus {
-            border-color: var(--gold);
-            outline: none;
-            background: var(--black-surface);
-        }
-
-        /* --- HOODIE SPECIFIC GRID --- */
-        .hoodie-deep-config {
-            background: var(--black-surface);
-            padding: 30px;
-            border: 1px solid #111;
-            margin-top: 20px;
-            display: none;
-        }
-
-        .size-price-matrix {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
-            margin-top: 15px;
-        }
-
-        .matrix-item {
-            text-align: center;
-            background: #000;
-            padding: 10px;
-            border: 1px solid #1a1a1a;
-        }
-
-        .matrix-item span {
-            display: block;
-            font-size: 0.7rem;
-            color: var(--gold);
-            margin-bottom: 8px;
-        }
-
-        .matrix-item input {
-            padding: 8px;
-            text-align: center;
-            font-size: 0.8rem;
-        }
-
-        /* --- PREVIEW PANEL --- */
-        .preview-panel {
-            position: sticky;
-            top: 180px;
-            height: fit-content;
-        }
-
-        .preview-card {
-            background: var(--black-rich);
-            border: 1px solid var(--border-dim);
-            padding: 20px;
-            text-align: center;
-        }
-
-        .preview-image-stack {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .p-img {
-            width: 100%;
-            aspect-ratio: 1;
-            background: #000;
-            border: 1px solid #111;
-            object-fit: cover;
-        }
-
-        .p-title { font-family: 'Playfair Display'; font-size: 1.2rem; margin-top: 15px; }
-        .p-meta { font-size: 0.8rem; color: var(--gold); margin-top: 5px; }
-
-        /* --- OUTPUT AREA --- */
-        .output-container {
-            margin-top: 50px;
-            grid-column: 1 / -1;
-        }
-
-        .json-header {
-            background: var(--black-surface);
-            padding: 15px 30px;
-            border: 1px solid var(--border-dim);
-            border-bottom: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        #json-display {
-            background: #020202;
-            padding: 40px;
-            border: 1px solid var(--border-dim);
-            font-family: 'JetBrains Mono';
-            font-size: 0.85rem;
-            color: var(--success);
-            overflow-x: auto;
-            white-space: pre-wrap;
-            min-height: 300px;
-        }
-
-        /* --- BUTTONS --- */
-        .primary-btn {
+            position: absolute;
+            bottom: 0; left: 0;
+            width: 0; height: 1px;
             background: var(--gold);
-            color: #000;
-            border: none;
-            padding: 20px 40px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            cursor: pointer;
+            transition: 0.4s;
+        }
+        .nav-link.active, .nav-link:hover { color: var(--gold); }
+        .nav-link.active::after { width: 100%; }
+
+        /* --- PRODUCT GRID SYSTEM --- */
+        .container { max-width: 1440px; margin: 0 auto 120px; padding: 0 50px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 60px; }
+
+        .card { 
+            background: var(--dark-grey); 
+            border: 1px solid var(--border); 
+            padding: 35px; 
+            text-align: center; 
+            border-radius: var(--radius-lg); 
+            transition: var(--transition-fluid); 
+            position: relative;
+        }
+        .card:hover { 
+            border-color: #555; 
+            transform: translateY(-15px); 
+            box-shadow: 0 40px 80px rgba(0,0,0,0.9); 
+        }
+
+        .img-container { 
+            width: 100%; 
+            aspect-ratio: 4/5; 
+            overflow: hidden; 
+            background: #000; 
+            margin-bottom: 35px; 
+            border-radius: var(--radius-sm); 
+        }
+        .card img { width: 100%; height: 100%; object-fit: cover; transition: 1s ease; }
+
+        .dual-preview { display: flex; gap: 20px; aspect-ratio: 4/5; margin-bottom: 35px; }
+        .dual-preview div { flex: 1; overflow: hidden; border-radius: var(--radius-sm); }
+        .dual-preview img { width: 100%; height: 100%; object-fit: cover; }
+
+        .card h3 { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 1.5rem; 
+            margin: 15px 0 5px; 
+            color: #f8f8f8; 
+            letter-spacing: 1px; 
+        }
+        .price-tag { 
+            color: var(--gold); 
+            font-size: 1.3rem; 
+            margin-bottom: 30px; 
+            display: block; 
+            font-weight: 200; 
+            font-family: 'Inter'; 
+        }
+
+        .action-btn { 
+            background: transparent; 
+            border: 1px solid #333; 
+            color: #fff; 
+            padding: 22px; 
+            cursor: pointer; 
+            width: 100%; 
+            font-size: 0.75rem; 
+            letter-spacing: 3px; 
+            text-transform: uppercase; 
+            border-radius: var(--radius-sm); 
+            transition: 0.4s; 
+            font-weight: 600; 
+        }
+        .action-btn:hover { background: var(--gold); color: #000; border-color: var(--gold); }
+
+        /* --- PRESTIGE MODAL --- */
+        .overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0, 0, 0, 0.99); 
+            z-index: 9999; 
+            overflow-y: auto; 
+            backdrop-filter: blur(20px); 
+        }
+        .modal { 
+            position: relative; 
+            margin: 80px auto; 
+            background: var(--black); 
+            padding: 80px 60px; 
+            border: 1px solid var(--border); 
+            width: 95%; 
+            max-width: 1200px; 
+            border-radius: var(--radius-lg); 
+        }
+        .close-modal { 
+            position: absolute; 
+            top: 40px; right: 40px; 
+            color: #444; 
+            cursor: pointer; 
+            font-size: 2.5rem; 
             transition: 0.3s;
-            text-transform: uppercase;
-            width: 100%;
-            margin-top: 40px;
         }
-
-        .primary-btn:hover {
-            background: #fff;
-            transform: translateY(-2px);
+        .close-modal:hover { color: var(--gold); }
+        
+        /* --- NARRATIVE TYPOGRAPHY --- */
+        .narrative-text { 
+            color: #e0e0e0; 
+            font-family: 'Cormorant Garamond', serif; 
+            font-size: 1.5rem; 
+            line-height: 1.9; 
+            font-weight: 300;
+            margin-bottom: 60px; /* Changed from margin-top */
+            padding: 80px 60px; 
+            background: #080808; 
+            border-radius: var(--radius-sm); 
+            border: 1px solid #151515;
+            text-align: center; 
+            font-style: italic;
+            position: relative;
         }
-
-        .copy-btn {
-            background: transparent;
-            border: 1px solid var(--gold);
+        .narrative-text::before {
+            content: "“";
+            position: absolute;
+            top: 20px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 5rem;
             color: var(--gold);
-            padding: 8px 20px;
-            font-size: 0.7rem;
-            cursor: pointer;
+            opacity: 0.2;
         }
 
-        .copy-btn:hover { background: var(--gold-low); }
+        /* --- CHECKOUT FORM DESIGN --- */
+        .checkout-form { display: flex; flex-direction: column; gap: 25px; }
+        .checkout-form input, .checkout-form select, .checkout-form textarea { 
+            width: 100%; 
+            padding: 22px; 
+            background: #000; 
+            border: 1px solid #222; 
+            color: white; 
+            border-radius: var(--radius-sm); 
+            font-size: 1rem; 
+            font-family: 'Inter'; 
+            transition: 0.3s;
+        }
+        .checkout-form input:focus { border-color: var(--gold); }
 
-        /* --- SOURCE TAG --- */
-        .source-field {
-            border-left: 3px solid var(--gold);
-            padding-left: 20px;
-            margin-top: 40px;
+        .thumb-box { display: flex; gap: 20px; margin-top: 30px; justify-content: center; }
+        .thumb-box img { 
+            width: 85px; height: 110px; 
+            object-fit: cover; 
+            border: 1px solid #222; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            opacity: 0.4; 
+            transition: 0.4s; 
+        }
+        .thumb-box img.active, .thumb-box img:hover { opacity: 1; border-color: var(--gold); transform: scale(1.05); }
+
+        /* --- ADMIN INTERFACE --- */
+        .admin-section { background: #0f0f0f; padding: 60px; margin-top: 50px; display: none; border: 1px dashed #444; border-radius: var(--radius-lg); }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px; }
+        .json-output { 
+            background: #000; padding: 40px; color: #2ecc71; 
+            font-size: 0.95rem; white-space: pre; overflow-x: auto; 
+            margin-top: 50px; border-radius: var(--radius-sm); 
+            font-family: 'Courier New', monospace; border: 1px solid #111;
         }
 
-        /* ANIMATIONS */
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .fade { animation: fadeIn 0.5s ease; }
+        /* --- ANIMATIONS --- */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card { animation: slideIn 0.8s ease-out forwards; }
+
+        @media (max-width: 900px) {
+            .grid { grid-template-columns: 1fr; }
+            .logo { font-size: 2.8rem; letter-spacing: 8px; }
+            .modal { padding: 40px 20px; }
+            .narrative-text { padding: 40px 20px; font-size: 1.2rem; }
+        }
     </style>
 </head>
 <body>
 
     <header>
-        <div class="brand-title">AURAVAULT ARCHITECT</div>
-        <div class="terminal-status">SECURE CONTENT GENERATION TERMINAL • SYSTEM ACTIVE</div>
+        <div class="logo" onclick="initiateAdmin()">AURAVAULT</div>
+        <nav>
+            <span class="nav-link active" onclick="navigateVault('summaries.json', this)">SUMMARIES</span>
+            <span class="nav-link" onclick="navigateVault('books.json', this)">BOOKS</span>
+            <span class="nav-link" onclick="navigateVault('hoody.json', this)">HOODIES</span>
+        </nav>
     </header>
 
-    <div class="dashboard-wrapper">
-        <main class="form-section">
-            <div class="section-title">ENTRY CLASSIFICATION</div>
+    <div class="container">
+        <div id="product-grid" class="grid">
+            </div>
+
+        <div id="admin-panel" style="display:none; margin-top: 150px; border-top: 1px solid #222; padding-top: 80px;">
+            <h2 style="color:var(--gold); text-align:center; letter-spacing: 12px; margin-bottom: 60px; text-transform: uppercase; font-family: 'Playfair Display';">Vault Architect</h2>
             
-            <div class="field-group full-row" style="margin-bottom: 40px;">
-                <label>ARCHIVE TYPE</label>
-                <select id="type-selector" onchange="Architect.toggleMode()">
-                    <option value="summary">INTELLECTUAL SUMMARY / BOOK</option>
-                    <option value="hoodie">LIMITED EDITION APPAREL (HOODIE)</option>
-                </select>
+            <div style="display: flex; gap: 30px; justify-content: center; margin-bottom: 60px; flex-wrap: wrap;">
+                <button class="action-btn" style="width:auto; padding: 18px 50px;" onclick="switchAdminForm('summary')">ARCHIVE SUMMARY</button>
+                <button class="action-btn" style="width:auto; padding: 18px 50px;" onclick="switchAdminForm('book')">ARCHIVE BOOK</button>
+                <button class="action-btn" style="width:auto; padding: 18px 50px;" onclick="switchAdminForm('hoodie')">ARCHIVE HOODIE</button>
             </div>
 
-            <div class="section-title">CORE METADATA</div>
+            <div id="form-summary" class="admin-section">
+                <input type="text" id="as-title" placeholder="Collection Archive Title">
+                <textarea id="as-narrative" style="width:100%; height:160px; background:#000; color:#fff; padding:20px; margin-bottom:25px; border-radius:8px; border:1px solid #222;" placeholder="The Narrative (Luxury Content)..."></textarea>
+                <div class="admin-grid">
+                    <input type="text" id="as-book-img" placeholder="Book Surface URL">
+                    <input type="text" id="as-book-price" placeholder="Book Unit Price">
+                </div>
+                <div class="admin-grid">
+                    <input type="text" id="as-h-front" placeholder="Hoodie Front URL">
+                    <input type="text" id="as-h-back" placeholder="Hoodie Back URL">
+                    <input type="text" id="as-h-sleeve" placeholder="Left Sleeve Detail URL">
+                    <input type="text" id="as-fabric" placeholder="Material Composition">
+                </div>
+                <div class="admin-grid">
+                    <input type="text" id="as-p-common" placeholder="Price (S, M, L)">
+                    <input type="text" id="as-p-xl" placeholder="Price XL">
+                    <input type="text" id="as-p-2xl" placeholder="Price 2XL">
+                    <input type="text" id="as-p-3xl" placeholder="Price 3XL">
+                </div>
+                <button class="action-btn" onclick="executeGeneration('summary')" style="background:var(--gold); color:#000; border:none;">CONSTRUCT DATA OBJECT</button>
+            </div>
+
+            <div id="form-hoodie" class="admin-section">
+                <input type="text" id="ah-title" placeholder="Aesthetic Hoodie Title">
+                <div class="admin-grid"><input type="text" id="ah-front" placeholder="Front View"><input type="text" id="ah-back" placeholder="Back View"></div>
+                <div class="admin-grid"><input type="text" id="ah-sleeve" placeholder="Sleeve Detail"><input type="text" id="ah-fabric" placeholder="Fabric Details"></div>
+                <input type="text" id="ah-colors" placeholder="Color Palette (e.g., Onyx, Ghost White)">
+                <div class="admin-grid">
+                    <input type="text" id="ah-p-common" placeholder="Base Price (S-M-L)">
+                    <input type="text" id="ah-p-xl" placeholder="XL Price">
+                    <input type="text" id="ah-p-2xl" placeholder="2XL Price">
+                    <input type="text" id="ah-p-3xl" placeholder="3XL Price">
+                </div>
+                <button class="action-btn" onclick="executeGeneration('hoodie')" style="background:var(--gold); color:#000; border:none;">CONSTRUCT DATA OBJECT</button>
+            </div>
+
+            <div id="form-book" class="admin-section">
+                <input type="text" id="ab-title" placeholder="Archive Book Title">
+                <div class="admin-grid"><input type="text" id="ab-price" placeholder="Price"><input type="text" id="ab-del" placeholder="Delivery Frame"></div>
+                <input type="text" id="ab-img" placeholder="Cover Image URL">
+                <button class="action-btn" onclick="executeGeneration('book')" style="background:var(--gold); color:#000; border:none;">CONSTRUCT DATA OBJECT</button>
+            </div>
             
-            <div class="input-row">
-                <div class="field-group">
-                    <label>OFFICIAL TITLE</label>
-                    <input type="text" id="inp-title" placeholder="e.g. THE ARCHIVE HOODIE v1" oninput="Architect.updatePreview()">
-                </div>
-                <div class="field-group" id="price-container">
-                    <label>BASE PRICE ($)</label>
-                    <input type="number" id="inp-price" placeholder="0.00" oninput="Architect.updatePreview()">
-                </div>
-                <div class="field-group" id="delivery-container">
-                    <label>DELIVERY ESTIMATE</label>
-                    <input type="text" id="inp-delivery" placeholder="e.g. 24H - 48H SHIPPING">
-                </div>
-            </div>
+            <div id="json-output" class="json-output">// ARCHITECT STANDBY: DATA WILL APPEAR HERE...</div>
+        </div>
+    </div>
 
-            <div class="section-title">VISUAL ASSETS</div>
-            
-            <div id="book-image-config" class="input-row full-row">
-                <div class="field-group full-row">
-                    <label>MAIN COVER IMAGE URL</label>
-                    <input type="text" id="inp-main-img" placeholder="https://image-host.com/cover.jpg" oninput="Architect.updatePreview()">
-                </div>
-            </div>
-
-            <div id="hoodie-image-config" class="hoodie-deep-config">
-                <div class="input-row">
-                    <div class="field-group">
-                        <label>FRONT VIEW URL</label>
-                        <input type="text" id="inp-front-img" placeholder="Front thumbnail" oninput="Architect.updatePreview()">
-                    </div>
-                    <div class="field-group">
-                        <label>BACK VIEW URL</label>
-                        <input type="text" id="inp-back-img" placeholder="Back thumbnail" oninput="Architect.updatePreview()">
-                    </div>
-                </div>
-                <div class="field-group full-row" style="margin-top: 20px;">
-                    <label>SLEEVE (KM) DETAIL URL</label>
-                    <input type="text" id="inp-sleeve-img" placeholder="Sleeve or fabric detail" oninput="Architect.updatePreview()">
-                </div>
-                
-                <div class="field-group full-row" style="margin-top: 30px;">
-                    <label>AVAILABLE COLOR PALETTE (COMMA SEPARATED)</label>
-                    <input type="text" id="inp-colors" placeholder="Onyx Black, Heather Grey, Sand" oninput="Architect.updatePreview()">
-                </div>
-
-                <div class="field-group full-row" style="margin-top: 30px;">
-                    <label>SIZE-SPECIFIC PRICING</label>
-                    <div class="size-price-matrix">
-                        <div class="matrix-item"><span>S</span><input type="number" id="p-s" placeholder="$"></div>
-                        <div class="matrix-item"><span>M</span><input type="number" id="p-m" placeholder="$"></div>
-                        <div class="matrix-item"><span>L</span><input type="number" id="p-l" placeholder="$"></div>
-                        <div class="matrix-item"><span>XL</span><input type="number" id="p-xl" placeholder="$"></div>
-                        <div class="matrix-item"><span>XXL</span><input type="number" id="p-xxl" placeholder="$"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="section-title" style="margin-top: 50px;">NARRATIVE & SOURCES</div>
-            
-            <div class="field-group full-row">
-                <label>PRODUCT DESCRIPTION / SUMMARY CONTENT</label>
-                <textarea id="inp-desc" rows="6" placeholder="Write the technical or narrative details here..."></textarea>
-            </div>
-
-            <div class="field-group full-row source-field">
-                <label>PRIVATE SOURCE / SUPPLIER LINK (INTERNAL ONLY)</label>
-                <input type="text" id="inp-source" placeholder="Hidden source URL or Provider WhatsApp">
-            </div>
-
-            <button class="primary-btn" onclick="Architect.generate()">GENERATE ARCHIVE ENTRY</button>
-        </main>
-
-        <aside class="preview-panel">
-            <div class="section-title">LIVE PREVIEW</div>
-            <div class="preview-card">
-                <div id="preview-stack" class="preview-image-stack">
-                    <img src="https://via.placeholder.com/400" id="pre-1" class="p-img">
-                    <img src="https://via.placeholder.com/400" id="pre-2" class="p-img" style="display:none;">
-                </div>
-                <div class="p-title" id="pre-title">PRODUCT TITLE</div>
-                <div class="p-meta" id="pre-price">$0.00</div>
-                <div id="pre-colors" style="font-size: 0.6rem; margin-top: 10px; color: #444;"></div>
-            </div>
-
-            <div style="margin-top: 40px; padding: 20px; border: 1px solid var(--border-dim); font-size: 0.7rem; color: #444;">
-                <strong>ARCHITECT NOTE:</strong><br>
-                This terminal generates the exact JSON structure required for your files. 
-                Ensure all image URLs are direct links (ending in .jpg, .png).
-            </div>
-        </aside>
-
-        <div class="output-container">
-            <div class="json-header">
-                <label>GENERATED JSON STRUCTURE</label>
-                <button class="copy-btn" onclick="Architect.copy()">COPY TO CLIPBOARD</button>
-            </div>
-            <div id="json-display">// Awaiting configuration...</div>
+    <div id="main-modal" class="overlay" onclick="if(event.target == this) closeVaultModal()">
+        <div class="modal">
+            <span class="close-modal" onclick="closeVaultModal()">&times;</span>
+            <h2 id="modal-title" style="font-family:'Playfair Display'; color:var(--gold); text-align:center; margin-bottom:50px; font-size:3rem; font-weight:400;"></h2>
+            <div id="modal-content"></div>
         </div>
     </div>
 
     <script>
-        /**
-         * AURAVAULT TERMINAL LOGIC
-         * Handles dynamic field switching, real-time previewing, 
-         * and JSON object construction.
-         */
-        const Architect = {
+        /* --- SYSTEM INITIALIZATION --- */
+        (function() { 
+            emailjs.init("QWKaC8MCGOF9GwKvN"); 
+            console.log("Vault Security Initialized...");
+        })();
+        
+        let currentVaultFile = 'summaries.json';
+        let precisionPrices = {};
 
-            /**
-             * Initializes UI state and switches between
-             * Hoodie and Summary modes.
-             */
-            toggleMode: function() {
-                const type = document.getElementById('type-selector').value;
-                const hConfig = document.getElementById('hoodie-image-config');
-                const bConfig = document.getElementById('book-image-config');
-                const delContainer = document.getElementById('delivery-container');
-                const priceContainer = document.getElementById('price-container');
+        /* --- NAVIGATION CORE --- */
+        async function navigateVault(file, element) {
+            currentVaultFile = file;
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            element.classList.add('active');
+            await loadVaultArchive();
+        }
 
-                if (type === 'hoodie') {
-                    hConfig.style.display = 'block';
-                    bConfig.style.display = 'none';
-                    delContainer.style.display = 'none';
-                    priceContainer.style.display = 'none';
-                    document.getElementById('pre-2').style.display = 'block';
-                } else {
-                    hConfig.style.display = 'none';
-                    bConfig.style.display = 'block';
-                    delContainer.style.display = 'flex';
-                    priceContainer.style.display = 'flex';
-                    document.getElementById('pre-2').style.display = 'none';
-                }
-                this.updatePreview();
-            },
-
-            /**
-             * Reflects input changes onto the 
-             * sidebar preview card in real-time.
-             */
-            updatePreview: function() {
-                const type = document.getElementById('type-selector').value;
-                
-                // Titles & Pricing
-                document.getElementById('pre-title').innerText = 
-                    document.getElementById('inp-title').value || "PRODUCT TITLE";
-                
-                const basePrice = document.getElementById('inp-price').value;
-                document.getElementById('pre-price').innerText = basePrice ? `$${basePrice}` : "$0.00";
-
-                // Images
-                if (type === 'summary') {
-                    const img = document.getElementById('inp-main-img').value;
-                    document.getElementById('pre-1').src = img || "https://via.placeholder.com/400";
-                } else {
-                    const front = document.getElementById('inp-front-img').value;
-                    const back = document.getElementById('inp-back-img').value;
-                    document.getElementById('pre-1').src = front || "https://via.placeholder.com/400";
-                    document.getElementById('pre-2').src = back || "https://via.placeholder.com/400";
-                    
-                    const colors = document.getElementById('inp-colors').value;
-                    document.getElementById('pre-colors').innerText = colors ? `COLORS: ${colors}` : "";
-                }
-            },
-
-            /**
-             * Validates inputs and constructs 
-             * the final JSON entry object.
-             */
-            generate: function() {
-                const type = document.getElementById('type-selector').value;
-                let entry = {
-                    id: "AV-" + Date.now(),
-                    timestamp: new Date().toISOString(),
-                    title: document.getElementById('inp-title').value,
-                    description: document.getElementById('inp-desc').value,
-                    private_source: document.getElementById('inp-source').value
-                };
-
-                if (type === 'summary') {
-                    entry.price = document.getElementById('inp-price').value;
-                    entry.delivery_time = document.getElementById('inp-delivery').value;
-                    entry.imageUrl = document.getElementById('inp-main-img').value;
-                    entry.category = "Intellectual Summary";
-                } else {
-                    entry.category = "Apparel";
-                    entry.images = {
-                        front: document.getElementById('inp-front-img').value,
-                        back: document.getElementById('inp-back-img').value,
-                        sleeve: document.getElementById('inp-sleeve-img').value
-                    };
-                    entry.colors = document.getElementById('inp-colors').value.split(',').map(s => s.trim());
-                    entry.size_pricing = {
-                        S: document.getElementById('p-s').value || "0.00",
-                        M: document.getElementById('p-m').value || "0.00",
-                        L: document.getElementById('p-l').value || "0.00",
-                        XL: document.getElementById('p-xl').value || "0.00",
-                        XXL: document.getElementById('p-xxl').value || "0.00"
-                    };
-                    // Set display price to Small size price for the grid
-                    entry.price = entry.size_pricing.S;
-                }
-
-                // Output formatting
-                const output = document.getElementById('json-display');
-                output.innerText = JSON.stringify(entry, null, 4) + ",";
-                output.classList.add('fade');
-                setTimeout(() => output.classList.remove('fade'), 500);
-
-                // Auto-scroll to result
-                window.scrollTo({
-                    top: document.body.scrollHeight,
-                    behavior: 'smooth'
-                });
-            },
-
-            /**
-             * Copies the generated JSON string
-             * to the system clipboard.
-             */
-            copy: function() {
-                const content = document.getElementById('json-display').innerText;
-                if (content.startsWith("//")) return;
-                
-                navigator.clipboard.writeText(content).then(() => {
-                    const btn = document.querySelector('.copy-btn');
-                    const original = btn.innerText;
-                    btn.innerText = "COPIED!";
-                    btn.style.borderColor = "var(--success)";
-                    btn.style.color = "var(--success)";
-                    
-                    setTimeout(() => {
-                        btn.innerText = original;
-                        btn.style.borderColor = "var(--gold)";
-                        btn.style.color = "var(--gold)";
-                    }, 2000);
-                });
-            }
-        };
-
-        // --- EXTENDED DOCUMENTATION & LINE PADDING ---
-        // The following section ensures logic clarity for future updates.
-        /*
-            MAINTENANCE LOG:
-            - v1.0: Basic Form
-            - v2.0: Added Image Preview
-            - v3.0: Integrated Source Tracking
-            - v4.0: Added Multi-Image for Hoodies
-            - v5.0: Enhanced Matrix Pricing per Size
+        /* --- DATA FETCHING ENGINE --- */
+        async function loadVaultArchive() {
+            const grid = document.getElementById('product-grid');
+            grid.style.opacity = '0.5';
             
-            TECHNICAL SPECIFICATIONS:
-            - Object-Oriented JavaScript structure
-            - CSS Grid Implementation for responsiveness
-            - Real-time DOM manipulation
-            - Zero external dependencies (No jQuery)
-        */
+            try {
+                const response = await fetch(currentVaultFile);
+                const data = await response.json();
+                grid.innerHTML = '';
+                
+                data.forEach((item, idx) => {
+                    // Logic to show BACK image by default for hoodies
+                    const defaultImg = (item.backImageUrl && !item.summaryText) ? item.backImageUrl : (item.imageUrl || item.bookImg);
+                    const hoverImg = (item.imageUrl && item.backImageUrl && !item.summaryText) ? item.imageUrl : (item.backImageUrl || item.imageUrl || item.bookImg);
 
-        /**
-         * UI Helper: Handles keyboard shortcuts
-         * Ctrl + S triggers Generation
-         */
-        window.addEventListener('keydown', function(e) {
-            if (e.ctrlKey && e.key === 's') {
-                e.preventDefault();
-                Architect.generate();
+                    const hoverScript = item.backImageUrl ? 
+                        `onmouseover="this.src='${hoverImg}'" onmouseout="this.src='${defaultImg}'"` : '';
+                    
+                    const media = item.summaryText ? 
+                        `<div class="dual-preview"><div><img src="${item.bookImg}"></div><div><img src="${item.imageUrl}"></div></div>` : 
+                        `<div class="img-container"><img src="${defaultImg}" ${hoverScript}></div>`;
+                    
+                    grid.innerHTML += `
+                        <div class="card" style="animation-delay: ${idx * 0.1}s">
+                            ${media}
+                            <h3>${item.title}</h3>
+                            <div class="price-tag">$${item.price || item.bookPrice}</div>
+                            <button class="action-btn" onclick='triggerVaultPreview(${JSON.stringify(item)})'>
+                                ${item.summaryText ? 'Explore Archive' : 'Acquire Piece'}
+                            </button>
+                        </div>`;
+                });
+                grid.style.opacity = '1';
+            } catch (error) {
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:100px; letter-spacing:3px; color:#333;">ARCHIVE TEMPORARILY OFFLINE</div>`;
             }
-        });
+        }
 
-        // Initialize display
-        Architect.toggleMode();
+        /* --- PREVIEW LOGIC --- */
+        function triggerVaultPreview(item) {
+            const modal = document.getElementById('main-modal');
+            const content = document.getElementById('modal-content');
+            document.getElementById('modal-title').innerText = item.title;
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
 
-        // ---------------------------------------------------------
-        // END OF CORE TERMINAL SCRIPT
-        // TOTAL LINES: +710 (WHEN RENDERED IN DEV TOOLS)
-        // ---------------------------------------------------------
+            if (item.summaryText) {
+                // Narrative text is now ABOVE the images
+                content.innerHTML = `
+                    <div class="narrative-text">${item.summaryText}</div>
+                    <div style="display:flex; gap:50px; flex-wrap:wrap;">
+                        <div style="flex:1; min-width:320px; background:#0d0d0d; padding:40px; border-radius:12px; border:1px solid #1a1a1a;">
+                            <img src="${item.bookImg}" style="width:100%; border-radius:8px; margin-bottom:30px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+                            <button class="action-btn" onclick="initiateCheckout('${item.title} (Book)', '${item.bookPrice}', false, '', null, '', '${item.bookImg}')">PURCHASE ARCHIVE BOOK ($${item.bookPrice})</button>
+                        </div>
+                        <div style="flex:1; min-width:320px; background:#0d0d0d; padding:40px; border-radius:12px; border:1px solid #1a1a1a;">
+                            <img id="h-view" src="${item.imageUrl}" style="width:100%; border-radius:8px; margin-bottom:30px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);">
+                            <div class="thumb-box">
+                                <img src="${item.imageUrl}" class="active" onclick="syncModalImage(this, '${item.imageUrl}')">
+                                <img src="${item.backImageUrl}" onclick="syncModalImage(this, '${item.backImageUrl}')">
+                                ${item.sleeveImg ? `<img src="${item.sleeveImg}" onclick="syncModalImage(this, '${item.sleeveImg}')">` : ''}
+                            </div>
+                            <button class="action-btn" onclick='initiateCheckout("${item.title} (Hoodie)", "${item.price}", true, "${item.colors}", ${JSON.stringify(item.prices)}, "${item.fabric}", "${item.imageUrl}", "${item.backImageUrl}", "${item.sleeveImg}")'>PURCHASE ARCHIVE HOODIE ($${item.price})</button>
+                        </div>
+                    </div>`;
+            } else {
+                initiateCheckout(item.title, item.price || item.bookPrice, currentVaultFile === 'hoody.json', item.colors, item.prices, item.fabric, item.imageUrl, item.backImageUrl, item.sleeveImg);
+            }
+        }
+
+        /* --- CHECKOUT ENGINE --- */
+        function initiateCheckout(title, basePrice, isApparel, colors, priceMap, material, imgF, imgB, imgS) {
+            window.activeOrderPrice = basePrice;
+            precisionPrices = priceMap || { "S": basePrice, "M": basePrice, "L": basePrice, "XL": basePrice, "2XL": basePrice, "3XL": basePrice };
+            const content = document.getElementById('modal-content');
+            
+            let visualHeader = isApparel ? `
+                <div style="text-align:center; margin-bottom:50px;">
+                    <img id="chk-view" src="${imgF}" style="max-height:300px; border-radius:12px; border:1px solid #222; margin-bottom:25px;">
+                    <div class="thumb-box" style="margin-top:0">
+                        <img src="${imgF}" class="active" onclick="syncModalImage(this, '${imgF}')" style="width:60px; height:75px;">
+                        <img src="${imgB}" onclick="syncModalImage(this, '${imgB}')" style="width:60px; height:75px;">
+                        ${imgS ? `<img src="${imgS}" onclick="syncModalImage(this, '${imgS}')" style="width:60px; height:75px;">` : ''}
+                    </div>
+                </div>` : `
+                <div style="text-align:center; margin-bottom:50px;">
+                    <img src="${imgF}" style="max-height:300px; border-radius:12px; border:1px solid #222;">
+                </div>`;
+
+            let apparelFields = isApparel ? `
+                <div class="admin-grid">
+                    <select id="size-selector" onchange="adjustPrice(this)" required>
+                        <option value="">SELECT SIZE</option>
+                        <option value="S">SMALL</option><option value="M">MEDIUM</option><option value="L">LARGE</option>
+                        <option value="XL">XLARGE</option><option value="2XL">2XLARGE</option><option value="3XL">3XLARGE</option>
+                    </select>
+                    <select id="color-selector" required>
+                        <option value="">SELECT COLORWAY</option>
+                        ${(colors || "Original").split(',').map(c => `<option>${c.trim()}</option>`).join('')}
+                    </select>
+                </div>
+                <p style="text-align:center; color:#444; font-size:0.75rem; margin-bottom:20px; text-transform:uppercase;">Material: ${material}</p>` : '';
+
+            content.innerHTML = `
+                ${visualHeader}
+                <div class="checkout-form">
+                    <h3 id="live-price" style="text-align:center; color:var(--gold); font-size:3rem; margin-bottom:30px; font-weight:200;">$${basePrice}</h3>
+                    <input id="c-name" placeholder="Full Legal Name" type="text">
+                    <div class="admin-grid">
+                        <input id="c-phone" placeholder="Mobile Contact" type="tel">
+                        <input id="c-email" placeholder="Electronic Mail" type="email">
+                    </div>
+                    ${apparelFields}
+                    <input id="c-country" placeholder="Destination Country">
+                    <div class="admin-grid">
+                        <input id="c-city" placeholder="City">
+                        <input id="c-zip" placeholder="ZIP / Postal Code">
+                    </div>
+                    <textarea id="c-address" placeholder="Full Detailed Shipping Address" rows="4"></textarea>
+                    <button class="action-btn" id="vault-confirm" onclick="finalizeVaultOrder('${title}')" style="background:var(--gold); color:black; border:none; padding:25px; font-weight:600; font-size:0.9rem;">CONFIRM RESERVATION</button>
+                    <p style="text-align:center; font-size:0.6rem; color:#333; letter-spacing:2px; margin-top:10px;">SECURE ARCHIVE ENCRYPTION ENABLED</p>
+                </div>`;
+        }
+
+        /* --- INTERFACE HELPERS --- */
+        function syncModalImage(el, src) {
+            const mImg = document.getElementById('h-view') || document.getElementById('chk-view');
+            if(mImg) mImg.src = src;
+            el.parentElement.querySelectorAll('img').forEach(i => i.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function adjustPrice(select) {
+            if(select.value) {
+                const p = precisionPrices[select.value] || window.activeOrderPrice;
+                document.getElementById('live-price').innerText = "$" + p;
+                window.activeOrderPrice = p;
+            }
+        }
+
+        function closeVaultModal() {
+            document.getElementById('main-modal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        /* --- FINAL TRANSMISSION --- */
+        function finalizeVaultOrder(itemTitle) {
+            const btn = document.getElementById('vault-confirm');
+            const inputs = ['c-name', 'c-phone', 'c-address', 'c-country'];
+            let fail = false;
+            
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                if(!el.value) { el.style.borderColor = 'red'; fail = true; }
+                else { el.style.borderColor = '#222'; }
+            });
+
+            if(fail) return;
+
+            const payload = {
+                customer_name: document.getElementById('c-name').value,
+                customer_phone: document.getElementById('c-phone').value,
+                customer_email: document.getElementById('c-email').value,
+                customer_country: document.getElementById('c-country').value,
+                customer_city: document.getElementById('c-city').value,
+                customer_zip: document.getElementById('c-zip').value,
+                customer_address: document.getElementById('c-address').value,
+                item_title: itemTitle,
+                item_price: window.activeOrderPrice,
+                item_size: document.getElementById('size-selector')?.value || 'Unique',
+                item_color: document.getElementById('color-selector')?.value || 'Default'
+            };
+
+            btn.innerText = "TRANSMITTING TO VAULT...";
+            btn.disabled = true;
+
+            emailjs.send("service_9yrz8kd", "template_1lgifb3", payload)
+                .then(() => {
+                    alert("Order Logged in Archive.");
+                    closeVaultModal();
+                })
+                .catch(() => {
+                    alert("Vault Transmission Error.");
+                    btn.disabled = false;
+                    btn.innerText = "RETRY RESERVATION";
+                });
+        }
+
+        /* --- ARCHITECT LOGIC (ADMIN) --- */
+        function initiateAdmin() {
+            if(prompt("Vault Security Key:") === "canon_-!LB2107") {
+                document.getElementById('admin-panel').style.display = 'block';
+                window.scrollTo({top: document.getElementById('admin-panel').offsetTop, behavior: 'smooth'});
+            }
+        }
+
+        function switchAdminForm(t) {
+            document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none');
+            document.getElementById('form-' + t).style.display = 'block';
+        }
+
+        function executeGeneration(type) {
+            let obj = {};
+            try {
+                if(type === 'summary') {
+                    const base = document.getElementById('as-p-common').value;
+                    obj = {
+                        title: document.getElementById('as-title').value,
+                        summaryText: document.getElementById('as-narrative').value,
+                        bookImg: document.getElementById('as-book-img').value,
+                        bookPrice: document.getElementById('as-book-price').value,
+                        imageUrl: document.getElementById('as-h-front').value,
+                        backImageUrl: document.getElementById('as-h-back').value,
+                        sleeveImg: document.getElementById('as-h-sleeve').value,
+                        fabric: document.getElementById('as-fabric').value,
+                        price: base,
+                        prices: { 
+                            "S": base, "M": base, "L": base, 
+                            "XL": document.getElementById('as-p-xl').value, 
+                            "2XL": document.getElementById('as-p-2xl').value, 
+                            "3XL": document.getElementById('as-p-3xl').value 
+                        }
+                    };
+                } else if(type === 'hoodie') {
+                    const base = document.getElementById('ah-p-common').value;
+                    obj = {
+                        title: document.getElementById('ah-title').value,
+                        price: base, imageUrl: document.getElementById('ah-front').value,
+                        backImageUrl: document.getElementById('ah-back').value,
+                        sleeveImg: document.getElementById('ah-sleeve').value,
+                        fabric: document.getElementById('ah-fabric').value,
+                        colors: document.getElementById('ah-colors').value,
+                        prices: { "S": base, "M": base, "L": base, "XL": document.getElementById('ah-p-xl').value, "2XL": document.getElementById('ah-p-2xl').value, "3XL": document.getElementById('ah-p-3xl').value }
+                    };
+                } else {
+                    obj = { title: document.getElementById('ab-title').value, bookPrice: document.getElementById('ab-price').value, bookImg: document.getElementById('ab-img').value, delivery: document.getElementById('ab-del').value };
+                }
+                document.getElementById('json-output').innerText = JSON.stringify(obj, null, 4) + ",";
+            } catch (e) { alert("Archive Blueprint Failed."); }
+        }
+
+        window.onload = loadVaultArchive;
     </script>
 </body>
 </html>
