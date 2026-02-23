@@ -446,9 +446,70 @@ function adjustPrice(select) {
 function closeVaultModal() { document.getElementById('main-modal').style.display = 'none'; document.body.style.overflow = 'auto'; }
 function initiateAdmin() { if(prompt("Vault Security Key:") === "canon_-!LB2107") { document.getElementById('admin-panel').style.display = 'block'; } }
 function switchAdminForm(t) { document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none'); document.getElementById('form-' + t).style.display = 'block'; }
-function executeGeneration(type) { /* ... نفس كود التوليد اللي عندك ... */ }
+function executeGeneration(type) {
+    let data = {};
+    const output = document.getElementById('json-output');
+    
+    try {
+        if(type === 'summary') {
+            data = {
+                title: document.getElementById('as-title').value,
+                summaryText: document.getElementById('as-narrative').value,
+                bookImg: document.getElementById('as-book-img').value,
+                bookPrice: document.getElementById('as-book-price').value,
+                imageUrl: document.getElementById('as-h-front').value,
+                backImageUrl: document.getElementById('as-h-back').value,
+                sleeveImg: document.getElementById('as-h-sleeve').value,
+                fabric: document.getElementById('as-fabric').value,
+                price: document.getElementById('as-p-common').value,
+                prices: {
+                    "S": document.getElementById('as-p-common').value,
+                    "M": document.getElementById('as-p-common').value,
+                    "L": document.getElementById('as-p-common').value,
+                    "XL": document.getElementById('as-p-xl').value,
+                    "2XL": document.getElementById('as-p-2xl').value,
+                    "3XL": document.getElementById('as-p-3xl').value
+                }
+            };
+        } else if(type === 'hoodie') {
+            data = {
+                title: document.getElementById('ah-title').value,
+                imageUrl: document.getElementById('ah-front').value,
+                backImageUrl: document.getElementById('ah-back').value,
+                sleeveImg: document.getElementById('ah-sleeve').value,
+                fabric: document.getElementById('ah-fabric').value,
+                colors: document.getElementById('ah-colors').value,
+                price: document.getElementById('ah-p-common').value,
+                prices: {
+                    "S": document.getElementById('ah-p-common').value,
+                    "M": document.getElementById('ah-p-common').value,
+                    "L": document.getElementById('ah-p-common').value,
+                    "XL": document.getElementById('ah-p-xl').value,
+                    "2XL": document.getElementById('ah-p-2xl').value,
+                    "3XL": document.getElementById('ah-p-3xl').value
+                }
+            };
+        } else if(type === 'book') {
+            data = {
+                title: document.getElementById('ab-title').value,
+                bookPrice: document.getElementById('ab-price').value,
+                imageUrl: document.getElementById('ab-img').value,
+                deliveryFrame: document.getElementById('ab-del').value
+            };
+        }
 
-window.onload = loadVaultArchive;
+        // تحويل البيانات لنص JSON وعرضها في الخانة الخضراء
+        output.innerText = JSON.stringify(data, null, 4) + ",";
+        output.style.color = "#2ecc71"; // يرجع اللون أخضر
+        
+        // Scroll لأسفل باش تشوف الكود
+        output.scrollIntoView({ behavior: 'smooth' });
+
+    } catch (err) {
+        output.innerText = "ERROR: " + err.message;
+        output.style.color = "red";
+    }
+}
     </script>
 </body>
 </html>
