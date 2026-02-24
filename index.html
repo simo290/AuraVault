@@ -3,201 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuraVault | Luxury Apparel Archive</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@200;300;400;600&display=swap" rel="stylesheet">
-
+    <title>AuraVault | Luxury Pack System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* --- CSS STYLE --- */
         :root {
             --gold: #d4af37;
             --bg: #0a0a0a;
             --card: #121212;
             --text: #ffffff;
             --border: #262626;
-            --gold-glow: rgba(212, 175, 55, 0.3);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        body { background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; }
 
-        /* Shipping Banner */
+        /* Banner */
         .shipping-banner {
-            background: var(--gold);
-            color: black;
-            text-align: center;
-            padding: 10px;
-            font-size: 0.7rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            text-transform: uppercase;
+            background: var(--gold); color: black; text-align: center;
+            padding: 10px; font-size: 0.7rem; font-weight: 800; letter-spacing: 2px;
+            position: sticky; top: 0; z-index: 1000; text-transform: uppercase;
         }
 
-        header { padding: 60px 20px 30px; text-align: center; }
-        .logo { 
-            font-family: 'Playfair Display', serif; 
-            font-size: 3rem; 
-            color: var(--gold); 
-            letter-spacing: 12px; 
-            cursor: pointer; 
-            text-transform: uppercase;
-            text-shadow: 0 0 15px var(--gold-glow);
-        }
+        header { padding: 40px 20px; text-align: center; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--gold); letter-spacing: 10px; }
 
-        /* Navigation */
-        nav { 
-            display: flex; 
-            justify-content: center; 
-            gap: 15px; 
-            margin-top: 30px; 
-            flex-wrap: wrap; 
-            padding: 0 20px;
-        }
-        .nav-link { 
-            color: #888; 
-            text-transform: uppercase; 
-            font-size: 0.65rem; 
-            letter-spacing: 2px; 
-            cursor: pointer; 
-            padding: 8px 12px; 
-            transition: 0.3s;
-            border-bottom: 2px solid transparent;
-        }
-        .nav-link.active { 
-            color: var(--gold); 
-            border-bottom: 2px solid var(--gold); 
-        }
+        /* Grid */
+        .container { max-width: 1300px; margin: 0 auto; padding: 40px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
 
-        /* Products Grid */
-        .container { max-width: 1400px; margin: 0 auto; padding: 40px 20px; }
-        .grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 40px; 
-        }
-
-        /* Product Card & Flip Effect */
+        /* Card */
         .card { 
-            background: var(--card); 
-            border: 1px solid var(--border); 
-            border-radius: 15px; 
-            padding: 20px; 
-            text-align: center; 
-            transition: 0.5s cubic-bezier(0.23, 1, 0.32, 1); 
+            background: var(--card); border: 1px solid var(--border); 
+            border-radius: 12px; padding: 20px; text-align: center; transition: 0.4s;
         }
-        .card:hover { 
-            border-color: var(--gold); 
-            transform: translateY(-10px); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-
         .img-box { 
-            position: relative; 
-            width: 100%; 
-            aspect-ratio: 4/5; 
-            overflow: hidden; 
-            border-radius: 10px; 
-            margin-bottom: 20px;
-            background: #000;
+            position: relative; width: 100%; aspect-ratio: 4/5; 
+            overflow: hidden; border-radius: 8px; margin-bottom: 15px;
         }
-        .img-box img { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            transition: 0.6s ease-in-out; 
-        }
-        .img-back { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            opacity: 0; 
-            transform: scale(1.1);
-        }
+        .img-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s ease; }
+        .img-back { position: absolute; top: 0; left: 0; opacity: 0; }
         .card:hover .img-front { opacity: 0; }
-        .card:hover .img-back { opacity: 1; transform: scale(1); }
+        .card:hover .img-back { opacity: 1; }
 
-        .product-title { 
-            font-size: 1.1rem; 
-            font-weight: 400; 
-            margin-bottom: 8px; 
-            letter-spacing: 1px;
-        }
-        .price-tag { 
-            color: var(--gold); 
-            font-size: 1.3rem; 
-            font-weight: 700; 
-            margin-bottom: 12px; 
-        }
-        .delivery-tag { 
-            display: block; 
-            font-size: 0.7rem; 
-            color: #4caf50; 
-            margin-bottom: 20px; 
-            font-weight: 600;
-        }
+        .price-tag { color: var(--gold); font-size: 1.4rem; font-weight: bold; margin: 10px 0; }
 
-        .order-btn { 
-            background: transparent; 
-            border: 1px solid var(--gold); 
-            color: var(--gold); 
-            padding: 14px; 
-            width: 100%; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            font-weight: 700; 
-            text-transform: uppercase; 
-            letter-spacing: 2px;
-            font-size: 0.75rem;
-            transition: 0.3s;
-        }
-        .order-btn:hover { 
-            background: var(--gold); 
-            color: black; 
-        }
+        /* --- Buttons System --- */
+        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
 
-        /* WhatsApp Float */
-        .wa-float { 
-            position: fixed; 
-            bottom: 30px; 
-            right: 30px; 
-            background: #25d366; 
-            width: 60px; 
-            height: 60px; 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            box-shadow: 0 5px 20px rgba(0,0,0,0.4); 
-            z-index: 2000; 
-            transition: 0.3s;
+        .btn-order { 
+            background: transparent; border: 1px solid var(--gold); color: var(--gold); 
+            padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; 
+            text-transform: uppercase; font-size: 0.75rem; transition: 0.3s;
         }
-        .wa-float:hover { transform: scale(1.1); }
+        .btn-order:hover { background: rgba(212, 175, 55, 0.1); }
 
-        /* Admin Trigger (Secret) */
-        .admin-trigger { position: fixed; bottom: 10px; left: 10px; width: 20px; height: 20px; cursor: pointer; opacity: 0; }
+        /* زر الـ Pack المتميز */
+        .btn-pack { 
+            background: var(--gold); color: black; border: none;
+            padding: 15px; border-radius: 6px; cursor: pointer; font-weight: 800;
+            text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        }
+        .btn-pack:hover { transform: scale(1.02); background: #e5bd3d; }
 
+        .badge-pack {
+            background: #ff3e3e; color: white; font-size: 0.6rem; padding: 3px 8px;
+            border-radius: 20px; position: absolute; top: 15px; right: 15px; font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
-    <div class="shipping-banner">
-        🇺🇸 FREE SHIPPING ONLY WITHIN THE UNITED STATES 🇺🇸
-    </div>
+    <div class="shipping-banner">🇺🇸 FREE SHIPPING ONLY WITHIN THE UNITED STATES 🇺🇸</div>
 
     <header>
         <div class="logo">AURAVAULT</div>
-        <nav id="nav-bar">
-            <span class="nav-link active" onclick="fetchData('sla.json', this)">Archive</span>
-            <span class="nav-link" onclick="fetchData('hoody.json', this)">Hoodies</span>
-            <span class="nav-link" onclick="fetchData('sweatshirts.json', this)">Sweatshirts</span>
-            <span class="nav-link" onclick="fetchData('tshirts.json', this)">T-Shirts</span>
-            <span class="nav-link" onclick="fetchData('pants.json', this)">Pants</span>
-            <span class="nav-link" onclick="fetchData('caps.json', this)">Caps</span>
-            <span class="nav-link" onclick="fetchData('beanies.json', this)">Beanies</span>
-        </nav>
     </header>
 
     <div class="container">
@@ -205,57 +85,57 @@
             </div>
     </div>
 
-    <a href="https://wa.me/212717948663" class="wa-float" target="_blank">
-        <svg width="32" height="32" fill="white" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.316 1.592 5.43 0 9.856-4.426 9.858-9.855.002-5.43-4.425-9.856-9.853-9.856-2.634 0-5.103 1.026-6.968 2.891-1.864 1.865-2.887 4.335-2.888 6.97-.001 2.016.518 3.588 1.517 5.251l-.991 3.616 3.709-.969zm11.323-6.205c-.133-.221-.489-.354-.985-.603s-2.935-1.447-3.385-1.612-.768-.248-1.092.24c-.324.488-1.254 1.612-1.537 1.942-.284.331-.567.372-1.063.124s-2.094-.772-3.99-2.464c-1.474-1.314-2.469-2.937-2.757-3.434-.287-.496-.03-.765.218-1.012.223-.223.489-.569.734-.853.245-.284.325-.487.489-.812.163-.325.082-.609-.041-.854s-1.092-2.645-1.498-3.637c-.396-.962-.797-.832-1.092-.847-.282-.015-.606-.017-.93-.017s-.85.123-1.294.609c-.444.487-1.696 1.658-1.696 4.045s1.741 4.694 1.986 5.02c.245.325 3.427 5.232 8.303 7.334 1.159.5 2.065.798 2.77 1.022 1.164.369 2.225.317 3.064.191.935-.14 2.935-1.2 3.344-2.356.408-1.156.408-2.147.284-2.356z"/></svg>
-    </a>
-
-    <div class="admin-trigger" onclick="location.href='admin.html'"></div>
-
     <script>
-        // دالة لجلب البيانات من ملفات الـ JSON
-        async function fetchData(file, element) {
-            // تحديث رابط الـ Active فـ الـ Navbar
-            if (element) {
-                document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
-                element.classList.add('active');
-            }
-
+        // دالة عرض المنتجات
+        async function loadProducts() {
             const grid = document.getElementById('product-grid');
             
-            try {
-                const response = await fetch(file);
-                const products = await response.json();
-                
-                grid.innerHTML = ''; // مسح الشبكة الحالية
+            // مثال لبيانات المنتج (هادي هي اللي غاتكون فـ JSON)
+            const products = [
+                {
+                    title: "Essential Archive Look",
+                    imgF: "front_hoodie.jpg",
+                    imgB: "back_hoodie.jpg",
+                    price_single: "45.00",
+                    price_pack: "89.99", // ثمن الباك (فوقية + سروال + كاسكيط)
+                    colors: "Classic Black, Silver"
+                }
+            ];
 
-                products.forEach(item => {
-                    grid.innerHTML += `
-                        <div class="card">
-                            <div class="img-box">
-                                <img src="${item.imgF}" class="img-front" alt="Front View">
-                                <img src="${item.imgB}" class="img-back" alt="Back View">
-                            </div>
-                            <h3 class="product-title">${item.title}</h3>
-                            <p class="price-tag">${item.p_std} $</p>
-                            <span class="delivery-tag">🚚 FREE 2-DAY DELIVERY</span>
-                            <button class="order-btn" onclick='buyNow(${JSON.stringify(item)})'>Acquire Now</button>
+            products.forEach(item => {
+                grid.innerHTML += `
+                    <div class="card">
+                        <div class="img-box">
+                            <span class="badge-pack">BEST VALUE</span>
+                            <img src="${item.imgF}" class="img-front">
+                            <img src="${item.imgB}" class="img-back">
                         </div>
-                    `;
-                });
-            } catch (error) {
-                grid.innerHTML = `<p style="color: gray; text-align: center; width: 100%;">Vault category empty or file missing.</p>`;
-            }
+                        <h3>${item.title}</h3>
+                        <p class="price-tag">$${item.price_single}</p>
+                        
+                        <div class="btn-group">
+                            <button class="btn-order" onclick='buyItem(${JSON.stringify(item)}, "Single")'>
+                                Buy Hoodie Only
+                            </button>
+
+                            <button class="btn-pack" onclick='buyItem(${JSON.stringify(item)}, "Full Pack")'>
+                                📦 GET THE FULL PACK ($${item.price_pack})
+                                <br><span style="font-size:0.6rem; font-weight:normal;">(Hoodie + Pants + Beanie)</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
         }
 
-        // دالة لإرسال الكليان لصفحة الـ Checkout مع معلومات المنتج
-        function buyNow(product) {
-            // تخزين معلومات المنتج فـ الـ Local Storage باش نقراوها فـ صفحة الـ Livraison
-            localStorage.setItem('selectedProduct', JSON.stringify(product));
+        function buyItem(product, type) {
+            // كنزيدو نوع الطلب (باك ولا قطعة) باش يوصلك فـ الإيميل
+            const orderData = { ...product, orderType: type };
+            localStorage.setItem('selectedProduct', JSON.stringify(orderData));
             window.location.href = 'checkout.html';
         }
 
-        // تحميل أول فئة عند فتح الموقع
-        window.onload = () => fetchData('sla.json');
+        window.onload = loadProducts;
     </script>
 </body>
 </html>
