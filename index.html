@@ -328,7 +328,7 @@
     </div>
 
     <script>
-        /* --- SYSTEM INITIALIZATION --- */
+/* --- SYSTEM INITIALIZATION --- */
 (function() { 
     emailjs.init("QWKaC8MCGOF9GwKvN"); 
     console.log("Vault Security Initialized...");
@@ -358,13 +358,17 @@ async function loadVaultArchive() {
             const hoverImg = (item.imageUrl && item.backImageUrl && !item.summaryText) ? item.imageUrl : (item.backImageUrl || item.imageUrl || item.bookImg);
             const hoverScript = item.backImageUrl ? `onmouseover="this.src='${hoverImg}'" onmouseout="this.src='${defaultImg}'"` : '';
             const media = item.summaryText ? `<div class="dual-preview"><div><img src="${item.bookImg}"></div><div><img src="${item.imageUrl}"></div></div>` : `<div class="img-container"><img src="${defaultImg}" ${hoverScript}></div>`;
-            grid.innerHTML += `<div class="card" style="animation-delay: ${idx * 0.1}s">${media}<h3>${item.title}</h3><div class="price-tag">$${item.price || item.bookPrice}</div><button class="action-btn" onclick='triggerVaultPreview(${JSON.stringify(item)})'>${item.summaryText ? 'Explore Archive' : 'Acquire Piece'}</button></div>`;
+            
+            // تنظيف البيانات باش تخدم فـ onclick بلا مشاكل
+            const safeItem = JSON.stringify(item).replace(/'/g, "&apos;");
+            
+            grid.innerHTML += `<div class="card" style="animation-delay: ${idx * 0.1}s">${media}<h3>${item.title}</h3><div class="price-tag">$${item.price || item.bookPrice}</div><button class="action-btn" onclick='triggerVaultPreview(${safeItem})'>${item.summaryText ? 'Explore Archive' : 'Acquire Piece'}</button></div>`;
         });
         grid.style.opacity = '1';
     } catch (error) { grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:100px; color:#333;">ARCHIVE OFFLINE</div>`; }
 }
 
-/* --- PREVIEW LOGIC --- */
+/* --- PREVIEW LOGIC (FIXED) --- */
 function triggerVaultPreview(item) {
     const modal = document.getElementById('main-modal');
     const content = document.getElementById('modal-content');
@@ -372,14 +376,33 @@ function triggerVaultPreview(item) {
     modal.style.display = 'block';
     document.body.style.overflow = 'hidden';
 
+    const safeTitle = item.title.replace(/'/g, "");
+
     if (item.summaryText) {
-        content.innerHTML = `<div class="narrative-text">${item.summaryText}</div><div style="display:flex; gap:50px; flex-wrap:wrap;"><div style="flex:1; min-width:320px; background:#0d0d0d; padding:40px; border-radius:12px; border:1px solid #1a1a1a;"><img src="${item.bookImg}" style="width:100%; border-radius:8px; margin-bottom:30px;"><button class="action-btn" onclick="initiateCheckout('${item.title} (Book)', '${item.bookPrice}', false, '', null, '', '${item.bookImg}')">PURCHASE BOOK ($${item.bookPrice})</button></div><div style="flex:1; min-width:320px; background:#0d0d0d; padding:40px; border-radius:12px; border:1px solid #1a1a1a;"><img id="h-view" src="${item.imageUrl}" style="width:100%; border-radius:8px; margin-bottom:30px;"><div class="thumb-box"><img src="${item.imageUrl}" class="active" onclick="syncModalImage(this, '${item.imageUrl}')"><img src="${item.backImageUrl}" onclick="syncModalImage(this, '${item.backImageUrl}')">${item.sleeveImg ? `<img src="${item.sleeveImg}" onclick="syncModalImage(this, '${item.sleeveImg}')">` : ''}</div><button class="action-btn" onclick='initiateCheckout("${item.title} (Hoodie)", "${item.price}", true, "${item.colors}", ${JSON.stringify(item.prices)}, "${item.fabric}", "${item.imageUrl}", "${item.backImageUrl}", "${item.sleeveImg}")'>PURCHASE HOODIE ($${item.price})</button></div></div>`;
+        content.innerHTML = `
+            <div class="narrative-text">${item.summaryText}</div>
+            <div style="display:flex; gap:50px; flex-wrap:wrap;">
+                <div style="flex:1; min-width:320px; background:#0d0d0d; padding:40px; border-radius:12px; border:1px solid #1a1a1a;">
+                    <img src="${item.bookImg}" style="width:100%; border-radius:8px; margin-bottom:30px;">
+                    <button class="action-btn" onclick="initiateCheckout('${safeTitle} (Book)', '${item.bookPrice}', false, '', null, '', '${item.bookImg}')">PURCHASE BOOK ($${item.bookPrice})</button>
+                </div>
+                <div style="flex:1; min-width:320px; background:#0d0d0d; padding:40px; border-radius:12px; border:1px solid #1a1a1a;">
+                    <img id="h-view" src="${item.imageUrl}" style="width:100%; border-radius:8px; margin-bottom:30px;">
+                    <div class="thumb-box">
+                        <img src="${item.imageUrl}" class="active" onclick="syncModalImage(this, '${item.imageUrl}')">
+                        <img src="${item.backImageUrl}" onclick="syncModalImage(this, '${item.backImageUrl}')">
+                        ${item.sleeveImg ? `<img src="${item.sleeveImg}" onclick="syncModalImage(this, '${item.sleeveImg}')">` : ''}
+                    </div>
+                    <button class="action-btn" onclick='initiateCheckout("${safeTitle} (Hoodie)", "${item.price}", true, "${item.colors || "Original"}", ${JSON.stringify(item.prices)}, "${item.fabric}", "${item.imageUrl}", "${item.backImageUrl}", "${item.sleeveImg}")'>PURCHASE HOODIE ($${item.price})</button>
+                </div>
+            </div>`;
     } else {
-        initiateCheckout(item.title, item.price || item.bookPrice, (currentVaultFile === 'hoody.json' || item.fabric), item.colors, item.prices, item.fabric, item.imageUrl, item.backImageUrl, item.sleeveImg);
+        const isApparel = (currentVaultFile === 'hoody.json' || item.fabric);
+        initiateCheckout(item.title, item.price || item.bookPrice, isApparel, item.colors, item.prices, item.fabric, item.imageUrl, item.backImageUrl, item.sleeveImg);
     }
 }
 
-/* --- CHECKOUT ENGINE (CLEAN VERSION) --- */
+/* --- CHECKOUT ENGINE --- */
 function initiateCheckout(title, basePrice, isApparel, colors, priceMap, material, imgF, imgB, imgS) {
     window.activeOrderPrice = basePrice;
     precisionPrices = priceMap || { "S": basePrice, "M": basePrice, "L": basePrice, "XL": basePrice, "2XL": basePrice, "3XL": basePrice };
@@ -389,10 +412,10 @@ function initiateCheckout(title, basePrice, isApparel, colors, priceMap, materia
 
     let apparelFields = isApparel ? `<div class="admin-grid"><select id="size-selector" onchange="adjustPrice(this)"><option value="">SELECT SIZE</option><option value="S">S</option><option value="M">M</option><option value="L">L</option><option value="XL">XL</option><option value="2XL">2XL</option><option value="3XL">3XL</option></select><select id="color-selector"><option value="">SELECT COLOR</option>${(colors || "Original").split(',').map(c => `<option>${c.trim()}</option>`).join('')}</select></div>` : '';
 
-    content.innerHTML = `${visualHeader}<div class="checkout-form"><h3 id="live-price" style="text-align:center; color:var(--gold); font-size:3rem; margin-bottom:30px;">$${basePrice}</h3><input id="c-name" placeholder="Full Legal Name"><div class="admin-grid"><input id="c-phone" placeholder="Mobile Contact" type="tel"><input id="c-email" placeholder="Electronic Mail" type="email"></div>${apparelFields}<input id="c-country" placeholder="Destination Country"><div class="admin-grid"><input id="c-city" placeholder="City"><input id="c-zip" placeholder="ZIP Code"></div><textarea id="c-address" placeholder="Full Detailed Shipping Address" rows="4"></textarea><button class="action-btn" id="vault-confirm" onclick="finalizeVaultOrder('${title}')" style="background:var(--gold); color:black;">CONFIRM RESERVATION</button></div>`;
+    content.innerHTML = `${visualHeader}<div class="checkout-form"><h3 id="live-price" style="text-align:center; color:var(--gold); font-size:3rem; margin-bottom:30px;">$${basePrice}</h3><input id="c-name" placeholder="Full Legal Name"><div class="admin-grid"><input id="c-phone" placeholder="Mobile Contact" type="tel"><input id="c-email" placeholder="Electronic Mail" type="email"></div>${apparelFields}<input id="c-country" placeholder="Destination Country"><div class="admin-grid"><input id="c-city" placeholder="City"><input id="c-zip" placeholder="ZIP Code"></div><textarea id="c-address" placeholder="Full Detailed Shipping Address" rows="4"></textarea><button class="action-btn" id="vault-confirm" onclick="finalizeVaultOrder('${title.replace(/'/g, "")}')" style="background:var(--gold); color:black;">CONFIRM RESERVATION</button></div>`;
 }
 
-/* --- FINAL TRANSMISSION (FIXED) --- */
+/* --- FINAL TRANSMISSION --- */
 function finalizeVaultOrder(itemTitle) {
     const btn = document.getElementById('vault-confirm');
     const inputs = ['c-name', 'c-phone', 'c-address', 'c-country', 'c-email', 'c-city', 'c-zip'];
@@ -429,7 +452,7 @@ function finalizeVaultOrder(itemTitle) {
         .catch((err) => { alert("Vault Error. Try again."); btn.disabled = false; btn.innerText = "RETRY"; });
 }
 
-/* --- HELPERS & ADMIN --- */
+/* --- HELPERS --- */
 function syncModalImage(el, src) {
     const mImg = document.getElementById('h-view') || document.getElementById('chk-view');
     if(mImg) mImg.src = src;
@@ -446,10 +469,10 @@ function adjustPrice(select) {
 function closeVaultModal() { document.getElementById('main-modal').style.display = 'none'; document.body.style.overflow = 'auto'; }
 function initiateAdmin() { if(prompt("Vault Security Key:") === "canon_-!LB2107") { document.getElementById('admin-panel').style.display = 'block'; } }
 function switchAdminForm(t) { document.querySelectorAll('.admin-section').forEach(s => s.style.display = 'none'); document.getElementById('form-' + t).style.display = 'block'; }
+
 function executeGeneration(type) {
     let data = {};
     const output = document.getElementById('json-output');
-    
     try {
         if(type === 'summary') {
             data = {
@@ -497,14 +520,9 @@ function executeGeneration(type) {
                 deliveryFrame: document.getElementById('ab-del').value
             };
         }
-
-        // تحويل البيانات لنص JSON وعرضها في الخانة الخضراء
         output.innerText = JSON.stringify(data, null, 4) + ",";
-        output.style.color = "#2ecc71"; // يرجع اللون أخضر
-        
-        // Scroll لأسفل باش تشوف الكود
+        output.style.color = "#2ecc71";
         output.scrollIntoView({ behavior: 'smooth' });
-
     } catch (err) {
         output.innerText = "ERROR: " + err.message;
         output.style.color = "red";
