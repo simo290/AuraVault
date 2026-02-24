@@ -16,5 +16,24 @@
     "2XL": "68.99",
     "3XL": "70.00"
   }
+},
+  {
+    "title": "In a world of noise, clarity is the ultimate leverage. This isn't just a book; it’s the blueprint for the modern alchemist. Escape the rat race without losing your soul. Build wealth, not just bank accounts. Master the art of 'Product-Led Growth' while the world sleeps. If you're still trading your time for money, you're playing the wrong game. Learn the code of the new elite, or stay stuck in the loops of the old world.",
+    "summaryText": "In a world of noise, clarity is the ultimate leverage. This isn't just a book; it’s the blueprint for the modern alchemist. Escape the rat race without losing your soul. Build wealth, not just bank accounts. Master the art of 'Product-Led Growth' while the world sleeps. If you're still trading your time for money, you're playing the wrong game. Learn the code of the new elite, or stay stuck in the loops of the old world.",
+    "bookImg": "https://ae-pic-a1.aliexpress-media.com/kf/S23dd0259cdf94a9797976948ac0b1e04E.jpg?has_lang=1&ver=2_220x220q75.jpg_.avif",
+    "bookPrice": "34.99",
+    "imageUrl": "https://files.cdn.printful.com/upload/product-templates/1c/1c4b9b32a3085f14ca4ed946110484d1_l",
+    "backImageUrl": "https://files.cdn.printful.com/upload/product-templates/e4/e4a0848e0bb73fd78baab4c2c443f59e_l",
+    "sleeveImg": "",
+    "fabric": "Sweat à capuche premium unisexe | Cotton Heritage M2580",
+    "price": "70",
+    "prices": {
+        "S": "70",
+        "M": "70",
+        "L": "70",
+        "XL": "72",
+        "2XL": "80",
+        "3XL": "85"
+    }
 }
 ]
