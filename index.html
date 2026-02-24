@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AuraVault | Luxury Pack System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>AuraVault | Luxury Archive</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@200;400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
             --gold: #d4af37;
@@ -21,54 +21,68 @@
         .shipping-banner {
             background: var(--gold); color: black; text-align: center;
             padding: 10px; font-size: 0.7rem; font-weight: 800; letter-spacing: 2px;
-            position: sticky; top: 0; z-index: 1000; text-transform: uppercase;
+            position: sticky; top: 0; z-index: 1000;
         }
 
-        header { padding: 40px 20px; text-align: center; }
-        .logo { font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--gold); letter-spacing: 10px; }
+        header { padding: 50px 20px; text-align: center; }
+        .logo { font-family: 'Playfair Display', serif; font-size: 3rem; color: var(--gold); letter-spacing: 12px; text-transform: uppercase; }
 
-        /* Grid */
-        .container { max-width: 1300px; margin: 0 auto; padding: 40px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+        /* Navigation */
+        nav { 
+            display: flex; justify-content: center; gap: 15px; 
+            margin-top: 30px; flex-wrap: wrap; padding: 0 10px;
+        }
+        .nav-link { 
+            color: #888; text-transform: uppercase; font-size: 0.65rem; 
+            letter-spacing: 2px; cursor: pointer; padding: 10px; transition: 0.3s;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active { color: var(--gold); border-bottom: 2px solid var(--gold); }
 
-        /* Card */
+        .container { max-width: 1300px; margin: 0 auto; padding: 40px 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 35px; }
+
+        /* Product Card */
         .card { 
             background: var(--card); border: 1px solid var(--border); 
-            border-radius: 12px; padding: 20px; text-align: center; transition: 0.4s;
+            border-radius: 15px; padding: 20px; text-align: center; transition: 0.4s;
+            position: relative;
         }
+        .card:hover { border-color: var(--gold); transform: translateY(-5px); }
+
         .img-box { 
             position: relative; width: 100%; aspect-ratio: 4/5; 
-            overflow: hidden; border-radius: 8px; margin-bottom: 15px;
+            overflow: hidden; border-radius: 10px; margin-bottom: 15px;
         }
-        .img-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s ease; }
+        .img-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.6s ease; }
         .img-back { position: absolute; top: 0; left: 0; opacity: 0; }
         .card:hover .img-front { opacity: 0; }
         .card:hover .img-back { opacity: 1; }
 
+        /* Price and Buttons */
         .price-tag { color: var(--gold); font-size: 1.4rem; font-weight: bold; margin: 10px 0; }
 
-        /* --- Buttons System --- */
-        .btn-group { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-
-        .btn-order { 
-            background: transparent; border: 1px solid var(--gold); color: var(--gold); 
-            padding: 12px; border-radius: 6px; cursor: pointer; font-weight: bold; 
-            text-transform: uppercase; font-size: 0.75rem; transition: 0.3s;
+        .btn-stack { display: flex; flex-direction: column; gap: 8px; }
+        
+        /* زر الباك */
+        .btn-pack {
+            background: var(--gold); color: black; border: none; padding: 14px;
+            border-radius: 6px; font-weight: 800; cursor: pointer; text-transform: uppercase;
+            font-size: 0.75rem; letter-spacing: 1px;
         }
-        .btn-order:hover { background: rgba(212, 175, 55, 0.1); }
 
-        /* زر الـ Pack المتميز */
-        .btn-pack { 
-            background: var(--gold); color: black; border: none;
-            padding: 15px; border-radius: 6px; cursor: pointer; font-weight: 800;
-            text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px;
-            box-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+        /* زر القطعة الواحدة */
+        .btn-single {
+            background: transparent; border: 1px solid #444; color: #888; padding: 10px;
+            border-radius: 6px; font-weight: 600; cursor: pointer; text-transform: uppercase;
+            font-size: 0.7rem;
         }
-        .btn-pack:hover { transform: scale(1.02); background: #e5bd3d; }
+        .btn-single:hover { border-color: var(--gold); color: var(--gold); }
 
-        .badge-pack {
-            background: #ff3e3e; color: white; font-size: 0.6rem; padding: 3px 8px;
-            border-radius: 20px; position: absolute; top: 15px; right: 15px; font-weight: bold;
+        .pack-badge {
+            position: absolute; top: 15px; left: 15px; background: var(--gold);
+            color: black; font-size: 0.6rem; font-weight: 900; padding: 5px 10px;
+            border-radius: 5px; z-index: 10;
         }
     </style>
 </head>
@@ -78,6 +92,14 @@
 
     <header>
         <div class="logo">AURAVAULT</div>
+        <nav>
+            <span class="nav-link active" onclick="loadCategory('packs.json', this)">The Packs</span>
+            <span class="nav-link" onclick="loadCategory('hoody.json', this)">Hoodies</span>
+            <span class="nav-link" onclick="loadCategory('tshirts.json', this)">T-Shirts</span>
+            <span class="nav-link" onclick="loadCategory('sweatshirts.json', this)">Sweatshirts</span>
+            <span class="nav-link" onclick="loadCategory('pants.json', this)">Pants</span>
+            <span class="nav-link" onclick="loadCategory('caps.json', this)">Caps & Beanies</span>
+        </nav>
     </header>
 
     <div class="container">
@@ -86,56 +108,58 @@
     </div>
 
     <script>
-        // دالة عرض المنتجات
-        async function loadProducts() {
-            const grid = document.getElementById('product-grid');
+        // دالة تحميل المنتجات
+        async function loadCategory(file, element) {
+            // تغيير الـ active link في القائمة
+            if (element) {
+                document.querySelectorAll('.nav-link').forEach(n => n.classList.remove('active'));
+                element.classList.add('active');
+            }
             
-            // مثال لبيانات المنتج (هادي هي اللي غاتكون فـ JSON)
-            const products = [
-                {
-                    title: "Essential Archive Look",
-                    imgF: "front_hoodie.jpg",
-                    imgB: "back_hoodie.jpg",
-                    price_single: "45.00",
-                    price_pack: "89.99", // ثمن الباك (فوقية + سروال + كاسكيط)
-                    colors: "Classic Black, Silver"
-                }
-            ];
+            const grid = document.getElementById('product-grid');
+            grid.innerHTML = ''; 
 
-            products.forEach(item => {
-                grid.innerHTML += `
-                    <div class="card">
-                        <div class="img-box">
-                            <span class="badge-pack">BEST VALUE</span>
-                            <img src="${item.imgF}" class="img-front">
-                            <img src="${item.imgB}" class="img-back">
-                        </div>
-                        <h3>${item.title}</h3>
-                        <p class="price-tag">$${item.price_single}</p>
-                        
-                        <div class="btn-group">
-                            <button class="btn-order" onclick='buyItem(${JSON.stringify(item)}, "Single")'>
-                                Buy Hoodie Only
-                            </button>
+            try {
+                const response = await fetch(file);
+                const data = await response.json();
 
-                            <button class="btn-pack" onclick='buyItem(${JSON.stringify(item)}, "Full Pack")'>
-                                📦 GET THE FULL PACK ($${item.price_pack})
-                                <br><span style="font-size:0.6rem; font-weight:normal;">(Hoodie + Pants + Beanie)</span>
-                            </button>
+                data.forEach(item => {
+                    const isPackCategory = file === 'packs.json';
+                    
+                    grid.innerHTML += `
+                        <div class="card">
+                            ${isPackCategory ? '<span class="pack-badge">LIMITED PACK</span>' : ''}
+                            <div class="img-box">
+                                <img src="${item.imgF}" class="img-front">
+                                <img src="${item.imgB}" class="img-back">
+                            </div>
+                            <h3 style="font-size:1rem; font-weight:400; margin-bottom:5px;">${item.title}</h3>
+                            <p class="price-tag">$${isPackCategory ? item.price_pack : item.p_std}</p>
+                            
+                            <div class="btn-stack">
+                                <button class="btn-pack" onclick="handleOrder('${item.title}', 'pack')">
+                                    ${isPackCategory ? 'GET THE FULL BUNDLE' : 'ACQUIRE NOW'}
+                                </button>
+                                ${isPackCategory ? `
+                                <button class="btn-single" onclick="handleOrder('${item.title}', 'single')">
+                                    Buy Hoodie Only
+                                </button>` : ''}
+                            </div>
                         </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            } catch (e) {
+                grid.innerHTML = "<p style='color:#666; text-align:center; width:100%;'>Coming Soon...</p>";
+            }
         }
 
-        function buyItem(product, type) {
-            // كنزيدو نوع الطلب (باك ولا قطعة) باش يوصلك فـ الإيميل
-            const orderData = { ...product, orderType: type };
-            localStorage.setItem('selectedProduct', JSON.stringify(orderData));
-            window.location.href = 'checkout.html';
+        function handleOrder(title, type) {
+            console.log("Ordering:", title, "Type:", type);
+            // غانخلو هاد البلاصة خاوية حتى نصاوبو صفحة Livraison فالمرحلة الجاية
         }
 
-        window.onload = loadProducts;
+        // تحميل قسم الباكات كأول حاجة
+        window.onload = () => loadCategory('packs.json');
     </script>
 </body>
 </html>
