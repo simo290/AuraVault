@@ -65,6 +65,9 @@ input,select,textarea{width:100%;background:#000;border:1px solid #222;padding:1
 .summary-panel div{margin-bottom:15px;display:flex;justify-content:space-between;}
 .summary-panel span{font-weight:600;}
 
+/* Story Section */
+#story-section textarea{min-height:60px; resize:none;}
+
 /* Responsive */
 @media(max-width:900px){.checkout-container{grid-template-columns:1fr;}.summary-panel{position:relative;top:auto;margin-top:20px;}}
 @media(max-width:500px){.brand-logo{font-size:2rem;letter-spacing:6px;}.nav-item{font-size:0.6rem;padding:8px 12px;}}
@@ -121,6 +124,15 @@ input,select,textarea{width:100%;background:#000;border:1px solid #222;padding:1
         <div class="input-box"><label>Size</label><select id="in-size" onchange="app.refreshTotal()"></select></div>
         <div class="input-box"><label>Color</label><select id="in-color" onchange="app.refreshTotal()"></select></div>
       </div>
+
+      <!-- Story Button & Section -->
+      <button class="btn-vault" style="margin-top:15px" onclick="app.toggleStorySection()">Share Your Story</button>
+      <div id="story-section" style="display:none; margin-top:20px;">
+        <textarea id="story-text" placeholder="Write your story or comment..."></textarea>
+        <button class="btn-vault" style="margin-top:8px;" onclick="app.submitStory()">Submit Story</button>
+        <div id="story-display" style="margin-top:15px;"></div>
+      </div>
+
       <button class="btn-vault" style="margin-top:20px" onclick="app.executeOrder()">Finalize Reservation</button>
       <div id="display-reviews" style="margin-top:25px"></div>
     </div>
@@ -141,7 +153,7 @@ input,select,textarea{width:100%;background:#000;border:1px solid #222;padding:1
   </div>
 </section>
 
-<!-- ADMIN VIEW -->
+<!-- ADMIN VIEW (unchanged) -->
 <section id="view-admin" class="view">
   <header><h1 style="color:var(--gold);letter-spacing:10px;text-align:center">VAULT COMMAND</h1></header>
   <div class="admin-dashboard">
@@ -228,7 +240,9 @@ const app = {
     if(prod.price_pack){ sz.innerHTML=`<option value="${prod.price_pack}">Full Pack Bundle</option>`; }
     else{ const opts=[{l:'S',p:prod.p_std},{l:'M',p:prod.p_std},{l:'L',p:prod.p_std},{l:'XL',p:prod.p_xl||prod.p_std}]; opts.forEach(o=>sz.innerHTML+=`<option value="${o.p}">${o.l}</option>`);}
     const col=document.getElementById('in-color'); col.innerHTML=''; prod.colors.split(',').forEach(c=>col.innerHTML+=`<option value="${c.trim()}">${c.trim()}</option>`);
-    this.renderReviews(prod.title); this.refreshTotal(); this.navigate('view-checkout');
+    this.renderReviews(prod.title); 
+    this.renderStories(prod.title); // <-- render story section
+    this.refreshTotal(); this.navigate('view-checkout');
   },
 
   refreshTotal:function(){
@@ -285,6 +299,39 @@ const app = {
       total:document.getElementById('sum-total').innerText
     };
     emailjs.send("service_9yrz8kd","template_1lgifb3",payload).then(()=>{alert("Order Received!"); location.reload();});
+  },
+
+  toggleStorySection: function(){
+    const sec = document.getElementById('story-section');
+    sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
+  },
+
+  submitStory: function(){
+    const text = document.getElementById('story-text').value.trim();
+    if(!text) return alert("Please write something!");
+    const prodTitle = this.state.activeProd.title;
+    const stories = JSON.parse(localStorage.getItem('vault_stories')||'[]');
+    stories.push({prod:prodTitle, text: text, date: new Date().toISOString()});
+    localStorage.setItem('vault_stories', JSON.stringify(stories));
+    this.renderStories(prodTitle);
+    document.getElementById('story-text').value = '';
+    alert("Story Submitted!");
+  },
+
+  renderStories: function(title){
+    const box = document.getElementById('story-display');
+    const stories = JSON.parse(localStorage.getItem('vault_stories')||'[]');
+    const filtered = stories.filter(s=>s.prod === title);
+    if(!filtered.length){
+      box.innerHTML = '<p style="font-size:0.7rem;color:#555;">No stories yet. Be the first!</p>';
+      return;
+    }
+    box.innerHTML = filtered.map(s=>`
+      <div class="review-card">
+        <p style="font-weight:700;color:var(--gold); font-size:0.75rem;">${new Date(s.date).toLocaleDateString()}</p>
+        <p style="color:#888; font-size:0.75rem;">${s.text}</p>
+      </div>
+    `).join('');
   }
 };
 
