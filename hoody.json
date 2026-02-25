@@ -1,38 +1,3 @@
 [
- {
-    "title": "power",
-    "price": "65.00",
-    "imageUrl": "https://files.cdn.printful.com/upload/product-templates/1c/1c4b9b32a3085f14ca4ed946110484d1_l",
-    "backImageUrl": "https://files.cdn.printful.com/upload/product-templates/64/644217e3c51a73da87a0cf63fc06ca2a_l",
-    "sleeveImg": "blob:https://www.printful.com/075d395c-9650-4028-8e72-f33a26a9724f",
-    "fabric": "Sweat à capuche premium unisexe | Cotton Heritage M2580",
-    "colors": "black",
-    "prices": {
-        "S": "65.00",
-        "M": "65.00",
-        "L": "65.00",
-        "XL": "67.99",
-        "2XL": "70.00",
-        "3XL": "72.00"
-    }
-},
  
- {
-    "title": "Don't Work For MANEY",
-    "imageUrl": "https://files.cdn.printful.com/upload/product-templates/1c/1c4b9b32a3085f14ca4ed946110484d1_l",
-    "backImageUrl": "https://files.cdn.printful.com/upload/product-templates/cb/cb4e40fe65c04d1bb8d07bc77f727d12_t",
-    "sleeveImg": "",
-    "fabric": "Sweat à capuche premium unisexe | Cotton Heritage M2580",
-    "colors": "black ",
-    "price": "70",
-    "prices": {
-        "S": "70",
-        "M": "70",
-        "L": "70",
-        "XL": "72",
-        "2XL": "80",
-        "3XL": "85"
-    }
-}
-
 ]
