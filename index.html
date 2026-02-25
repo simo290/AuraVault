@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AURA VAULT | Dark Luxury Archive</title>
 
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@100;300;400;600;800;900&display=swap" rel="stylesheet">
 
 <style>
@@ -84,6 +83,7 @@ input,select,textarea{width:100%;background:#000;border:1px solid #222;padding:1
 </style>
 </head>
 <body>
+
 <div class="shipping-announcement">🇺🇸 Free US Shipping on All Orders 🇺🇸</div>
 
 <!-- SHOP VIEW -->
@@ -92,15 +92,18 @@ input,select,textarea{width:100%;background:#000;border:1px solid #222;padding:1
 <div class="brand-logo" onclick="location.reload()">AURA VAULT</div>
 <nav class="nav-container" id="main-nav"></nav>
 </header>
+
 <div class="content-wrapper">
 <div id="product-grid" class="product-grid"></div>
+
 <div class="email-capture">
-<input type="email" id="email-capture" placeholder="أدخل بريدك الإلكتروني">
-<button onclick="captureEmail()">اشترك</button>
+<input type="email" id="email-capture" placeholder="Enter your email">
+<button onclick="captureEmail()">Subscribe</button>
 </div>
 </div>
+
 <footer style="padding:80px;text-align:center;opacity:0.2;">
-<p onclick="app.authAdmin()" style="cursor:pointer;font-size:0.65rem;letter-spacing:5px;">الوصول للـ Admin</p>
+<p onclick="app.authAdmin()" style="cursor:pointer;font-size:0.65rem;letter-spacing:5px;">Admin Access</p>
 </footer>
 </section>
 
@@ -109,128 +112,122 @@ input,select,textarea{width:100%;background:#000;border:1px solid #222;padding:1
 <header><div class="brand-logo" onclick="app.navigate('view-shop')">AURA VAULT</div></header>
 <div class="checkout-container">
 <div class="logistics-panel">
-<h2 style="color:var(--gold); margin-bottom:25px;font-family:'Playfair Display';">تفاصيل الطلب</h2>
-<div class="input-box"><label>الإسم الكامل</label><input type="text" id="in-name"></div>
-<div class="input-box"><label>العنوان (USA)</label><input type="text" id="in-addr"></div>
-<div style="display:flex;gap:10px"><input type="text" id="in-city" placeholder="المدينة"><input type="text" id="in-zip" placeholder="ZIP"></div>
-<div class="input-box" style="margin-top:15px"><label>الهاتف</label><input type="tel" id="in-phone"></div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px;">
-<div class="input-box"><label>المقاس</label><select id="in-size" onchange="app.refreshTotal()"></select></div>
-<div class="input-box"><label>اللون</label><select id="in-color" onchange="app.refreshTotal()"></select></div>
+<h2 style="color:var(--gold); margin-bottom:25px;font-family:'Playfair Display';">Order Details</h2>
+<div class="input-box"><label>Full Name</label><input type="text" id="in-name"></div>
+<div class="input-box"><label>Address</label><input type="text" id="in-addr"></div>
+<div style="display:flex;gap:10px">
+<input type="text" id="in-city" placeholder="City">
+<input type="text" id="in-zip" placeholder="ZIP Code">
 </div>
-<button class="btn-vault" style="margin-top:20px" onclick="app.executeOrder()">تأكيد الطلب</button>
+<div class="input-box" style="margin-top:15px"><label>Phone</label><input type="tel" id="in-phone"></div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:20px;">
+<div class="input-box"><label>Size</label><select id="in-size" onchange="app.refreshTotal()"></select></div>
+<div class="input-box"><label>Color</label><select id="in-color" onchange="app.refreshTotal()"></select></div>
+</div>
+<button class="btn-vault" style="margin-top:20px" onclick="app.executeOrder()">Confirm Order</button>
 
 <div class="story-panel">
-<h3 style="color:var(--gold);margin-bottom:10px;">حكايات و تعليقات</h3>
+<h3 style="color:var(--gold);margin-bottom:10px;">Stories & Comments</h3>
 <div id="display-story"></div>
-<input type="text" id="story-user" placeholder="إسمك" style="margin-top:8px;margin-bottom:5px;width:100%;">
-<textarea id="story-text" placeholder="شارك القصة أو التعليق" style="width:100%;height:60px;"></textarea>
-<button class="btn-vault" onclick="app.addStory()" style="margin-top:5px;">إرسال</button>
+<input type="text" id="story-user" placeholder="Your Name" style="margin-top:8px;margin-bottom:5px;width:100%;">
+<textarea id="story-text" placeholder="Share your story or comment" style="width:100%;height:60px;"></textarea>
+<button class="btn-vault" onclick="app.addStory()" style="margin-top:5px;">Submit</button>
 </div>
 </div>
 
 <div class="summary-panel">
-<h3 id="sum-title" style="margin-bottom:12px">المنتج</h3>
+<h3 id="sum-title" style="margin-bottom:12px">Product</h3>
 <div>
-<span>الكمية:</span>
+<span>Quantity:</span>
 <input type="number" id="in-qty" value="1" min="1" onchange="app.refreshTotal()" style="width:50px;padding:2px;background:none;border:1px solid #333;color:white;">
 </div>
 <div style="font-size:0.8rem">
-<span>الشحن:</span><span style="color:var(--accent-green)">مجاني (USA)</span>
+<span>Shipping:</span><span style="color:var(--accent-green)">Free (USA)</span>
 </div>
 <div style="margin-top:25px;border-top:1px solid var(--gold);padding-top:15px;font-size:1.6rem;font-weight:900;color:var(--gold);display:flex;justify-content:space-between;">
-<span>الإجمالي:</span><span id="sum-total">$0.00</span>
+<span>Total:</span><span id="sum-total">$0.00</span>
 </div>
 </div>
 </section>
 
 <!-- ADMIN VIEW -->
 <section id="view-admin" class="view">
-<header><h1 style="color:var(--gold);letter-spacing:10px;text-align:center">VAULT COMMAND</h1></header>
+<header><h1 style="color:var(--gold);letter-spacing:10px;text-align:center">VAULT ADMIN PANEL</h1></header>
 <div class="admin-dashboard">
 <div class="admin-box">
-<h3 style="color:var(--gold);margin-bottom:15px">إضافة منتج جديد</h3>
+<h3 style="color:var(--gold);margin-bottom:15px">Add New Product</h3>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
 <div class="input-box">
-<label>التصنيف</label>
+<label>Category</label>
 <select id="adm-cat">
-<option value="hoody.json">HOODIES</option>
-<option value="tshirts.json">T-SHIRTS</option>
-<option value="packs.json">PACKS</option>
-<option value="pants.json">PANTS</option>
+<option value="hoody.json">Hoodies</option>
+<option value="tshirts.json">T-Shirts</option>
+<option value="packs.json">Packs</option>
+<option value="pants.json">Pants</option>
 </select>
 </div>
-<div class="input-box"><label>العنوان</label><input type="text" id="adm-title" placeholder="مثال: AURA HOODIE"></div>
+<div class="input-box"><label>Title</label><input type="text" id="adm-title" placeholder="Ex: AURA Hoodie"></div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-<div class="input-box"><label>صورة أمامية URL</label><input type="text" id="adm-imgf"></div>
-<div class="input-box"><label>صورة خلفية URL</label><input type="text" id="adm-imgb"></div>
+<div class="input-box"><label>Front Image URL</label><input type="text" id="adm-imgf"></div>
+<div class="input-box"><label>Back Image URL</label><input type="text" id="adm-imgb"></div>
 </div>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-<div class="input-box"><label>سعر S-M-L</label><input type="text" id="adm-p-std"></div>
-<div class="input-box"><label>سعر XL-2XL-3XL</label><input type="text" id="adm-p-xl"></div>
-<div class="input-box"><label>الألوان (مفصولة بفاصلة)</label><input type="text" id="adm-cols" placeholder="أسود, أحمر"></div>
+<div class="input-box"><label>Price S-M-L</label><input type="text" id="adm-p-std"></div>
+<div class="input-box"><label>Price XL-2XL-3XL</label><input type="text" id="adm-p-xl"></div>
+<div class="input-box"><label>Colors (comma separated)</label><input type="text" id="adm-cols" placeholder="Black, Red"></div>
 </div>
-<button class="btn-vault" onclick="app.adminAddProduct()">نشر المنتج</button>
+<button class="btn-vault" onclick="app.adminAddProduct()">Publish Product</button>
 </div>
 
 <div class="admin-box">
-<h3 style="color:var(--gold);margin-bottom:15px">إضافة Pack جديد</h3>
+<h3 style="color:var(--gold);margin-bottom:15px">Create New Pack</h3>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;">
-<div class="input-box"><label>اختر Hoodie</label><select id="adm-pack-hoodie"></select></div>
-<div class="input-box"><label>اختر T-shirt</label><select id="adm-pack-tshirt"></select></div>
-<div class="input-box"><label>اختر Pants</label><select id="adm-pack-pants"></select></div>
+<div class="input-box"><label>Select Hoodie</label><select id="adm-pack-hoodie"></select></div>
+<div class="input-box"><label>Select T-Shirt</label><select id="adm-pack-tshirt"></select></div>
+<div class="input-box"><label>Select Pants</label><select id="adm-pack-pants"></select></div>
 </div>
-<div class="input-box"><label>عنوان Pack</label><input type="text" id="adm-pack-title" placeholder="مثال: Pack Luxe"></div>
-<button class="btn-vault" onclick="app.adminAddPack()">إنشاء Pack</button>
+<div class="input-box"><label>Pack Title</label><input type="text" id="adm-pack-title" placeholder="Ex: Luxe Pack"></div>
+<button class="btn-vault" onclick="app.adminAddPack()">Create Pack</button>
 </div>
 
-<button class="btn-vault btn-close" onclick="app.navigate('view-shop')">إغلاق Admin</button>
+<button class="btn-vault btn-close" onclick="app.navigate('view-shop')">Close Admin</button>
 </div>
 </section>
 
-<a href="https://wa.me/212717948663" class="whatsapp-fixed">
-<svg style="width:30px;height:30px" viewBox="0 0 24 24"><path fill="#fff" d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42 1.56 1.56 2.41 3.63 2.41 5.83 0 4.54-3.7 8.23-8.24 8.23-1.48 0-2.93-.39-4.19-1.15l-.3-.17-3.12.82.83-3.04-.19-.3a8.132 8.132 0 0 1-1.26-4.38c.01-4.54 3.7-8.24 8.24-8.24m-3.53 3.03c-.19 0-.43.07-.66.33-.23.25-.87.86-.87 2.1s.9 2.44 1.03 2.61c.13.17 1.76 2.68 4.26 3.76.59.26 1.05.41 1.41.53.6.19 1.15.16 1.58.1.48-.07 1.48-.6 1.69-1.19.21-.58.21-1.09.14-1.19-.07-.1-.24-.17-.51-.3s-1.59-.78-1.84-.87-.43-.13-.6.13c-.17.26-.66.86-.81 1.03-.14.17-.29.19-.56.06-.26-.13-1.11-.41-2.11-1.31-.78-.69-1.3-1.55-1.45-1.81-.15-.26-.02-.4.12-.53.12-.11.26-.31.4-.46.13-.15.17-.26.26-.43.09-.17.04-.32-.02-.45-.06-.13-.6-1.45-.82-1.99-.21-.52-.43-.45-.6-.45z"/></svg>
-</a>
-
 <script>
-const app = {
+const app={
 state:{cats:['packs.json','hoody.json','tshirts.json','pants.json'],activeProd:null},
 
-init:function(){
-emailjs.init("QWKaC8MCGOF9GwKvN"); this.renderNav(); this.fetchArchive('packs.json'); this.fillPackSelects();
-},
+init:function(){ this.renderNav(); this.fetchArchive('packs.json'); this.fillPackSelects(); },
 
 renderNav:function(){
 const nav=document.getElementById('main-nav'); nav.innerHTML='';
 this.state.cats.forEach((c,i)=>{
-const item=document.createElement('div');
-item.className=`nav-item ${i===0?'active':''}`;
+const item=document.createElement('div'); item.className=`nav-item ${i===0?'active':''}`;
 item.innerText=c.split('.')[0].toUpperCase();
 item.onclick=(e)=>{document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active')); e.target.classList.add('active'); this.fetchArchive(c);};
 nav.appendChild(item);
 });
 },
 
-fetchArchive:async function(file){
-const grid=document.getElementById('product-grid'); grid.innerHTML='<p>جارٍ التحميل...</p>';
+fetchArchive:function(file){
+const grid=document.getElementById('product-grid'); grid.innerHTML='<p>Loading...</p>';
 try{
-const res=await fetch(file); let data=await res.json();
 const localData=JSON.parse(localStorage.getItem('vault_local_'+file)||'[]');
-const combined=[...data,...localData];
 grid.innerHTML='';
-combined.forEach(prod=>{
+localData.forEach(prod=>{
 const card=document.createElement('div'); card.className='archive-card';
-card.innerHTML=`<div class="media-portal"><img src="${prod.imgF}" loading="lazy"><div class="img-overlay"><img src="${prod.imgB||prod.imgF}" loading="lazy"></div></div><div class="card-meta"><h3>${prod.title}</h3><div class="card-price">$${prod.price_pack||prod.p_std}</div><button class="btn-vault" onclick='app.goCheckout(${JSON.stringify(prod)})'>احصل عليه</button></div>`;
+card.innerHTML=`<div class="media-portal"><img src="${prod.imgF}"><div class="img-overlay"><img src="${prod.imgB||prod.imgF}"></div></div><div class="card-meta"><h3>${prod.title}</h3><div class="card-price">$${prod.price_pack||prod.p_std}</div><button class="btn-vault" onclick='app.goCheckout(${JSON.stringify(prod)})'>Get it</button></div>`;
 grid.appendChild(card);
 });
-}catch(e){ grid.innerHTML='<p>خطأ في تحميل المنتجات.</p>'; }
+}catch(e){ grid.innerHTML='<p>Error loading products.</p>'; }
 },
 
 goCheckout:function(prod){
 this.state.activeProd=prod; document.getElementById('sum-title').innerText=prod.title;
 const sz=document.getElementById('in-size'); sz.innerHTML='';
-if(prod.price_pack){ sz.innerHTML=`<option value="${prod.price_pack}">Pack كامل</option>`;}
+if(prod.price_pack){ sz.innerHTML=`<option value="${prod.price_pack}">Full Pack</option>`;}
 else{ const opts=[{l:'S',p:prod.p_std},{l:'M',p:prod.p_std},{l:'L',p:prod.p_std},{l:'XL',p:prod.p_xl||prod.p_std}]; opts.forEach(o=>sz.innerHTML+=`<option value="${o.p}">${o.l}</option>`);}
 const col=document.getElementById('in-color'); col.innerHTML=''; (prod.colors||'').split(',').forEach(c=>col.innerHTML+=`<option value="${c.trim()}">${c.trim()}</option>`);
 this.renderStory(prod.title); this.refreshTotal(); this.navigate('view-checkout');
@@ -244,23 +241,14 @@ document.getElementById('sum-total').innerText="$"+(price*qty).toFixed(2);
 
 navigate:function(id){ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0); },
 
-authAdmin:function(){ const p=prompt("ACCESS KEY:"); if(p==="canon_-!LB2107") this.navigate('view-admin'); },
+authAdmin:function(){ const p=prompt("Enter Admin Password:"); if(p==="YOUR_PASSWORD") this.navigate('view-admin'); },
 
 adminAddProduct:function(){
 const cat=document.getElementById('adm-cat').value;
-const newItem={
-title:document.getElementById('adm-title').value,
-imgF:document.getElementById('adm-imgf').value,
-imgB:document.getElementById('adm-imgb').value,
-p_std:document.getElementById('adm-p-std').value,
-p_xl:document.getElementById('adm-p-xl').value,
-colors:document.getElementById('adm-cols').value,
-price_pack:cat==='packs.json'?document.getElementById('adm-p-std').value:null
-};
-if(!newItem.title||!newItem.imgF) return alert("املأ البيانات الأساسية!");
-const localData=JSON.parse(localStorage.getItem('vault_local_'+cat)||'[]');
-localData.push(newItem); localStorage.setItem('vault_local_'+cat,JSON.stringify(localData));
-alert("تم نشر المنتج!"); location.reload();
+const newItem={ title:document.getElementById('adm-title').value, imgF:document.getElementById('adm-imgf').value, imgB:document.getElementById('adm-imgb').value, p_std:document.getElementById('adm-p-std').value, p_xl:document.getElementById('adm-p-xl').value, colors:document.getElementById('adm-cols').value, price_pack:cat==='packs.json'?document.getElementById('adm-p-std').value:null };
+if(!newItem.title||!newItem.imgF) return alert("Fill required fields!");
+const localData=JSON.parse(localStorage.getItem('vault_local_'+cat)||'[]'); localData.push(newItem); localStorage.setItem('vault_local_'+cat,JSON.stringify(localData));
+alert("Product added!"); location.reload();
 },
 
 fillPackSelects:function(){
@@ -275,10 +263,10 @@ adminAddPack:function(){
 const hoodie=JSON.parse(localStorage.getItem('vault_local_hoody.json')||'[]').find(p=>p.title===document.getElementById('adm-pack-hoodie').value);
 const tshirt=JSON.parse(localStorage.getItem('vault_local_tshirts.json')||'[]').find(p=>p.title===document.getElementById('adm-pack-tshirt').value);
 const pants=JSON.parse(localStorage.getItem('vault_local_pants.json')||'[]').find(p=>p.title===document.getElementById('adm-pack-pants').value);
-if(!hoodie||!tshirt||!pants) return alert("اختر كل المنتجات");
+if(!hoodie||!tshirt||!pants) return alert("Select all products!");
 
 const newPack={
-title:document.getElementById('adm-pack-title').value||"PACK جديد",
+title:document.getElementById('adm-pack-title').value||"New Pack",
 imgF:hoodie.imgF, imgB:hoodie.imgB,
 colors:[...new Set( (hoodie.colors.split(',')).concat(tshirt.colors.split(','), pants.colors.split(',')) )].join(', '),
 sizes:{S:parseFloat(hoodie.p_std)+parseFloat(tshirt.p_std)+parseFloat(pants.p_std),
@@ -288,9 +276,8 @@ XL:(parseFloat(hoodie.p_xl||hoodie.p_std)+parseFloat(tshirt.p_xl||tshirt.p_std)+
 },
 components:{hoodie,tshirt,pants}
 };
-const localData=JSON.parse(localStorage.getItem('vault_local_packs.json')||'[]');
-localData.push(newPack); localStorage.setItem('vault_local_packs.json',JSON.stringify(localData));
-alert("تم إنشاء Pack!"); location.reload();
+const localData=JSON.parse(localStorage.getItem('vault_local_packs.json')||'[]'); localData.push(newPack); localStorage.setItem('vault_local_packs.json',JSON.stringify(localData));
+alert("Pack Created!"); location.reload();
 },
 
 addStory:function(){
@@ -308,11 +295,10 @@ this.renderStory(prod);
 renderStory:function(title){
 const box=document.getElementById('display-story');
 const stories=JSON.parse(localStorage.getItem('vault_story')||'[]').filter(s=>s.prod===title);
-box.innerHTML=stories.length?stories.map(s=>`<div class="story-card"><p>${s.user}</p><p>${s.text}</p></div>`).join(''):'<p style="font-size:0.7rem;color:#555;">لا توجد تعليقات</p>';
+box.innerHTML=stories.length?stories.map(s=>`<div class="story-card"><p>${s.user}</p><p>${s.text}</p></div>`).join(''):'<p style="font-size:0.7rem;color:#555;">No comments yet</p>';
 },
 
 executeOrder:function(){
-const btn=document.querySelector('.btn-vault'); btn.innerText="جارٍ الإرسال...";
 const payload={
 customer:document.getElementById('in-name').value,
 product:this.state.activeProd.title,
@@ -321,13 +307,14 @@ phone:document.getElementById('in-phone').value,
 config:document.getElementById('in-size').options[document.getElementById('in-size').selectedIndex].text+" / "+document.getElementById('in-color').value,
 total:document.getElementById('sum-total').innerText
 };
-emailjs.send("service_9yrz8kd","template_1lgifb3",payload).then(()=>{alert("تم استقبال الطلب!"); location.reload();});
-}
+alert("Order received!\n"+JSON.stringify(payload,null,2));
+},
+
 };
 
 function captureEmail(){
 const email=document.getElementById('email-capture').value.trim();
-if(email){ alert("شكراً! تم تسجيل البريد: "+email); document.getElementById('email-capture').value=''; }
+if(email){ alert("Thanks! Email captured: "+email); document.getElementById('email-capture').value=''; }
 }
 
 window.onload=()=>app.init();
